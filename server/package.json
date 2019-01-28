@@ -1,0 +1,23 @@
+{
+  "name": "bob-server",
+  "version": "1.0.0",
+  "description": "A server that processes orders and sends instructions to B.O.B. to deliver the orders.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Assis10t/assis10t.git"
+  },
+  "author": "SDP Team 10",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Assis10t/assis10t/issues"
+  },
+  "homepage": "https://github.com/Assis10t/assis10t#readme",
+  "devDependencies": {
+    "jest": "^23.6.0"
+  }
+}
