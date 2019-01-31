@@ -19,5 +19,6 @@
   "homepage": "https://github.com/Assis10t/assis10t#readme",
   "devDependencies": {
     "jest": "^23.6.0"
-  }
+  },
+  "dependencies": {}
 }
