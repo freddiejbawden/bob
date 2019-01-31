@@ -9,6 +9,7 @@ matrix:
     - nvm install node
     - node -v
     - npm install
+    before_deploy: cd ..
     deploy:
       - provider: firebase
         token:
