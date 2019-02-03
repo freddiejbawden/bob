@@ -1,30 +1,10 @@
 matrix:
   include:
-  - stage: test
-    language: node_js
+  - language: node_js
     node_js: node
     before_install:
-    - cd firebase/functions
+    - cd server
     install:
     - nvm install node
     - node -v
     - npm install
-    before_deploy: cd ..
-    deploy:
-      - provider: firebase
-        token:
-          secure: eZTl4E2ocCVJqeB+P3yvtT1DiR9pZWNObS6lRE4wWEYQGzt5zJ2DJUvbz75fxQbNYQM+rO0n9u7xBfsx5IUVQyppH3Wjp7sJsRt5e2XI36nYE3bZcwCpDpRPrpKXGyMg2DCjZYGSBai8oXJ+DCj/39RVOy1BE1alHTL0WkLC8HRV5hNZFOaSXdNtbjyXHkHO5ZtjndsG5D3+q5zXfQ5SHpEMKjBGlzQ9wt+6q11Ag4VlEbWIDlRwbhOiJ4IAO+7K4s0E6J54mvMFzhAeJzZxkvK+fmZN+cG9XF/lmeILLypkGHiYRTHjDlePHRyqHoiDpSOwXwCjOeMJGeg+H1dW0F6KEL5qZ7UITajWhjYXFMThDEGj2qtj5dUjhkuu+gUsnumZ3KB38fRG9AGrzZB2+GIGLto/R0bFJPin+5hxDAClkCGEDZz2sjsV77IKv1UoOfp/1oB78+8B3gcAHxA9zT5ks5gqazrT7lJdkaUUupOIiBnvR3+OI0WQwHYuMqk2beCdvpjDxzCPEUjP9kzlTa3y/YIDbfP3Jv8uLodiImuvLwxFl281cNrJUsMpjTqXxn/OVhSzk+YygnlsA1rrTkDqkj1/fUAdEi7Y4e1F7AT3YOLd1DAd/wQoCYlZeEG8B9SowxFVhsdPPPFpSkFUL8YiqdDAAxViUt3hi9gUzg8=
-        project: "assis10t-524c5"
-        message: "Travis beta deploy: $commit_message"
-        skip_cleanup: true
-        on:
-          branch: beta
-      - provider: firebase
-        token:
-          secure: eZTl4E2ocCVJqeB+P3yvtT1DiR9pZWNObS6lRE4wWEYQGzt5zJ2DJUvbz75fxQbNYQM+rO0n9u7xBfsx5IUVQyppH3Wjp7sJsRt5e2XI36nYE3bZcwCpDpRPrpKXGyMg2DCjZYGSBai8oXJ+DCj/39RVOy1BE1alHTL0WkLC8HRV5hNZFOaSXdNtbjyXHkHO5ZtjndsG5D3+q5zXfQ5SHpEMKjBGlzQ9wt+6q11Ag4VlEbWIDlRwbhOiJ4IAO+7K4s0E6J54mvMFzhAeJzZxkvK+fmZN+cG9XF/lmeILLypkGHiYRTHjDlePHRyqHoiDpSOwXwCjOeMJGeg+H1dW0F6KEL5qZ7UITajWhjYXFMThDEGj2qtj5dUjhkuu+gUsnumZ3KB38fRG9AGrzZB2+GIGLto/R0bFJPin+5hxDAClkCGEDZz2sjsV77IKv1UoOfp/1oB78+8B3gcAHxA9zT5ks5gqazrT7lJdkaUUupOIiBnvR3+OI0WQwHYuMqk2beCdvpjDxzCPEUjP9kzlTa3y/YIDbfP3Jv8uLodiImuvLwxFl281cNrJUsMpjTqXxn/OVhSzk+YygnlsA1rrTkDqkj1/fUAdEi7Y4e1F7AT3YOLd1DAd/wQoCYlZeEG8B9SowxFVhsdPPPFpSkFUL8YiqdDAAxViUt3hi9gUzg8=
-        project: "assis10t-c654f"
-        message: "Travis master deploy: $commit_message"
-        skip_cleanup: true
-        on:
-          branch: master
-
