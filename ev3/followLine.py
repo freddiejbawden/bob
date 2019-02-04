@@ -1,7 +1,8 @@
 #! /usr/bin/env python3
 import ev3dev.ev3 as ev3
 import logging
-from time import sleep
+from time import sleep, time
+from threading import Thread
 
 
 class FollowLine:
@@ -10,12 +11,46 @@ class FollowLine:
     KP = 20
     KD = 0.1  # derivative gain   medium
     KI = 0  # integral gain       lowest
-    DT = 50  # milliseconds  -  represents change in time since last sensor reading/movement
+    DT = 50  # milliseconds  -  represents change in time since last sensor reading/
+
+    MARKING_NUMBER = 2  # number of consecutive colour readings to detect marking
 
     # Constructor
     def __init__(self):
         self.btn = ev3.Button()
         self.shut_down = False
+
+        # colour sensors
+        self.csfl = ev3.ColorSensor('in1')  # colour sensor front left
+        self.csfr = ev3.ColorSensor('in2')  # colour sensor front right
+        self.csb = ev3.ColorSensor('in3')  # colour sensor back
+        assert self.csfl.connected
+        assert self.csfr.connected
+        self.csfl.mode = 'COL-REFLECT'  # measure light intensity
+        self.csfr.mode = 'COL-REFLECT'  # measure light intensity
+        self.csb.mode = 'COL-COLOR'  # measure colour
+
+        # motors
+        self.lm = ev3.LargeMotor('outA')  # left motor
+        self.rm = ev3.LargeMotor('outC')  # right motor
+        assert self.lm.connected
+        assert self.rm.connected
+
+        self.consecutive_colours = 0  # counter for consecutive colour readings
+
+
+        self.runner = None
+
+    def detect_marking(self):
+        colour = self.csb.value()
+        if colour == 3:  # green
+            self.consecutive_colours += 1
+            print("CONSECUTIVE COLOURS: ", self.consecutive_colours)
+            if self.consecutive_colours > self.MARKING_NUMBER:
+                return True
+        else:
+            self.consecutive_colours = 0
+        return False
 
     @staticmethod
     def on_line(sensor_value, position):
@@ -26,10 +61,12 @@ class FollowLine:
         logging.error("onLine: wrong position value for sensor")
         return False
 
-    def correct_trajectory(self, csfl, csfr, lm, rm):
+    def correct_trajectory(self, csfl, csfr, lm, rm, number_of_markers):
         integral = 0
         previous_error = 0
-
+        marker_counter = 0
+        start_time = 0
+        interval_between_colors = 2 # time between marker checks in seconds
         while not self.shut_down:
             lval = csfl.value()
             rval = csfr.value()
@@ -63,28 +100,31 @@ class FollowLine:
 
             previous_error = error
 
-    def run(self):
+            #Check markers
+            if (time() - start_time > interval_between_colors):
+                if self.detect_marking():
+                    marker_counter += 1
+                    start_time = time()
+                    if (marker_counter >= number_of_markers):
+                        self.stop()
 
-        # colour sensors
-        csfl = ev3.ColorSensor('in1')  # colour sensor front left
-        csfr = ev3.ColorSensor('in2')  # colour sensor front right
-        assert csfl.connected
-        assert csfr.connected
-        csfl.mode = 'COL-REFLECT'  # measure light intensity
-        csfr.mode = 'COL-REFLECT'  # measure light intensity
+    def run(self, number_of_markers):
+        self.correct_trajectory(self.csfl, self.csfr, self.lm, self.rm,number_of_markers)
+        self.stop()
 
-        # motors
-        lm = ev3.LargeMotor('outA')  # left motor
-        rm = ev3.LargeMotor('outC')  # right motor
-        assert lm.connected
-        assert rm.connected
-        self.correct_trajectory(csfl, csfr, lm, rm)
+    def stop(self):
+        self.shut_down = True
+        self.rm.stop()
+        self.lm.stop()
+        ev3.Sound.speak("yeet").wait()
 
-        rm.stop()
-        lm.stop()
+    def start(self,number_of_markers):
+        self.shut_down = False
+        self.runner = Thread(target=self.run, name='move', args=(number_of_markers,))
+        self.runner.start()
 
 
 # Main function
 if __name__ == "__main__":
     robot = FollowLine()
-    robot.run()
+    robot.start(3)
