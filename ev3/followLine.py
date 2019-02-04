@@ -8,8 +8,8 @@ from threading import Thread
 class FollowLine:
     # From https://gist.github.com/CS2098/ecb3a078ed502c6a7d6e8d17dc095b48
     MOTOR_SPEED = 700
-    KP = 20
-    KD = 0.1  # derivative gain   medium
+    KP = 10
+    KD = 0.5  # derivative gain   medium
     KI = 0  # integral gain       lowest
     DT = 50  # milliseconds  -  represents change in time since last sensor reading/
 
@@ -38,19 +38,19 @@ class FollowLine:
 
         self.consecutive_colours = 0  # counter for consecutive colour readings
 
-
         self.runner = None
 
     def detect_marking(self):
         colour = self.csb.value()
-        if colour == 3:  # green
+        if colour == 3 or colour == 2:  # 3 = green 2 = blue
             self.consecutive_colours += 1
             print("CONSECUTIVE COLOURS: ", self.consecutive_colours)
             if self.consecutive_colours > self.MARKING_NUMBER:
-                return True
+                return colour
         else:
             self.consecutive_colours = 0
-        return False
+        return -1
+
 
     @staticmethod
     def on_line(sensor_value, position):
@@ -67,6 +67,7 @@ class FollowLine:
         marker_counter = 0
         start_time = 0
         interval_between_colors = 2 # time between marker checks in seconds
+
         while not self.shut_down:
             lval = csfl.value()
             rval = csfr.value()
@@ -100,16 +101,24 @@ class FollowLine:
 
             previous_error = error
 
-            #Check markers
-            if (time() - start_time > interval_between_colors):
-                if self.detect_marking():
+            # Check markers
+            if time() - start_time > interval_between_colors:
+                # returns 3 if green, 2 if blue
+                marker_colour = self.detect_marking()
+                if marker_colour == 3:
+                    # stop after given number of greens
                     marker_counter += 1
                     start_time = time()
-                    if (marker_counter >= number_of_markers):
+                    if marker_counter >= number_of_markers:
                         self.stop()
+                elif marker_colour == 2:
+                    # stop on blue marker
+                    self.stop()
+
+
 
     def run(self, number_of_markers):
-        self.correct_trajectory(self.csfl, self.csfr, self.lm, self.rm,number_of_markers)
+        self.correct_trajectory(self.csfl, self.csfr, self.lm, self.rm, number_of_markers)
         self.stop()
 
     def stop(self):
@@ -118,7 +127,7 @@ class FollowLine:
         self.lm.stop()
         ev3.Sound.speak("yeet").wait()
 
-    def start(self,number_of_markers):
+    def start(self, number_of_markers):
         self.shut_down = False
         self.runner = Thread(target=self.run, name='move', args=(number_of_markers,))
         self.runner.start()
