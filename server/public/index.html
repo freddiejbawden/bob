@@ -1,0 +1,36 @@
+<html>
+    <head>
+        <script>
+            function turnOn() {
+                console.log("Turn On!")
+                var url = "http://localhost:9000/turnon";
+                var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance 
+                xmlhttp.onreadystatechange = function () {
+                    if(xmlhttp.readyState === 4) {
+                        console.log(xmlhttp.responseText);
+                    }
+                };
+                xmlhttp.open("PUT", url);
+                xmlhttp.send();
+            }
+            function turnOff() {
+                console.log("Turn off!")
+                var url = "http://localhost:9000/turnoff";
+                var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance 
+                xmlhttp.onreadystatechange = function () {
+                    if(xmlhttp.readyState === 4) {
+                        console.log(xmlhttp.responseText);
+                    }
+                };
+                xmlhttp.open("PUT", url);
+                xmlhttp.send();
+            }
+        </script>
+    </head>
+    <body>
+        <h1>Start BOB!</h1>
+        <button onclick="turnOn()">Start!</button>
+        <h1>Stop BOB!</h1>
+        <button onclick="turnOff()">Stop!</button>
+    </body>
+</html>
