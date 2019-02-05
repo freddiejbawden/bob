@@ -101,6 +101,24 @@ const factory = db => ({
                 .toArray((err, items) => {
                     err ? rej(err) : res(items)
                 })
+        }),
+    createUser: (uname, pass) =>
+        new Promise((res, rej) => {
+            db()
+                .collection('users')
+                .insertOne({ _id: new ObjectID(), username: uname, password: pass }, (err, user) => {
+                    err ? rej(err) : res(user)
+                })
+        }),
+    authUser: (uname, pass) =>
+        new Promise((res, rej) => {
+            db()
+                .collection('users')
+                .find({ username: uname, password: pass })
+                .toArray((err, users) => {
+                    console.log(users)
+                    err ? rej(err) : res(users.length > 0)
+                })
         })
 })
 

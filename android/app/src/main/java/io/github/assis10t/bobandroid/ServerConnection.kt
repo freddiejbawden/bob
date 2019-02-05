@@ -1,9 +1,7 @@
 package io.github.assis10t.bobandroid
 
 import com.google.gson.Gson
-import io.github.assis10t.bobandroid.pojo.GetItemsResponse
-import io.github.assis10t.bobandroid.pojo.Item
-import io.github.assis10t.bobandroid.pojo.Order
+import io.github.assis10t.bobandroid.pojo.*
 import okhttp3.MediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -12,7 +10,6 @@ import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import timber.log.Timber
 import java.io.IOException
-import java.util.concurrent.TimeUnit
 import javax.jmdns.JmDNS
 import javax.jmdns.ServiceEvent
 import javax.jmdns.ServiceListener
@@ -56,6 +53,13 @@ class ServerConnection {
             ServerConnection().connect { ip ->
                 Timber.d("Server found at $ip")
             }
+        }
+
+        fun zeroconfBypass(address: String) {
+            Timber.d("Bypassed zeroconf: $address")
+            serverAddress = "http://$address:9000"
+            onConnectedListeners.forEach { it(serverAddress!!) }
+            onConnectedListeners.clear()
         }
     }
 
@@ -137,7 +141,7 @@ class ServerConnection {
                     if (!success) {
                         onOrderComplete?.invoke(success)
                     } else {
-                        val response = gson.fromJson(str!!, GetItemsResponse::class.java)
+                        val response = gson.fromJson(str!!, GenericResponse::class.java)
                         onOrderComplete?.invoke(response.success)
                     }
                 }
@@ -145,4 +149,38 @@ class ServerConnection {
         }
     }
     val makeOrder = makeOrderFactory(httpClient, Gson())
+
+    val loginFactory = { http: OkHttpClient, gson: Gson ->
+        { username: String, password: String, onLoginComplete: ((success: Boolean, loggedIn: Boolean) -> Unit)? ->
+            connect { server ->
+                postRequestFactory(http, gson)("$server/login", LoginRequest(username, password)) { success, str ->
+                    Timber.d("Result: $success, response: $str")
+                    if (!success) {
+                        onLoginComplete?.invoke(success, false)
+                    } else {
+                        val response = gson.fromJson(str!!, LoginResponse::class.java)
+                        onLoginComplete?.invoke(response.success, response.loggedIn)
+                    }
+                }
+            }
+        }
+    }
+    val login = loginFactory(httpClient, Gson())
+
+    val registerFactory = { http: OkHttpClient, gson: Gson ->
+        { username: String, password: String, onRegisterComplete: ((success: Boolean) -> Unit)? ->
+            connect { server ->
+                postRequestFactory(http, gson)("$server/register", RegisterRequest(username, password)) { success, str ->
+                    Timber.d("Result: $success, response: $str")
+                    if (!success) {
+                        onRegisterComplete?.invoke(success)
+                    } else {
+                        val response = gson.fromJson(str!!, GenericResponse::class.java)
+                        onRegisterComplete?.invoke(response.success)
+                    }
+                }
+            }
+        }
+    }
+    val register = registerFactory(httpClient, Gson())
 }

@@ -1,5 +1,6 @@
 <html>
     <head>
+        <script src="md5.min.js"></script>
         <script>
             function turnOn() {
                 console.log("Turn On!")
@@ -32,5 +33,67 @@
         <button onclick="turnOn()">Start!</button>
         <h1>Stop BOB!</h1>
         <button onclick="turnOff()">Stop!</button>
+        <h1>Login</h1>
+        <input id="username" type="email" placeholder="Username"></input>
+        <input id="password" type="password" placeholder="Password"></input>
+        <div style="display: flex; flex-direction: row;">
+            <button id="login">Login</button>
+            <button id="register">Register</button>
+        </div>
+        <script>
+            document.querySelector('#login').onclick = () => {
+                console.log('Pressed login')
+                const body = {
+                    username: document.querySelector('#username').value,
+                    password: md5(document.querySelector('#username').value)
+                }
+                fetch('http://localhost:9000/login', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(body)
+                })
+                .then(res => res.json())
+                .then(json => {
+                    console.log(json)
+                    if (json.loggedIn) {
+                        alert('Successfully logged in as ' + body.username + '.')
+                    } else if (json.success) {
+                        alert('Wrong username or password')
+                    } else {
+                        alert('Login error. See logs.')
+                    }
+                })
+                .catch(err => console.error(err) || alert('Login error. See logs.'))
+            }
+            
+            document.querySelector('#register').onclick = () => {
+                console.log('Pressed register')
+                const body = {
+                    username: document.querySelector('#username').value,
+                    password: md5(document.querySelector('#username').value)
+                }
+                fetch('http://localhost:9000/register', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(body)
+                })
+                .then(res => res.json())
+                .then(json => {
+                    console.log(json)
+                    if (json.success) {
+                        alert('Successfully registered as ' + body.username + '.')
+                    } else {
+                        alert('Register error. See logs.')
+                    }
+                })
+                .catch(err => console.error(err) || alert('Login error. See logs.'))
+            }
+        </script>
     </body>
 </html>

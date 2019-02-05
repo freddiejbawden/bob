@@ -106,6 +106,18 @@ app.get('/getmovement', (req, res, next) => {
         .then(status => res.json({ success: true, status }))
         .catch(next)
 })
+app.post('/register', (req, res, next) => {
+    model
+        .createUser(req.body.username, req.body.password)
+        .then(status => res.json({ success: true, status }))
+        .catch(next)
+})
+app.post('/login', (req, res, next) => {
+    model
+        .authUser(req.body.username, req.body.password)
+        .then(loggedIn => res.json({ success: true, loggedIn }))
+        .catch(next)
+})
 
 //Logs all responses.
 app.use((req, res, next) => {
