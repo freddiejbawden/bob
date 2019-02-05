@@ -30,6 +30,7 @@ const factory = db => ({
                         return
                     }
                     Promise.all(orderData.items.map(i => factory(db).removeItem(i)))
+                        .then(() => factory(db).turnOn())
                         .then(() => res(orderData))
                         .catch(err => rej(err))
                 })
