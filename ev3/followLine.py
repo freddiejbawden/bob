@@ -13,7 +13,7 @@ class FollowLine:
     KI = 0  # integral gain       lowest
     DT = 50  # milliseconds  -  represents change in time since last sensor reading/
 
-    MARKING_NUMBER = 2  # number of consecutive colour readings to detect marking
+    MARKING_NUMBER = 1  # number of consecutive colour readings to detect marking
 
     # Constructor
     def __init__(self):
@@ -123,9 +123,10 @@ class FollowLine:
         while not self.shut_down:
             cm.run_timed(time_sp=self.DT, speed_sp=300)
 
-
     def run(self, number_of_markers):
         self.correct_trajectory(self.csfl, self.csfr, self.lm, self.rm, number_of_markers)
+        #  while not self.shut_down:
+        #     print(self.csb.value())
         self.stop()
 
     def stop(self):
