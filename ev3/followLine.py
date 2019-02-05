@@ -26,6 +26,7 @@ class FollowLine:
         self.csb = ev3.ColorSensor('in3')  # colour sensor back
         assert self.csfl.connected
         assert self.csfr.connected
+        assert self.csb.connected
         self.csfl.mode = 'COL-REFLECT'  # measure light intensity
         self.csfr.mode = 'COL-REFLECT'  # measure light intensity
         self.csb.mode = 'COL-COLOR'  # measure colour
@@ -33,6 +34,7 @@ class FollowLine:
         # motors
         self.lm = ev3.LargeMotor('outA')  # left motor
         self.rm = ev3.LargeMotor('outC')  # right motor
+        self.cm = ev3.LargeMotor('outD')  # centre motor
         assert self.lm.connected
         assert self.rm.connected
 
@@ -42,6 +44,7 @@ class FollowLine:
 
     def detect_marking(self):
         colour = self.csb.value()
+        print(colour)
         if colour == 3 or colour == 2:  # 3 = green 2 = blue
             self.consecutive_colours += 1
             print("CONSECUTIVE COLOURS: ", self.consecutive_colours)
@@ -65,8 +68,8 @@ class FollowLine:
         integral = 0
         previous_error = 0
         marker_counter = 0
-        start_time = 0
-        interval_between_colors = 2 # time between marker checks in seconds
+        start_time = time()
+        interval_between_colors = 1 # time between marker checks in seconds
 
         while not self.shut_down:
             lval = csfl.value()
@@ -94,10 +97,10 @@ class FollowLine:
             rm.run_timed(time_sp=self.DT, speed_sp=-(self.MOTOR_SPEED - u))
             sleep(self.DT / 1000)
 
-            print("u {}".format(u))
-            print("lm {}\n".format(lm.speed_sp))
-            print("rm {}".format(rm.speed_sp))
-            print("PID:", lval, rval)
+            #print("u {}".format(u))
+            #print("lm {}\n".format(lm.speed_sp))
+            #print("rm {}".format(rm.speed_sp))
+            #print("PID:", lval, rval)
 
             previous_error = error
 
@@ -108,6 +111,7 @@ class FollowLine:
                 if marker_colour == 3:
                     # stop after given number of greens
                     marker_counter += 1
+                    ev3.Sound.beep()
                     start_time = time()
                     if marker_counter >= number_of_markers:
                         self.stop()
@@ -115,6 +119,9 @@ class FollowLine:
                     # stop on blue marker
                     self.stop()
 
+    def move_sideways(self, cm):
+        while not self.shut_down:
+            cm.run_timed(time_sp=self.DT, speed_sp=300)
 
 
     def run(self, number_of_markers):
@@ -136,4 +143,4 @@ class FollowLine:
 # Main function
 if __name__ == "__main__":
     robot = FollowLine()
-    robot.start(3)
+    robot.start(2)
