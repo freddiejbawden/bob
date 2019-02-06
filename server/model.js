@@ -35,45 +35,45 @@ const factory = db => ({
                         .catch(err => rej(err))
                 })
         }),
-    addJob: jobData =>
+    addJob: jobData => 
         new Promise((res, rej) => {
             db()
                 .collection('jobs')
-                .insertOne(jobData, (err, job) => {
+                .insertOne(jobData, (err,job) => {
                     err ? rej(err) : res(jobData)
                 })
         }),
     getAllJobs: () =>
-        new Promise((res, rej) => {
-            db()
-                .collection('jobs')
-                .find({})
-                .toArray((err, docs) => {
-                    err ? rej(err) : res(docs)
-                })
+    new Promise((res, rej) => {
+        db()
+            .collection('jobs')
+            .find({})
+            .toArray((err, docs) => {
+                err ? rej(err) : res(docs)
+            })
         }),
-    turnOn: () =>
-        new Promise((res, rej) => {
+    turnOn: markers =>
+        new Promise((res,rej) => {
             db()
                 .collection('bob_movement')
-                .updateOne({ _id: 'movement' }, { $set: { moving: true } }, (err, count_modified) => {
+                .updateOne({"_id":"movement"}, {"$set":{"moving":true,"markers":parseInt(markers)}}, (err, count_modified) => {
                     err ? rej(err) : res('on')
                 })
-        }),
+            }),
     turnOff: () =>
-        new Promise((res, rej) => {
-            db()
-                .collection('bob_movement')
-                .updateOne({ _id: 'movement' }, { $set: { moving: false } }, (err, count_modified) => {
-                    err ? rej(err) : res('off')
-                })
+    new Promise((res,rej) => {
+        db()
+            .collection('bob_movement')
+            .updateOne({"_id":"movement"}, {"$set":{"moving":false}}, (err, count_modified) => {
+                err ? rej(err) : res('off')
+            })
         }),
     getMovement: () =>
         new Promise((res, rej) => {
             db()
                 .collection('bob_movement')
                 .find({})
-                .toArray((err, docs) => {
+                .toArray((err,docs) => {
                     err ? rej(err) : res(docs[0])
                 })
         }),
@@ -121,6 +121,7 @@ const factory = db => ({
                     err ? rej(err) : res(users.length > 0)
                 })
         })
+    
 })
 
 module.exports = factory(db)

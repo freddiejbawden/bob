@@ -13,7 +13,7 @@ class FollowLine:
     KI = 0  # integral gain       lowest
     DT = 50  # milliseconds  -  represents change in time since last sensor reading/
 
-    MARKING_NUMBER = 2  # number of consecutive colour readings to detect marking
+    MARKING_NUMBER = 1  # number of consecutive colour readings to detect marking
 
     # Constructor
     def __init__(self):
@@ -39,7 +39,6 @@ class FollowLine:
         assert self.rm.connected
 
         self.consecutive_colours = 0  # counter for consecutive colour readings
-
         self.runner = None
 
     def detect_marking(self):
@@ -86,12 +85,12 @@ class FollowLine:
             u = (self.KP * error) + (self.KI * integral) + (self.KD * derivative)
 
             # limit u to safe values: [-1000, 1000] deg/sec
+             # limit u to safe values: [-1000, 1000] deg/sec
             if self.MOTOR_SPEED + abs(u) > 1000:  # reduce u if speed and torque are too high
                 if u >= 0:
                     u = 1000 - self.MOTOR_SPEED
                 else:
                     u = self.MOTOR_SPEED - 1000
-
             # run motors
             lm.run_timed(time_sp=self.DT, speed_sp=-(self.MOTOR_SPEED + u))
             rm.run_timed(time_sp=self.DT, speed_sp=-(self.MOTOR_SPEED - u))
@@ -118,14 +117,15 @@ class FollowLine:
                 elif marker_colour == 2:
                     # stop on blue marker
                     self.stop()
-
+                
     def move_sideways(self, cm):
         while not self.shut_down:
             cm.run_timed(time_sp=self.DT, speed_sp=300)
 
-
     def run(self, number_of_markers):
         self.correct_trajectory(self.csfl, self.csfr, self.lm, self.rm, number_of_markers)
+        #  while not self.shut_down:
+        #     print(self.csb.value())
         self.stop()
 
     def stop(self):
@@ -135,9 +135,18 @@ class FollowLine:
         ev3.Sound.speak("yeet").wait()
 
     def start(self, number_of_markers):
-        self.shut_down = False
-        self.runner = Thread(target=self.run, name='move', args=(number_of_markers,))
-        self.runner.start()
+        self.consecutive_colours = 0
+        if (self.shut_down):
+            self.shut_down = False
+            self.runner = Thread(target=self.run, name='move', args=(number_of_markers,))
+            self.runner.start()
+        else:
+            self.shut_down = True
+            self.runner = Thread(target=self.run, name='move', args=(number_of_markers,))
+            self.shut_down = False
+            self.runner.start()
+
+
 
 
 # Main function

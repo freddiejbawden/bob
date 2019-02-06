@@ -12,6 +12,14 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
         <android.support.v7.widget.RecyclerView
+<<<<<<< HEAD
+                android:id="@+id/items"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+        />
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+=======
                 android:id="@+id/item_list"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -28,4 +36,5 @@
             android:tint="@color/white"
             android:layout_gravity="bottom|end"
             android:layout_margin="16dp"/>
+>>>>>>> 1339882e609619cd14b45720a5a2a734b8a407d6
 </FrameLayout>

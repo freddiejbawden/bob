@@ -1,13 +1,14 @@
 #!/usr/bin/python3
-
+import traceback
 #check that the robot packages are present
 print("Starting Client")
 ev3_package_check = True
 try:
     import ev3dev.ev3 as ev3
-    from followLine import FollowLine
+    from followLineServer import FollowLine
     print("ev3 modules imported")
 except:
+    traceback.print_exc()
     print("Unable to load robot control packages package!")
     ev3_package_check = False
 import requests
@@ -29,7 +30,7 @@ print("threading imported")
 from zeroconf import ServiceBrowser, Zeroconf
 print("zeroconf imported")
 #remove me
-import traceback
+
 
 last_json = {}
 
@@ -42,18 +43,20 @@ def polling(ip_addr, port, run_robot):
         try:
             r = requests.get("http://{}:{}/getmovement".format(ip_addr,port))
             robot = json.loads(r.text)['status']
+            print(robot['moving'],movement)
             if (robot['moving'] == True and movement == False):
                 #fire motors
                 print("Turned on!")
                 if (run_robot):
 
-                    bob_bot.start()
+                    bob_bot.start(int(robot['markers']))
                     # TODO: Find out a way to halt this call
                     # so we can start and stop the robot
             elif(robot['moving'] == False and movement == True):
                 bob_bot.stop()
-                ev3.Sound.speak("yeet")
-
+                # ev3.Sound.speak("yeet")
+                if (run_robot):
+                    ev3.Sound.beep()
                 print("Turned Off!")
             movement = robot['moving']
         except:
