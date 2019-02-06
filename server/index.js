@@ -61,6 +61,7 @@ app.post('/jobs', (req, res, next) => {
         .then(job => res.json({ success: true, job }))
         .catch(next)
 })
+
 app.get('/jobs', (req, res, next) => {
     model
         .getAllJobs(req.body)
@@ -70,24 +71,39 @@ app.get('/jobs', (req, res, next) => {
         })
         .catch(next)
 })
+app.get('/items', (req, res, next) => {
+    model
+        .getItems()
+        .then(items => {
+            if (items) res.json({ success: true, items })
+            else res.status(404).json({ success: true, items: null })
+        })
+        .catch(next)
+})
 
-app.put('/turnon/:nOfMarkers', (req,res,next) => {
+app.post('/items', (req, res, next) => {
+    model
+        .addItem(req.body)
+        .then(item => res.json({ success: true, item }))
+        .catch(next)
+})
+app.put('/turnon/:nOfMarkers', (req, res, next) => {
     const markers = req.params.nOfMarkers
     model
         .turnOn(markers)
-        .then(on => res.json({success: true, on}))
+        .then(on => res.json({ success: true, on }))
         .catch(next)
 })
-app.put('/turnoff', (req,res,next) => {
+app.put('/turnoff', (req, res, next) => {
     model
         .turnOff()
-        .then(off => res.json({success: true, off}))
+        .then(off => res.json({ success: true, off }))
         .catch(next)
 })
-app.get('/getmovement', (req,res,next) => {
+app.get('/getmovement', (req, res, next) => {
     model
         .getMovement()
-        .then(status => res.json({success:true, status}))
+        .then(status => res.json({ success: true, status }))
         .catch(next)
 })
 app.post('/register', (req, res, next) => {
@@ -105,7 +121,7 @@ app.post('/login', (req, res, next) => {
 
 //Logs all responses.
 app.use((req, res, next) => {
-    console.log(`${req.ip}: ${req.method} ${req.originalUrl} response: ${res.body}`)
+    console.log(`${req.ip}: ${req.method} ${req.originalUrl} response: ${res.body || ''}`)
     next()
 })
 
@@ -117,7 +133,6 @@ app.use((err, req, res, next) => {
 })
 
 app.listen(PORT, () => {
-  console.log(`Listening on port ${PORT}.`)
-  
+    console.log(`Listening on port ${PORT}.`)
 })
-bonjour.publish({ name: 'assis10t', type: 'http', port: PORT })
+bonjour.publish({ name: 'assis10t', type: 'http', host: utils.getIp(), port: PORT })

@@ -75,11 +75,7 @@ class MainActivity : AppCompatActivity() {
             }
             Timber.d("GetItems success. Items: ${items?.size}")
             val adapter = item_list.adapter as ItemAdapter
-            //TODO: Remove if condition.
-            if (loggedIn)
-                adapter.updateItems(items!!)
-            else
-                adapter.updateItems(listOf())
+            adapter.updateItems(items!!)
         }
     }
 
