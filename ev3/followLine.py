@@ -3,6 +3,7 @@ import ev3dev.ev3 as ev3
 import logging
 from time import sleep, time
 from threading import Thread
+import detectMarking
 
 
 class FollowLine:
@@ -13,7 +14,7 @@ class FollowLine:
     KI = 0  # integral gain       lowest
     DT = 50  # milliseconds  -  represents change in time since last sensor reading/
 
-    MARKING_NUMBER = 1  # number of consecutive colour readings to detect marking
+    MARKING_NUMBER = 2  # number of consecutive colour readings to detect marking
 
     # Constructor
     def __init__(self):
@@ -29,7 +30,8 @@ class FollowLine:
         assert self.csb.connected
         self.csfl.mode = 'COL-REFLECT'  # measure light intensity
         self.csfr.mode = 'COL-REFLECT'  # measure light intensity
-        self.csb.mode = 'COL-COLOR'  # measure colour
+        #self.csb.mode = 'COL-COLOR'  # measure colour
+        self.csb.mode = 'RGB-RAW'  # measure rgb values
 
         # motors
         self.lm = ev3.LargeMotor('outA')  # left motor
@@ -43,12 +45,16 @@ class FollowLine:
         self.runner = None
 
     def detect_marking(self):
+        self.csb.mode = 'RGB-RAW'
+        r, g, b = detectMarking.get_rgb(self.csb)
+        print(r,g,b)
+        self.csb.mode = 'COL-COLOR'
         colour = self.csb.value()
-        print(colour)
+        print(time(), colour)
         if colour == 3 or colour == 2:  # 3 = green 2 = blue
             self.consecutive_colours += 1
-            print("CONSECUTIVE COLOURS: ", self.consecutive_colours)
-            if self.consecutive_colours > self.MARKING_NUMBER:
+            #print("CONSECUTIVE COLOURS: ", self.consecutive_colours)
+            if self.consecutive_colours >= self.MARKING_NUMBER:
                 return colour
         else:
             self.consecutive_colours = 0
