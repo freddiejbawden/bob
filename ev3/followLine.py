@@ -4,6 +4,7 @@ import logging
 from time import sleep, time
 from threading import Thread
 import detectMarking
+import control
 
 
 class FollowLine:
@@ -15,6 +16,7 @@ class FollowLine:
     DT = 50  # milliseconds  -  represents change in time since last sensor reading/
 
     MARKING_NUMBER = 2  # number of consecutive colour readings to detect marking
+    MARKING_INTERVAL = 1  # time between marking checks in seconds
 
     # Constructor
     def __init__(self):
@@ -30,8 +32,8 @@ class FollowLine:
         assert self.csb.connected
         self.csfl.mode = 'COL-REFLECT'  # measure light intensity
         self.csfr.mode = 'COL-REFLECT'  # measure light intensity
-        #self.csb.mode = 'COL-COLOR'  # measure colour
-        self.csb.mode = 'RGB-RAW'  # measure rgb values
+        self.csb.mode = 'COL-COLOR'  # measure colour
+        #self.csb.mode = 'RGB-RAW'  # measure rgb values
 
         # motors
         self.lm = ev3.LargeMotor('outA')  # left motor
@@ -41,77 +43,59 @@ class FollowLine:
         assert self.rm.connected
 
         self.consecutive_colours = 0  # counter for consecutive colour readings
+        self.number_of_markers = 0  # at which marker it should stop
 
         self.runner = None
 
     def detect_marking(self):
-        self.csb.mode = 'RGB-RAW'
-        r, g, b = detectMarking.get_rgb(self.csb)
-        print(r,g,b)
-        self.csb.mode = 'COL-COLOR'
+        #self.csb.mode = 'RGB-RAW'
+        #r, g, b = detectMarking.get_rgb(self.csb)
+        #print(r, g, b)
+        #self.csb.mode = 'COL-COLOR'
         colour = self.csb.value()
         print(time(), colour)
         if colour == 3 or colour == 2:  # 3 = green 2 = blue
             self.consecutive_colours += 1
-            #print("CONSECUTIVE COLOURS: ", self.consecutive_colours)
+            # print("CONSECUTIVE COLOURS: ", self.consecutive_colours)
             if self.consecutive_colours >= self.MARKING_NUMBER:
                 return colour
         else:
             self.consecutive_colours = 0
         return -1
 
+    # limit motor speed to safe values: [-1000, 1000] deg/sec
+    def limit_speed(self, speed):
+        if speed > 1000:
+            return 1000
+        if speed < -1000:
+            return -1000
+        return speed
 
-    @staticmethod
-    def on_line(sensor_value, position):
-        if position == 'left':
-            return sensor_value < 30
-        if position == 'right':
-            return sensor_value < 40
-        logging.error("onLine: wrong position value for sensor")
-        return False
-
-    def correct_trajectory(self, csfl, csfr, lm, rm, number_of_markers):
+    def correct_trajectory(self):
         integral = 0
         previous_error = 0
         marker_counter = 0
         start_time = time()
-        interval_between_colors = 1 # time between marker checks in seconds
 
         while not self.shut_down:
-            lval = csfl.value()
-            rval = csfr.value()
-            error = lval - rval - 10
-            logging.info("PID error: ", error)
-            integral += (error * self.DT)
-            derivative = (error - previous_error) / self.DT
-
-            # u zero:     on target,  drive forward
-            # u positive: too bright, turn right
-            # u negative: too dark,   turn left
-            # u is torque (See IVR lecture on Control)
-            u = (self.KP * error) + (self.KI * integral) + (self.KD * derivative)
-
-            # limit u to safe values: [-1000, 1000] deg/sec
-            if self.MOTOR_SPEED + abs(u) > 1000:  # reduce u if speed and torque are too high
-                if u >= 0:
-                    u = 1000 - self.MOTOR_SPEED
-                else:
-                    u = self.MOTOR_SPEED - 1000
+            lval = self.csfl.value()
+            u, integral, previous_error = control.calculate_torque\
+                (self.csfl.value(), self.csfr.value(), self.DT, integral, previous_error)
+            speed_left = self.limit_speed(self.MOTOR_SPEED + u)
+            speed_right = self.limit_speed(self.MOTOR_SPEED - u)
 
             # run motors
-            lm.run_timed(time_sp=self.DT, speed_sp=-(self.MOTOR_SPEED + u))
-            rm.run_timed(time_sp=self.DT, speed_sp=-(self.MOTOR_SPEED - u))
+            self.lm.run_timed(time_sp=self.DT, speed_sp=-(speed_left))
+            self.rm.run_timed(time_sp=self.DT, speed_sp=-(speed_right))
             sleep(self.DT / 1000)
 
-            #print("u {}".format(u))
-            #print("lm {}\n".format(lm.speed_sp))
-            #print("rm {}".format(rm.speed_sp))
-            #print("PID:", lval, rval)
-
-            previous_error = error
+            # print("u {}".format(u))
+            # print("lm {}\n".format(lm.speed_sp))
+            # print("rm {}".format(rm.speed_sp))
+            # print("PID:", lval, rval)
 
             # Check markers
-            if time() - start_time > interval_between_colors:
+            if time() - start_time > self.MARKING_INTERVAL:
                 # returns 3 if green, 2 if blue
                 marker_colour = self.detect_marking()
                 if marker_colour == 3:
@@ -119,7 +103,7 @@ class FollowLine:
                     marker_counter += 1
                     ev3.Sound.beep()
                     start_time = time()
-                    if marker_counter >= number_of_markers:
+                    if marker_counter >= self.number_of_markers:
                         self.stop()
                 elif marker_colour == 2:
                     # stop on blue marker
@@ -129,22 +113,25 @@ class FollowLine:
         while not self.shut_down:
             cm.run_timed(time_sp=self.DT, speed_sp=300)
 
-    def run(self, number_of_markers):
-        self.correct_trajectory(self.csfl, self.csfr, self.lm, self.rm, number_of_markers)
-        #  while not self.shut_down:
-        #     print(self.csb.value())
+    def start(self, number_of_markers):
+        self.shut_down = False
+        self.number_of_markers = number_of_markers
+        if self.number_of_markers == 0:
+            ev3.Sound.speak("0 number of markers specified").wait()
+            self.stop()
+        else:
+            self.runner = Thread(target=self.run, name='move')
+            self.runner.start()
+
+    def run(self):
+        self.correct_trajectory()
         self.stop()
 
     def stop(self):
         self.shut_down = True
         self.rm.stop()
         self.lm.stop()
-        ev3.Sound.speak("yeet").wait()
-
-    def start(self, number_of_markers):
-        self.shut_down = False
-        self.runner = Thread(target=self.run, name='move', args=(number_of_markers,))
-        self.runner.start()
+        ev3.Sound.speak("bruh").wait()
 
 
 # Main function
