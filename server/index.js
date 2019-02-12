@@ -109,13 +109,13 @@ app.get('/getmovement', (req, res, next) => {
 app.post('/register', (req, res, next) => {
     model
         .createUser(req.body.username, req.body.password)
-        .then(status => res.json({ success: true, status }))
+        .then(token => res.json({ success: true, token }))
         .catch(next)
 })
 app.post('/login', (req, res, next) => {
     model
         .authUser(req.body.username, req.body.password)
-        .then(loggedIn => res.json({ success: true, loggedIn }))
+        .then(token => res.json({ success: true, token }))
         .catch(next)
 })
 

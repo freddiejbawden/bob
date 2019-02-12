@@ -1,6 +1,7 @@
 const db = require('./db')
 const assert = require('assert')
 const ObjectID = require('mongodb').ObjectID
+const randomToken = require('./utils').randomToken
 const factory = db => ({
     getAllOrders: () =>
         new Promise((res, rej) => {
@@ -109,20 +110,32 @@ const factory = db => ({
         }),
     createUser: (uname, pass) =>
         new Promise((res, rej) => {
+            const token = randomToken()
             db()
                 .collection('users')
-                .insertOne({ _id: new ObjectID(), username: uname, password: pass }, (err, user) => {
-                    err ? rej(err) : res(user)
+                .insertOne({ _id: new ObjectID(), username: uname, password: pass, token }, (err, result) => {
+                    err ? rej(err) : res(token)
                 })
         }),
     authUser: (uname, pass) =>
         new Promise((res, rej) => {
             db()
                 .collection('users')
-                .find({ username: uname, password: pass })
+                .find({ username: uname })
                 .toArray((err, users) => {
                     console.log(users)
-                    err ? rej(err) : res(users.length > 0)
+                    if (err) {
+                        rej(err)
+                        return
+                    }
+                    if (users[0] && users[0].password == pass) {
+                        const token = randomToken()
+                        db()
+                            .collection('users')
+                            .updateOne({ _id: users[0]._id }, { $set: { token } }, (err, result) => {
+                                err ? rej(err) : res(token)
+                            })
+                    }
                 })
         })
 })
