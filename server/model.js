@@ -139,6 +139,21 @@ const factory = db => ({
                         res(null)
                     }
                 })
+        }),
+    getAuthUser: (uname, token) =>
+        new Promise((res, rej) => {
+            db()
+                .collection('users')
+                .find({ username: uname })
+                .toArray((err, users) => {
+                    console.log(users)
+                    if (err) {
+                        rej(err)
+                        return
+                    }
+                    if (users[0] && users[0].token === token) res(users[0])
+                    else res(null)
+                })
         })
 })
 
