@@ -1,4 +1,5 @@
 const os = require('os')
+const uuid = require('uuid/v4')
 
 let ips = null
 
@@ -32,3 +33,5 @@ module.exports.getIp = () => {
     console.log('=== END IP ADDRESSES ===')
     return ips[0]
 }
+
+module.exports.randomToken = () => uuid()
