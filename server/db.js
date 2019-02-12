@@ -12,6 +12,8 @@ module.exports = () => {
     return db
 }
 
+const model = require('./model')
+
 module.exports.init = () => {
     client = new MongoClient(mongo_url, {
         useNewUrlParser: true
@@ -25,11 +27,15 @@ module.exports.init = () => {
             db = client.db('bob')
             //FOR DEMO 1
 
-            db.collection('bob_movement').insertOne({"_id":"movement","moving":false,"markers":1}, (err,doc) => {
+            db.collection('bob_movement').insertOne({ _id: 'movement', moving: false, markers: 1 }, (err, doc) => {
                 if (err) {
-                    console.log("Movment already in database")
+                    console.log('Movment already in database')
+                    model
+                        .turnOff()
+                        .then(() => console.log('Robot Stopped'))
+                        .catch(err => console.error(err))
                 }
-            });
+            })
             res(db)
             //console.log(`Initialized database connection on ${mongo_url}.`)
         })
