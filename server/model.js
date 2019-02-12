@@ -135,6 +135,8 @@ const factory = db => ({
                             .updateOne({ _id: users[0]._id }, { $set: { token } }, (err, result) => {
                                 err ? rej(err) : res(token)
                             })
+                    } else {
+                        res(null)
                     }
                 })
         })
