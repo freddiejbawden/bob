@@ -14,6 +14,8 @@ import javax.jmdns.JmDNS
 import javax.jmdns.ServiceEvent
 import javax.jmdns.ServiceListener
 
+// Using API level v1
+
 class ServerConnection {
     companion object {
         val SERVER_NAME = "assis10t"
