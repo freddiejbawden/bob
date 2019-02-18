@@ -1,6 +1,6 @@
 # API Schema
 ```bash
-Schema Version: v1 # Increase this number whenever the schema changes.
+Schema Version: v2 # Increase this number whenever the schema changes.
 ```
 
 The interactions with the server and data storage in the database are all done using JSON objects. The file that contains code for these interactions should have the version number in a comment. This will make any API level incompability easily noticable.
@@ -9,12 +9,17 @@ The interactions with the server and data storage in the database are all done u
 
 Using zeroconf, look for this service: `assis10t._http._tcp.`
 
+## Authentication
+
+For requests that require authentication, include an http header called `"username"` with the username
+
 ## Data Types:
 
 ```javascript
 User {
     "_id": String,
-    "username": String
+    "username": String,
+    "type": "merchant" or "customer" or "robot"
 }
 
 Item {
@@ -29,35 +34,41 @@ Order {
     "_id": String,
     "userId": String,
     "warehouseId": String,
-    "items": [Item]
+    "timestamp": String,
+    "items": [Item],
+    "status": "PENDING", "IN_TRANSIT", "COMPLETE", "CANCELED"
 }
 
 Warehouse {
     "_id": String,
-    "location": String // String to be used for the Google Maps API query
+    "merchantId": String, // The merchant that owns this warehouse.
+    "image": Base64 encoded String (or null for default image),
+    "location": String, // String to be used for the Google Maps API query
+    "items": [Item] // Only for GET /warehouse/:warehouseId
 }
 ```
 
 
 ## API Endpoints
 
-| Method | Path | Description |
-|-|-|-|
-| `GET` | `/ping` | Returns `Pong`. |
-| `GET` | `/order` | Gets all `Order`s. |
-| `GET` | `/order/:orderId` | Gets `Order` with given id. |
-| `POST` | `/order` | Adds given `Order`. Starts moving robot. |
-| `GET` | `/jobs` | Gets all `Job`s. |
-| `POST` | `/jobs` | Adds given `Job`. |
-| `GET` | `/items` | Gets all `Item`s. |
-| `POST` | `/items` | Adds `Item`. |
-| `PUT` | `/turnon/:n` | Starts moving the robot. Robot stops after seeing `n` markers. |
-| `PUT` | `/turnoff` | Stops the robot. |
-| `GET` | `/getmovement` | Gets the current task for the robot. |
-| `POST` | `/register` | Registers a new user. |
-| `POST` | `/login` | Logs in existing user. |
+| Method | Path | Auth | Description |
+|-|-|:-:|-
+| `GET` | `/ping` | | Returns `Pong`. |
+| `POST` | `/register` | | Registers a new `User`. |
+| `POST` | `/login` | | Logs in existing `User`. |
+| `GET` | `/order` | `Customer` | Gets all `Order`s of current `User`. |
+| `GET` | `/order/:orderId` | `Customer` | Gets `Order` with given id. |
+| `POST` | `/order` | `Customer` | Adds given `Order`. |
+| `GET` | `/warehouse` | | Gets all `Warehouse`s. |
+| `GET` | `/warehouse/:warehouseId` | | Gets given `Warehouse` with its items. |
+| `POST` | `/warehouse/:warehouseId/items` | `Merchant` | Adds an `Item` to a `Warehouse`. |
+| `GET` | `/warehouse/:warehouseId/orders` | `Merchant` | Gets all orders in the given `Warehouse`. |
+| `PUT` | `/turnon/:n` | | Starts moving the robot. Robot stops after seeing `n` markers. |
+| `PUT` | `/turnoff` | | Stops the robot. |
+| `GET` | `/getmovement` | `Robot` | Gets the current task for the robot. |
+| `PUT` | `/updatemovement` | `Robot` | Signals the server that robot is finished with current movement task. The server should assign a new task here. |
 
-#### Any Server Error (Status 500)
+#### Internal Server Error (Status 500)
 ```javascript
 ===== Output =====
 {
@@ -65,11 +76,45 @@ Warehouse {
     "error": String
 }
 ```
+#### Unauthorized (Status 401)
+```javascript
+===== Output =====
+{
+    "success": false,
+    "error": "You are not authorized to use this resource."
+}
+```
 
 #### `GET /ping`
 ```javascript
 ===== Output =====
-"pong"
+pong
+```
+
+#### `POST /register`
+```javascript
+===== Input =====
+{
+    "username": String
+}
+===== Output =====
+{
+    "success": Boolean,
+    "user": User
+}
+```
+
+#### `POST /login`
+```javascript
+===== Input =====
+{
+    "username": String
+}
+===== Output =====
+{
+    "success": true,
+    "user": User
+}
 ```
 
 #### `GET /order`
@@ -77,7 +122,7 @@ Warehouse {
 ===== Output =====
 {
     "success": true,
-    "orders": [Order] (or null if no orders found)
+    "orders": [Order]
 }
 ```
 
@@ -97,47 +142,44 @@ Order // without _id field
 
 ===== Output =====
 {
-    "success": Boolean
+    "success": true
 }
 ```
 
-#### `GET /jobs`
+#### `GET /warehouse`
 ```javascript
 ===== Output =====
 {
-    "success": Boolean,
-    "jobs": [Job] (or null if no jobs found)
+    "success": true,
+    "warehouses": [Warehouse]
 }
 ```
 
-#### `POST /jobs`
-```javascript
-===== Input =====
-Job // without _id field
-
-===== Output =====
-{
-    "success": Boolean
-}
-```
-
-#### `GET /items`
+#### `GET /warehouse/:warehouseId`
 ```javascript
 ===== Output =====
 {
-    "success": Boolean,
-    "items": [Item] (or null if no items found)
+    "success": true,
+    "warehouse": Warehouse // Including list of items in the warehouse.
 }
 ```
 
-#### `POST /items`
+#### `POST /warehouse/:warehouseId/items`
 ```javascript
 ===== Input =====
-Item // without _id field
-
+Item //With _id if updating an existing item, or without _id if creating a new one.
 ===== Output =====
 {
-    "success": Boolean
+    "success": true
+}
+```
+
+#### `GET /warehouse/:warehouseId/orders`
+```javascript
+===== Output =====
+{
+    "success": true,
+    "orders": [Order]
 }
 ```
 
@@ -169,19 +211,12 @@ Item // without _id field
 }
 ```
 
-#### `POST /register`
+#### `PUT /updatemovement`
 ```javascript
+===== Input =====
+// TODO: Put information about the robot's current state, so the server can provide proper instructions.
 ===== Output =====
 {
-    "success": Boolean
-}
-```
-
-#### `POST /login`
-```javascript
-===== Output =====
-{
-    "success": true,
-    "loggedIn": Boolean
+    "success": true
 }
 ```
