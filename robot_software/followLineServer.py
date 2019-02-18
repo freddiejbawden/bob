@@ -45,15 +45,10 @@ class FollowLine:
         assert self.cm.connected
 
         self.consecutive_colours = 0  # counter for consecutive colour readings
-        self.number_of_markers = 0  # at which marker it should stop
+        #self.number_of_markers = 0  # at which marker it should stop
         self.runner = None
-        self.reverse = False
 
-    def detect_marking(self):
-        if self.reverse:
-            colour = self.csfl.value()
-        else:
-            colour = self.csbl.value()
+    def detect_marking(self, colour):
         if colour == 3 or colour == 2:  # 3 = green 2 = blue
             self.consecutive_colours += 1
             # print("CONSECUTIVE COLOURS: ", self.consecutive_colours)
@@ -71,18 +66,19 @@ class FollowLine:
             return -1000
         return speed
 
-    def correct_trajectory(self):
+    def correct_trajectory(self, number_of_markers, reverse):
         integral = 0
         previous_error = 0
         marker_counter = 0
         start_time = time()
 
+        # Assign sensors to act as front or back
         while not self.shut_down:
-            if self.reverse:
-                self.csfl.mode = 'COL-COLOR'  # measure light intensity
-                self.csfr.mode = 'COL-COLOR'  # measure light intensity
-                self.csbl.mode = 'COL-REFLECT'  # measure colour
-                self.csbr.mode = 'COL-REFLECT'
+            if reverse:
+                self.csfl.mode = 'COL-COLOR'  # measure colour
+                self.csfr.mode = 'COL-COLOR'  # measure colour
+                self.csbl.mode = 'COL-REFLECT'  # measure light intensity
+                self.csbr.mode = 'COL-REFLECT'  # measure light intensity
                 lval = self.csbr.value()  # back right becomes front left
                 rval = self.csbl.value()
             else:
@@ -93,18 +89,20 @@ class FollowLine:
                 lval = self.csfl.value()
                 rval = self.csfr.value()
 
+            # Calculate torque using PID control
             u, integral, previous_error = control.calculate_torque\
                 (lval, rval, self.DT, integral, previous_error)
+            # Set the speed of the motors
             speed_left = self.limit_speed(self.MOTOR_SPEED + u)
             speed_right = self.limit_speed(self.MOTOR_SPEED - u)
 
             # run motors
-            if self.reverse:
-                lm.run_timed(time_sp=self.DT, speed_sp=speed_right)
-                rm.run_timed(time_sp=self.DT, speed_sp=speed_left)
+            if reverse:
+                self.lm.run_timed(time_sp=self.DT, speed_sp=speed_right)
+                self.rm.run_timed(time_sp=self.DT, speed_sp=speed_left)
             else:
-                lm.run_timed(time_sp=self.DT, speed_sp=-speed_left)
-                rm.run_timed(time_sp=self.DT, speed_sp=-speed_right)
+                self.lm.run_timed(time_sp=self.DT, speed_sp=-speed_left)
+                self.rm.run_timed(time_sp=self.DT, speed_sp=-speed_right)
             sleep(self.DT / 1000)
 
             # print("u {}".format(u))
@@ -114,14 +112,19 @@ class FollowLine:
 
             # Check markers
             if time() - start_time > self.MARKING_INTERVAL:
+                if reverse:
+                    current_colour = self.csfl.value()
+                else:
+                    current_colour = self.csbl.value()
+
                 # returns 3 if green, 2 if blue
-                marker_colour = self.detect_marking()
+                marker_colour = self.detect_marking(current_colour)
                 if marker_colour == 3:
                     # stop after given number of greens
                     marker_counter += 1
                     ev3.Sound.beep()
                     start_time = time()
-                    if marker_counter >= self.number_of_markers:
+                    if marker_counter >= number_of_markers:
                         self.stop()
                 elif marker_colour == 2:
                     # stop on blue marker
@@ -132,14 +135,22 @@ class FollowLine:
         while not self.shut_down:
             cm.run_timed(time_sp=self.DT, speed_sp=300)
 
+    #TODO: possibly move start and stop to FollowPath or move correct trajectory to a separate file instead
     def start(self, number_of_markers):
         self.shut_down = False
-        self.number_of_markers = number_of_markers
-        if self.number_of_markers == 0:
+        if number_of_markers == 0:
             ev3.Sound.speak("0 number of markers specified").wait()
             self.stop()
+        elif number_of_markers > 0:
+            # positive number of markers move forwards
+            reverse = False
+            self.runner = Thread(target=self.run, args=(number_of_markers, reverse,), name='move')
+            self.runner.start()
+            #TODO: move thread to followPath?
         else:
-            self.runner = Thread(target=self.run, name='move')
+            # negative number of markers move backwards
+            reverse = True
+            self.runner = Thread(target=self.run, args=(number_of_markers*-1, reverse), name='move')
             self.runner.start()
 
     def run(self):
