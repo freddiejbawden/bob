@@ -1,6 +1,4 @@
 const os = require('os')
-const uuid = require('uuid/v4')
-const db = require('./db')
 
 let ips = null
 
@@ -34,9 +32,3 @@ module.exports.getIp = () => {
     console.log('=== END IP ADDRESSES ===')
     return ips[0]
 }
-
-module.exports.randomToken = () => uuid()
-
-module.exports.withAuthFactory = db => route => (req, res, next) => {}
-
-module.exports.withAuth = module.exports.withAuthFactory(db)
