@@ -125,37 +125,27 @@ class FollowLine:
                     ev3.Sound.beep()
                     start_time = time()
                     if marker_counter >= number_of_markers:
-                        self.stop()
+                        # self.stop()
+                        return
                 elif marker_colour == 2:
                     # stop on blue marker
-                    self.stop()
+                    # self.stop()
                     # self.reverse = not self.reverse
+                    return
 
     def move_sideways(self, cm):
         while not self.shut_down:
             cm.run_timed(time_sp=self.DT, speed_sp=300)
 
-    #TODO: possibly move start and stop to FollowPath or move correct trajectory to a separate file instead
-    def start(self, number_of_markers):
-        self.shut_down = False
-        if number_of_markers == 0:
-            ev3.Sound.speak("0 number of markers specified").wait()
-            self.stop()
-        elif number_of_markers > 0:
-            # positive number of markers move forwards
+    # move fowards/backwards
+    def run_y(self, distance):
+        if distance > 0:
             reverse = False
-            self.runner = Thread(target=self.run, args=(number_of_markers, reverse,), name='move')
-            self.runner.start()
-            #TODO: move thread to followPath?
+            number_of_markers = distance
         else:
-            # negative number of markers move backwards
             reverse = True
-            self.runner = Thread(target=self.run, args=(number_of_markers*-1, reverse), name='move')
-            self.runner.start()
-
-    def run(self):
-        self.correct_trajectory()
-        self.stop()
+            number_of_markers = distance * -1
+        self.correct_trajectory(number_of_markers, reverse)
 
     def stop(self):
         self.shut_down = True
