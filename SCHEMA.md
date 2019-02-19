@@ -11,7 +11,7 @@ Using zeroconf, look for this service: `assis10t._http._tcp.`
 
 ## Authentication
 
-For requests that require authentication, include an http header called `"username"` with the username
+For requests that require authentication, include an http header called `"username"` with the username.
 
 ## Data Types:
 
@@ -26,6 +26,12 @@ Item {
     "_id": String,
     "warehouseId": String,
     "name": String,
+    "image": Base64 encoded String (or null for default image),
+    "position": {
+        "x": Int, // Perpendicular to robot's initial position.
+        "y": Int, // Parallel to robot's initial position.
+        "z": Int // Vertical
+    },
     "quantity": Double,
     "unit": String (or null if there is no unit)
 }
@@ -44,18 +50,23 @@ Warehouse {
     "merchantId": String, // The merchant that owns this warehouse.
     "image": Base64 encoded String (or null for default image),
     "location": String, // String to be used for the Google Maps API query
+    "dimensions": {
+        "x": Int, // Perpendicular to robot's initial position.
+        "y": Int, // Parallel to robot's initial position.
+        "z": [Double] // Vertical. Each element is height of a shelf, in ascending order, in meters. (Include bottom shelf as 0.0)
+    },
     "items": [Item] // Only for GET /warehouse/:warehouseId
 }
 
 Robot {
-    "_id":String,
+    "_id": String,
     "warehouseId": String,
-    "last_request": Date,
-    "status": "WAITING","ONJOB","STUCK","NOTRESPONDING","MANUALCONTROL",
-    "location":{
-        "x": Int,
-        "y": Int,
-        "z": Int
+    "last_seen": ISO-8601 formatted date String,
+    "status": "WAITING" or "ON_JOB" or "MIA" or "NOT_RESPONDING" or "MANUAL_CONTROL",
+    "location": {
+        "x": Int, // Perpendicular to robot's initial position.
+        "y": Int, // Parallel to robot's initial position.
+        "z": Int // Vertical
     }
 }
 ```
@@ -75,6 +86,7 @@ Robot {
 | `GET` | `/warehouse/:warehouseId` | | Gets given `Warehouse` with its items. |
 | `POST` | `/warehouse/:warehouseId/items` | `Merchant` | Adds an `Item` to a `Warehouse`. |
 | `GET` | `/warehouse/:warehouseId/orders` | `Merchant` | Gets all orders in the given `Warehouse`. |
+| `GET` | `/warehouse/:warehouseId/robot` | `Merchant` | Gets the state of the robot(s). |
 | `PUT` | `/turnon/:n` | | Starts moving the robot. Robot stops after seeing `n` markers. |
 | `PUT` | `/turnoff` | | Stops the robot. |
 | `GET` | `/getmovement` | `Robot` | Gets the current task for the robot. |
@@ -192,6 +204,15 @@ Item //With _id if updating an existing item, or without _id if creating a new o
 {
     "success": true,
     "orders": [Order]
+}
+```
+
+#### `GET /warehouse/:warehouseId/robot`
+```javascript
+===== Output =====
+{
+    "success": true,
+    "robots": [Robot]
 }
 ```
 
