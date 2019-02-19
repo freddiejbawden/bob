@@ -4,6 +4,7 @@ const db = require('./db')
 const model = require('./model')
 const bonjour = require('bonjour')()
 const utils = require('./utils')
+const auth = require('./auth')
 
 const PORT = process.env.PORT || 9000
 
@@ -108,15 +109,15 @@ app.get('/getmovement', (req, res, next) => {
 })
 app.post('/register', (req, res, next) => {
     model
-        .createUser(req.body.username, req.body.password)
-        .then(token => res.json({ success: true, token }))
+        .createUser(req.body.username, res.body.type)
+        .then(user => res.json({ success: true, user }))
         .catch(next)
 })
 app.post('/login', (req, res, next) => {
     model
-        .authUser(req.body.username, req.body.password)
-        .then(token => {
-            if (token) res.json({ success: true, token })
+        .authUser(req.body.username)
+        .then(user => {
+            if (user) res.json({ success: true, user })
             else res.status(401).json({ success: false, error: 'Username or password is incorrect.' })
         })
         .catch(next)

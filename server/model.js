@@ -108,51 +108,27 @@ const factory = db => ({
                     err ? rej(err) : res(items)
                 })
         }),
-    createUser: (uname, pass) =>
+    createUser: (username, type) =>
         new Promise((res, rej) => {
-            const token = randomToken()
+            const user = { _id: new ObjectID(), username, type }
             db()
                 .collection('users')
-                .insertOne({ _id: new ObjectID(), username: uname, password: pass, token }, (err, result) => {
-                    err ? rej(err) : res(token)
+                .insertOne(user, (err, result) => {
+                    err ? rej(err) : res(user)
                 })
         }),
-    authUser: (uname, pass) =>
+    authUser: username =>
         new Promise((res, rej) => {
             db()
                 .collection('users')
-                .find({ username: uname })
+                .find({ username })
                 .toArray((err, users) => {
                     console.log(users)
                     if (err) {
                         rej(err)
                         return
                     }
-                    if (users[0] && users[0].password == pass) {
-                        const token = randomToken()
-                        db()
-                            .collection('users')
-                            .updateOne({ _id: users[0]._id }, { $set: { token } }, (err, result) => {
-                                err ? rej(err) : res(token)
-                            })
-                    } else {
-                        res(null)
-                    }
-                })
-        }),
-    getAuthUser: (uname, token) =>
-        new Promise((res, rej) => {
-            db()
-                .collection('users')
-                .find({ username: uname })
-                .toArray((err, users) => {
-                    console.log(users)
-                    if (err) {
-                        rej(err)
-                        return
-                    }
-                    if (users[0] && users[0].token === token) res(users[0])
-                    else res(null)
+                    res(users[0] || null)
                 })
         })
 })
