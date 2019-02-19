@@ -46,6 +46,18 @@ Warehouse {
     "location": String, // String to be used for the Google Maps API query
     "items": [Item] // Only for GET /warehouse/:warehouseId
 }
+
+Robot {
+    "_id":String,
+    "warehouseId": String,
+    "last_request": Date,
+    "status": "WAITING","ONJOB","STUCK","NOTRESPONDING","MANUALCONTROL",
+    "location":{
+        "x": Int,
+        "y": Int,
+        "z": Int
+    }
+}
 ```
 
 
