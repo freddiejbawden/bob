@@ -49,7 +49,7 @@ const authFactory = model => (userTypes, routeHandler) => (req, res, next) => {
                     success: false,
                     error: 'User not found.'
                 })
-            } else if (!userTypes.contains(user.type)) {
+            } else if (!userTypes.includes(user.type)) {
                 res.status(403).json({
                     success: false,
                     error: 'You do not have the required permissions to access this resource.'

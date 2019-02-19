@@ -109,7 +109,7 @@ app.get('/getmovement', (req, res, next) => {
 })
 app.post('/register', (req, res, next) => {
     model
-        .createUser(req.body.username, res.body.type)
+        .createUser(req.body.username, req.body.type)
         .then(user => res.json({ success: true, user }))
         .catch(next)
 })
