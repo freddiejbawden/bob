@@ -16,7 +16,7 @@ const factory = db => ({
         new Promise((res, rej) => {
             db()
                 .collection('orders')
-                .find({ _id: new ObjectID(orderId) })
+                .find({ _id: orderId })
                 .toArray((err, docs) => {
                     err ? rej(err) : res(docs[0])
                 })
@@ -95,7 +95,7 @@ const factory = db => ({
         new Promise((res, rej) => {
             db()
                 .collection('inventory')
-                .deleteOne({ _id: new ObjectID(item._id) }, (err, item) => {
+                .deleteOne({ _id: item._id }, (err, item) => {
                     err ? rej(err) : res(item)
                 })
         }),

@@ -21,4 +21,3 @@ def calculate_torque(lval, rval, DT, integral, previous_error):
     print("u:", u)
     logging.info("PID torque: ", u)
     return u, integral, error
-
