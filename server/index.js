@@ -56,7 +56,8 @@ app.get(
             .catch(next)
     })
 )
-
+// TODO: Check if ordered items exist.
+// TODO: Reduce amount on items ordered.
 app.post(
     '/order',
     auth.customer((req, res, next) => {
@@ -86,12 +87,41 @@ app.get('/warehouse/:warehouseId', (req, res, next) => {
         .catch(next)
 })
 
-app.post('/warehouse/:warehouseId/items', (req, res, next) => {
-    model
-        .addItem({ ...req.body, warehouseId: req.params.warehouseId })
-        .then(item => res.json({ success: true, item }))
-        .catch(next)
-})
+app.post(
+    '/warehouse/:warehouseId/items',
+    auth.merchant((req, res, next) => {
+        model
+            .getWarehouseById(warehouseId)
+            .then(warehouse => {
+                if (!warehouse) {
+                    res.status(404).json({
+                        success: false,
+                        error: 'Warehouse not found.'
+                    })
+                    throw null
+                }
+                if (warehouse.merchantId !== req.user._id) {
+                    res.status(403).json({
+                        success: false,
+                        error: 'You cannot modify items in a warehouse you dont own.'
+                    })
+                    throw null
+                }
+                return model.addItem({ ...req.body, warehouseId: req.params.warehouseId })
+            })
+            .then(item => res.json({ success: true, item }))
+            .catch(err => err && next(err))
+    })
+)
+app.post(
+    '/warehouse/:warehouseId/orders',
+    auth.merchant((req, res, next) => {
+        model
+            .getOrdersByWarehouseId({ warehouseId: req.params.warehouseId })
+            .then(orders => res.json({ success: true, orders }))
+            .catch(next)
+    })
+)
 app.put('/turnon/:nOfMarkers', (req, res, next) => {
     const markers = req.params.nOfMarkers
     model
