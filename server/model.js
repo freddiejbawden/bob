@@ -2,25 +2,26 @@ const db = require('./db')
 const assert = require('assert')
 const ObjectID = require('mongodb').ObjectID
 const factory = db => ({
-    getAllOrders: () =>
+    getOrders: userId =>
         new Promise((res, rej) => {
             db()
                 .collection('orders')
-                .find({})
+                .find({ userId })
                 .toArray((err, docs) => {
                     err ? rej(err) : res(docs)
                 })
         }),
-    getOrderById: orderId =>
+    getOrderById: (orderId, userId) =>
         new Promise((res, rej) => {
             db()
                 .collection('orders')
-                .find({ _id: orderId })
+                .find({ _id: orderId, userId })
                 .toArray((err, docs) => {
                     err ? rej(err) : res(docs[0])
                 })
         }),
     addOrder: orderData =>
+        // TODO: Check stock before finishing the order.
         new Promise((res, rej) => {
             db()
                 .collection('orders')

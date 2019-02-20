@@ -8,7 +8,7 @@ const auth = require('./auth')
 
 const PORT = process.env.PORT || 9000
 
-const API_LEVEL = 'v1'
+const API_LEVEL = 'v2'
 console.log('Using api level ' + API_LEVEL)
 
 db.init()
@@ -30,34 +30,43 @@ app.use((req, res, next) => {
 app.get('/ping', (req, res) => {
     res.send('pong')
 })
-app.get('/order', (req, res, next) =>
-    model
-        .getAllOrders()
-        .then(orders => {
-            if (orders) res.json({ success: true, orders })
-            else res.status(404).json({ success: false, orders: null })
-        })
-        .catch(next)
+app.get(
+    '/order',
+    auth.customer((req, res, next) =>
+        model
+            .getOrders(req.user._id)
+            .then(orders => {
+                if (orders) res.json({ success: true, orders })
+                else res.status(404).json({ success: false, orders: null })
+            })
+            .catch(next)
+    )
 )
 
-app.get('/order/:orderId', (req, res, next) => {
-    const orderId = req.params.orderId
-    model
-        .getOrderById(orderId)
-        .then(order => {
-            if (order) res.json({ success: true, order })
-            else res.status(404).json({ success: true, order: null })
-        })
-        .catch(next)
-})
+app.get(
+    '/order/:orderId',
+    auth.customer((req, res, next) => {
+        const orderId = req.params.orderId
+        model
+            .getOrderById(orderId)
+            .then(order => {
+                if (order) res.json({ success: true, order })
+                else res.status(404).json({ success: true, order: null })
+            })
+            .catch(next)
+    })
+)
 
-app.post('/order', (req, res, next) => {
-    //verification steps?
-    model
-        .addOrder(req.body)
-        .then(order => res.json({ success: true, order }))
-        .catch(next)
-})
+app.post(
+    '/order',
+    auth.customer((req, res, next) => {
+        const order = { ...req.body, userId: req.user._id }
+        model
+            .addOrder(order)
+            .then(order => res.json({ success: true, order }))
+            .catch(next)
+    })
+)
 
 app.post('/jobs', (req, res, next) => {
     model
