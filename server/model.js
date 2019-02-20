@@ -1,7 +1,6 @@
 const db = require('./db')
 const assert = require('assert')
 const ObjectID = require('mongodb').ObjectID
-const randomToken = require('./utils').randomToken
 const factory = db => ({
     getAllOrders: () =>
         new Promise((res, rej) => {
