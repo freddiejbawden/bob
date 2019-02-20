@@ -49,7 +49,10 @@ Warehouse {
     "_id": String,
     "merchantId": String, // The merchant that owns this warehouse.
     "image": Base64 encoded String (or null for default image),
-    "location": String, // String to be used for the Google Maps API query
+    "location": {
+        "latitude": Double,
+        "longitude": Double
+    },
     "dimensions": {
         "x": Int, // Perpendicular to robot's initial position.
         "y": Int, // Parallel to robot's initial position.
