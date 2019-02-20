@@ -119,7 +119,8 @@ pong
 ```javascript
 ===== Input =====
 {
-    "username": String
+    "username": String,
+    "type": "merchant" or "customer" or "robot"
 }
 ===== Output =====
 {
