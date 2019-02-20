@@ -67,36 +67,28 @@ app.post(
             .catch(next)
     })
 )
-
-app.post('/jobs', (req, res, next) => {
+app.get('/warehouse', (req, res, next) => {
     model
-        .addJob(req.body)
-        .then(job => res.json({ success: true, job }))
-        .catch(next)
-})
-
-app.get('/jobs', (req, res, next) => {
-    model
-        .getAllJobs(req.body)
-        .then(jobs => {
-            if (jobs) res.json({ success: true, jobs })
-            else res.status(404).json({ success: true, jobs: null })
+        .getWarehouses()
+        .then(warehouses => {
+            if (warehouses) res.json({ success: true, warehouses })
+            else res.status(404).json({ success: true, warehouses: null })
         })
         .catch(next)
 })
-app.get('/items', (req, res, next) => {
+app.get('/warehouse/:warehouseId', (req, res, next) => {
     model
-        .getItems()
-        .then(items => {
-            if (items) res.json({ success: true, items })
-            else res.status(404).json({ success: true, items: null })
+        .getWarehouseById(req.params.warehouseId)
+        .then(warehouse => {
+            if (warehouse) res.json({ success: true, warehouse })
+            else res.status(404).json({ success: true, warehouse: null })
         })
         .catch(next)
 })
 
-app.post('/items', (req, res, next) => {
+app.post('/warehouse/:warehouseId/items', (req, res, next) => {
     model
-        .addItem(req.body)
+        .addItem({ ...req.body, warehouseId: req.params.warehouseId })
         .then(item => res.json({ success: true, item }))
         .catch(next)
 })
