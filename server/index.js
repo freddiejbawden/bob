@@ -113,7 +113,7 @@ app.post(
             .catch(err => err && next(err))
     })
 )
-app.post(
+app.get(
     '/warehouse/:warehouseId/orders',
     auth.merchant((req, res, next) => {
         model
