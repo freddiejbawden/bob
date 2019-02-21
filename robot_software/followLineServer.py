@@ -17,6 +17,8 @@ class FollowLine:
 
     MARKING_NUMBER = 2  # number of consecutive colour readings to detect marking
     MARKING_INTERVAL = 1  # time between marking checks in seconds
+    # time() is seconds
+    # time_sp is milliseconds
 
     # Constructor
     def __init__(self):
@@ -76,6 +78,9 @@ class FollowLine:
         previous_error = 0
         marker_counter = 0
         start_time = time()
+        speed_left = 0
+        speed_right = 0
+        time_off_line = 0
 
         while not self.shut_down:
             if self.reverse:
@@ -93,6 +98,34 @@ class FollowLine:
                 lval = self.csfl.value()
                 rval = self.csfr.value()
 
+            # most likely off line, may need to recalibrate numbers later
+            if lval > 90 and rval > 70:
+                if time_off_line == 0:
+                    time_off_line = time()
+                # if off line for more than a second move side-to-side until line is found
+                print(time() - time_off_line)
+                if time() - time_off_line > 0.5:
+                    """self.lm.stop()
+                    self.rm.stop()
+                    correction_speed = 100
+                    correction_time = 500
+                    while lval > 90 and rval > 70:
+                        self.cm.run_timed(time_sp=correction_time, speed_sp=correction_speed)
+                        correction_speed *= -1
+                        correction_time += 100"""
+                    while lval > 80 and rval > 60:
+                        print(speed_right, speed_left)
+                        if self.reverse:
+                            self.lm.run_timed(time_sp=self.DT, speed_sp=-speed_right)
+                            self.rm.run_timed(time_sp=self.DT, speed_sp=-speed_left)
+                        else:
+                            self.lm.run_timed(time_sp=self.DT, speed_sp=-(-speed_left))
+                            self.rm.run_timed(time_sp=self.DT, speed_sp=-(-speed_right))
+                        lval = self.csfl.value()
+                        rval = self.csfr.value()
+                        sleep(self.DT / 1000)
+                    time_off_line = 0
+
             u, integral, previous_error = control.calculate_torque\
                 (lval, rval, self.DT, integral, previous_error)
             speed_left = self.limit_speed(self.MOTOR_SPEED + u)
@@ -100,11 +133,11 @@ class FollowLine:
 
             # run motors
             if self.reverse:
-                lm.run_timed(time_sp=self.DT, speed_sp=speed_right)
-                rm.run_timed(time_sp=self.DT, speed_sp=speed_left)
+                self.lm.run_timed(time_sp=self.DT, speed_sp=speed_right)
+                self.rm.run_timed(time_sp=self.DT, speed_sp=speed_left)
             else:
-                lm.run_timed(time_sp=self.DT, speed_sp=-speed_left)
-                rm.run_timed(time_sp=self.DT, speed_sp=-speed_right)
+                self.lm.run_timed(time_sp=self.DT, speed_sp=-speed_left)
+                self.rm.run_timed(time_sp=self.DT, speed_sp=-speed_right)
             sleep(self.DT / 1000)
 
             # print("u {}".format(u))
@@ -150,6 +183,7 @@ class FollowLine:
         self.shut_down = True
         self.rm.stop()
         self.lm.stop()
+        self.cm.stop()
         ev3.Sound.speak("bruh").wait()
 
 
