@@ -2,7 +2,6 @@
 import ev3dev.ev3 as ev3
 import logging
 from time import sleep, time
-from threading import Thread
 import detectMarking
 import control
 
@@ -46,14 +45,13 @@ class FollowLine:
 
         self.consecutive_colours = 0  # counter for consecutive colour readings
         #self.number_of_markers = 0  # at which marker it should stop
-        self.runner = None
 
-    def detect_marking(self, colour):
-        if colour == 3 or colour == 2:  # 3 = green 2 = blue
+    def detect_marking(self, colour_left, colour_right):
+        if (colour_right == 3 and colour_left == 3) or (colour_right == 2 and colour_left == 2):  # 3 = green 2 = blue
             self.consecutive_colours += 1
             # print("CONSECUTIVE COLOURS: ", self.consecutive_colours)
             if self.consecutive_colours > self.MARKING_NUMBER:
-                return colour
+                return colour_right
         else:
             self.consecutive_colours = 0
         return -1
@@ -111,14 +109,17 @@ class FollowLine:
             # print("PID:", lval, rval)
 
             # Check markers
+            # Wait before checking for colour again
             if time() - start_time > self.MARKING_INTERVAL:
                 if reverse:
-                    current_colour = self.csfl.value()
+                    colour_left = self.csfr.value()
+                    colour_right = self.csfl.value()
                 else:
-                    current_colour = self.csbl.value()
+                    colour_left = self.csbl.value()
+                    colour_right = self.csbr.value()
 
                 # returns 3 if green, 2 if blue
-                marker_colour = self.detect_marking(current_colour)
+                marker_colour = self.detect_marking(colour_left, colour_right)
                 if marker_colour == 3:
                     # stop after given number of greens
                     marker_counter += 1
@@ -133,12 +134,56 @@ class FollowLine:
                     # self.reverse = not self.reverse
                     return
 
-    def move_sideways(self, cm):
-        while not self.shut_down:
-            cm.run_timed(time_sp=self.DT, speed_sp=300)
-
-    # move fowards/backwards
     def run_y(self, distance):
+        if distance > 0:
+            reverse = False
+            number_of_markers = distance
+        else:
+            reverse = True
+            number_of_markers = distance * -1
+
+        marker_counter = 0
+        start_time = time()
+        while not self.shut_down:
+            if reverse:
+                self.csfl.mode = 'COL-REFLECT'  # measure light intensity
+                self.csfr.mode = 'COL-COLOR'  # measure colour
+                self.csbl.mode = 'COL-REFLECT'  # measure light intensity
+                self.csbr.mode = 'COL-COLOR'  # measure colour
+                self.cm.run_timed(time_sp=self.DT, speed_sp=300)
+            else:
+                self.csfl.mode = 'COL-COLOR'  # measure light intensity
+                self.csfr.mode = 'COL-REFLECT'  # measure colour
+                self.csbl.mode = 'COL-COLOR'  # measure light intensity
+                self.csbr.mode = 'COL-REFLECT'  # measure colour
+                self.cm.run_timed(time_sp=self.DT, speed_sp=-300)
+
+            if time() - start_time > self.MARKING_INTERVAL:
+                if reverse:
+                    colour_left = self.csbr.value()
+                    colour_right = self.csfr.value()
+                else:
+                    colour_left = self.csfl.value()
+                    colour_right = self.csbl.value()
+
+                # returns 3 if green, 2 if blue
+                marker_colour = self.detect_marking(colour_left, colour_right)
+                if marker_colour == 2:
+                    # stop after given number of greens
+                    marker_counter += 1
+                    ev3.Sound.beep()
+                    start_time = time()
+                    if marker_counter >= number_of_markers:
+                        # self.stop()
+                        return
+                elif marker_colour == 3:
+                    # stop on blue marker
+                    # self.stop()
+                    # self.reverse = not self.reverse
+                    return
+
+    # move forwards/backwards
+    def run_x(self, distance):
         if distance > 0:
             reverse = False
             number_of_markers = distance
@@ -157,4 +202,4 @@ class FollowLine:
 # Main function
 if __name__ == "__main__":
     robot = FollowLine()
-    robot.start(2)
+    robot.run_x(2)

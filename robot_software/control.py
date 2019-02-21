@@ -18,6 +18,6 @@ def calculate_torque(lval, rval, DT, integral, previous_error):
     # u negative: too dark,   turn left
     # u is torque (See IVR lecture on Control)
     u = (KP * error) + (KI * integral) + (KD * derivative)
-    print("u:", u)
+    #print("u:", u)
     logging.info("PID torque: ", u)
     return u, integral, error

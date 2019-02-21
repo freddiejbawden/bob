@@ -1,29 +1,29 @@
 #! /usr/bin/env python3
 import ev3dev.ev3 as ev3
 from followLineServer import FollowLine
+from threading import Thread
 
 
 class FollowPath:
     # Follow a path given by the server
 
     # Constructor
-    #def __init__(self):
-
+    def __init__(self):
+        self.shut_down = False
+        self.runner = None
 
     def go(self, path):
         line_follower = FollowLine()
         for direction, distance in path:
+            print(direction, distance)
             # direction move in forwards axis or side axis
-            if direction == 'Y':
+            if direction == 'X':
                 # start currently only deals with forwards and backwards motion
+                line_follower.run_x(distance)
+            elif direction == 'Y':
                 line_follower.run_y(distance)
-            elif direction == 'X':
-                if distance < 0:
-                    ev3.Sound.speak("Slide to the left").wait()
-                else:
-                    ev3.Sound.speak("Slide to the right").wait()
             elif direction == 'G':
-                ev3.Sound.speak("Criss cross").wait()
+                ev3.Sound.speak("Grab").wait()
         line_follower.stop()
 
     # TODO: possibly move start and stop to FollowPath or move correct trajectory to a separate file instead
@@ -39,9 +39,9 @@ class FollowPath:
 # Main function
 if __name__ == "__main__":
     path_follower = FollowPath()
-    # Y = forwards
-    # X = sideways
+    # X = forwards
+    # Y = sideways
     # G = grab
-    path = [('Y', 2), ('G', 0), ('Y', -2), ('G', 0), ('Y', 1), ('X', 1), ('Y', -2), ('G', 0), ('Y', 1), ('X', 1),
-            ('Y', 1), ('G', 0), ('Y', -1), ('X', -2)]
-    path_follower.go(path)
+    current_path = [('Y', 1), ('X', 2), ('G', 0), ('X', -1), ('G', 0), ('X', 2), ('Y', 1), ('G', 0), ('X', -4),
+                    ('Y', -2)]
+    path_follower.start(current_path)
