@@ -3,176 +3,92 @@ const assert = require('assert')
 const ObjectID = require('mongodb').ObjectID
 const factory = db => ({
     getOrders: userId =>
-        new Promise((res, rej) => {
-            db()
-                .collection('orders')
-                .find({ userId })
-                .toArray((err, docs) => {
-                    err ? rej(err) : res(docs)
-                })
-        }),
-    getOrderById: (orderId, userId) =>
-        new Promise((res, rej) => {
-            db()
-                .collection('orders')
-                .find({ _id: orderId, userId })
-                .toArray((err, docs) => {
-                    err ? rej(err) : res(docs[0])
-                })
-        }),
+        db()
+            .collection('orders')
+            .find({ userId })
+            .toArray(),
+    getOrderById: orderId =>
+        db()
+            .collection('orders')
+            .findOne({ _id: ObjectID(orderId) }),
     addOrder: orderData =>
         // TODO: Check stock before finishing the order.
-        new Promise((res, rej) => {
-            db()
-                .collection('orders')
-                .insertOne(orderData, (err, order) => {
-                    if (err) {
-                        rej(err)
-                        return
-                    }
-                    Promise.all(orderData.items.map(i => factory(db).removeItem(i)))
-                        .then(() => factory(db).turnOn(1))
-                        .then(() => res(orderData))
-                        .catch(err => rej(err))
-                })
-        }),
+        db()
+            .collection('orders')
+            .insertOne(orderData)
+            .then(() => Promise.all(orderData.items.map(i => factory(db).removeItem(i))))
+            .then(() => factory(db).turnOn(1))
+            .then(() => orderData),
     turnOn: markers =>
-        new Promise((res, rej) => {
-            db()
-                .collection('bob_movement')
-                .updateOne(
-                    { _id: 'movement' },
-                    { $set: { moving: true, markers: parseInt(markers) } },
-                    (err, count_modified) => {
-                        err ? rej(err) : res('on')
-                    }
-                )
-        }),
+        db()
+            .collection('bob_movement')
+            .updateOne({ _id: 'movement' }, { $set: { moving: true, markers: parseInt(markers) } })
+            .then(() => 'on'),
     turnOff: () =>
-        new Promise((res, rej) => {
-            db()
-                .collection('bob_movement')
-                .updateOne({ _id: 'movement' }, { $set: { moving: false } }, (err, count_modified) => {
-                    err ? rej(err) : res('off')
-                })
-        }),
+        db()
+            .collection('bob_movement')
+            .updateOne({ _id: 'movement' }, { $set: { moving: false } })
+            .then(() => 'off'),
     getMovement: () =>
-        new Promise((res, rej) => {
-            db()
-                .collection('bob_movement')
-                .find({})
-                .toArray((err, docs) => {
-                    err ? rej(err) : res(docs[0])
-                })
-        }),
+        db()
+            .collection('bob_movement')
+            .findOne(),
     getWarehouses: () =>
-        new Promise((res, rej) => {
-            db()
-                .collection('warehouses')
-                .find({})
-                .toArray((err, docs) => {
-                    err ? rej(err) : res(docs)
-                })
-        }),
-    getWarehouseById: warehouseId =>
-        new Promise((res, rej) => {
-            db()
-                .collection('warehouses')
-                .find({ _id: warehouseId })
-                .toArray((err, warehouses) => {
-                    if (err) {
-                        rej(err)
-                        return
-                    }
-                    if (!warehouses[0]) {
-                        res(null)
-                        return
-                    }
-                    factory(db)
-                        .getItemsByWarehouseId(warehouseId)
-                        .then(items => {
-                            const warehouse = {
-                                ...warehouses[0],
-                                items
-                            }
-                            res(warehouse)
-                        })
-                        .catch(rej)
-                })
-        }),
+        db()
+            .collection('warehouses')
+            .find()
+            .toArray(),
+    getWarehouseById: async warehouseId => {
+        const warehouse = await db()
+            .collection('warehouses')
+            .findOne({ _id: warehouseId })
+        if (!warehouse) return null
+
+        const items = await factory(db).getItemsByWarehouseId(warehouseId)
+        return {
+            ...warehouse,
+            items
+        }
+    },
     getItemsByWarehouseId: warehouseId =>
-        new Promise((res, rej) => {
-            db()
-                .collection('inventory')
-                .find({ warehouseId })
-                .toArray((err, items) => {
-                    err ? rej(err) : res(items)
-                })
-        }),
+        db()
+            .collection('inventory')
+            .find({ warehouseId })
+            .toArray(),
     getOrdersByWarehouseId: warehouseId =>
-        new Promise((res, rej) => {
-            db()
-                .collection('orders')
-                .find({ warehouseId })
-                .toArray((err, items) => {
-                    err ? rej(err) : res(items)
-                })
-        }),
-    addItem: item =>
-        new Promise((res, rej) => {
-            if (!item._id) {
-                item = { _id: new ObjectID(), ...item }
-                db()
-                    .collection('inventory')
-                    .insertOne(item, (err, result) => {
-                        err ? rej(err) : res(item)
-                    })
-            } else {
-                db()
-                    .collection('inventory')
-                    .updateOne({ _id: item._id }, { $set: item }, (err, count_modified) => {
-                        if (err) {
-                            rej(err)
-                        } else if (count_modified === 0) {
-                            res(null)
-                        } else {
-                            console.log('count_modified:', count_modified)
-                            res(item)
-                        }
-                    })
-            }
-        }),
-    removeItem: item =>
-        new Promise((res, rej) => {
-            db()
+        db()
+            .collection('orders')
+            .find({ warehouseId })
+            .toArray(),
+    addItem: item => {
+        if (!item._id) {
+            item = { _id: new ObjectID(), ...item }
+            return db()
                 .collection('inventory')
-                .deleteOne({ _id: item._id }, (err, item) => {
-                    err ? rej(err) : res(item)
-                })
-        }),
-    createUser: (username, type) =>
-        new Promise((res, rej) => {
-            const user = { _id: new ObjectID(), username, type }
-            db()
-                .collection('users')
-                .insertOne(user, (err, result) => {
-                    err ? rej(err) : res(user)
-                })
-        }),
+                .insertOne(item)
+                .then(() => item)
+        } else {
+            return db()
+                .collection('inventory')
+                .updateOne({ _id: item._id }, { $set: item })
+                .then(modifiedCount => (modifiedCount ? item : null))
+        }
+    },
+    removeItem: item =>
+        db()
+            .collection('inventory')
+            .deleteOne({ _id: item._id }),
+    createUser: (username, type) => {
+        const user = { _id: new ObjectID(), username, type }
+        return db()
+            .collection('users')
+            .insertOne(user)
+            .then(() => user)
+    },
     authUser: username =>
-        new Promise((res, rej) => {
-            db()
-                .collection('users')
-                .find({ username })
-                .toArray((err, users) => {
-                    console.log(users)
-                    if (err) {
-                        rej(err)
-                        return
-                    }
-                    res(users[0] || null)
-                })
-        })
+        db()
+            .collection('users')
+            .findOne({ username })
 })
 
 module.exports = factory(db)

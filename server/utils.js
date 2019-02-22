@@ -32,3 +32,10 @@ module.exports.getIp = () => {
     console.log('=== END IP ADDRESSES ===')
     return ips[0]
 }
+
+module.exports.loadDBwithData = (db, data) => {
+    const promises = Object.keys(data)
+        .map(collection => ({ collection, data: data[collection] }))
+        .map(({ collection, data }) => db.collection(collection).insertMany(data))
+    return Promise.all(promises)
+}

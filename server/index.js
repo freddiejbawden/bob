@@ -45,16 +45,17 @@ app.get(
 
 app.get(
     '/order/:orderId',
-    auth.customer((req, res, next) => {
-        const orderId = req.params.orderId
+    auth.customer((req, res, next) =>
         model
-            .getOrderById(orderId)
+            .getOrderById(req.params.orderId)
             .then(order => {
-                if (order) res.json({ success: true, order })
+                if (order && req.user._id.equals(order.userId)) res.json({ success: true, order })
+                else if (order)
+                    res.status(403).json({ success: false, error: 'You cannot view details on this order.' })
                 else res.status(404).json({ success: true, order: null })
             })
             .catch(next)
-    })
+    )
 )
 // TODO: Check if ordered items exist.
 // TODO: Reduce amount on items ordered.

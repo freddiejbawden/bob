@@ -1,0 +1,7 @@
+{
+    "bob_movement": [{
+        "_id": "movement",
+        "moving": false,
+        "markers": 1
+    }]
+}
