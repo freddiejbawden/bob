@@ -105,26 +105,18 @@ class FollowLine:
                 # if off line for more than a second move side-to-side until line is found
                 print(time() - time_off_line)
                 if time() - time_off_line > 0.5:
-                    """self.lm.stop()
-                    self.rm.stop()
-                    correction_speed = 100
-                    correction_time = 500
-                    while lval > 90 and rval > 70:
+                    correction_speed = 200
+                    correction_time = 100
+                    while lval > 70 and rval > 50:
                         self.cm.run_timed(time_sp=correction_time, speed_sp=correction_speed)
                         correction_speed *= -1
-                        correction_time += 100"""
-                    while lval > 80 and rval > 60:
-                        print(speed_right, speed_left)
-                        if self.reverse:
-                            self.lm.run_timed(time_sp=self.DT, speed_sp=-speed_right)
-                            self.rm.run_timed(time_sp=self.DT, speed_sp=-speed_left)
-                        else:
-                            self.lm.run_timed(time_sp=self.DT, speed_sp=-(-speed_left))
-                            self.rm.run_timed(time_sp=self.DT, speed_sp=-(-speed_right))
+                        correction_time += 100
+                        sleep(correction_time/1000) # milliseconds to seconds
                         lval = self.csfl.value()
                         rval = self.csfr.value()
-                        sleep(self.DT / 1000)
                     time_off_line = 0
+            else:
+                time_off_line = 0
 
             u, integral, previous_error = control.calculate_torque\
                 (lval, rval, self.DT, integral, previous_error)
@@ -158,7 +150,8 @@ class FollowLine:
                         self.stop()
                 elif marker_colour == 2:
                     # stop on blue marker
-                    self.stop()
+                    # self.stop()
+                    print("blue")
                     # self.reverse = not self.reverse
 
     def move_sideways(self, cm):
@@ -190,4 +183,4 @@ class FollowLine:
 # Main function
 if __name__ == "__main__":
     robot = FollowLine()
-    robot.start(2)
+    robot.start(5)
