@@ -2,7 +2,6 @@
 import ev3dev.ev3 as ev3
 import logging
 from time import sleep, time
-import detectMarking
 import control
 
 
@@ -43,7 +42,11 @@ class FollowLine:
         assert self.rm.connected
         assert self.cm.connected
 
+        self.blue = 2
+        self.green = 3
+
         self.consecutive_colours = 0  # counter for consecutive colour readings
+        self.ignore_blue = False
         #self.number_of_markers = 0  # at which marker it should stop
 
     def detect_marking(self, colour_left, colour_right):
@@ -70,20 +73,23 @@ class FollowLine:
         marker_counter = 0
         start_time = time()
 
+        if reverse:
+            self.csfl.mode = 'COL-COLOR'  # measure colour
+            self.csfr.mode = 'COL-COLOR'  # measure colour
+            self.csbl.mode = 'COL-REFLECT'  # measure light intensity
+            self.csbr.mode = 'COL-REFLECT'  # measure light intensity
+        else:
+            self.csfl.mode = 'COL-REFLECT'  # measure light intensity
+            self.csfr.mode = 'COL-REFLECT'  # measure light intensity
+            self.csbl.mode = 'COL-COLOR'  # measure colour
+            self.csbr.mode = 'COL-COLOR'
+
         # Assign sensors to act as front or back
         while not self.shut_down:
             if reverse:
-                self.csfl.mode = 'COL-COLOR'  # measure colour
-                self.csfr.mode = 'COL-COLOR'  # measure colour
-                self.csbl.mode = 'COL-REFLECT'  # measure light intensity
-                self.csbr.mode = 'COL-REFLECT'  # measure light intensity
                 lval = self.csbr.value()  # back right becomes front left
                 rval = self.csbl.value()
             else:
-                self.csfl.mode = 'COL-REFLECT'  # measure light intensity
-                self.csfr.mode = 'COL-REFLECT'  # measure light intensity
-                self.csbl.mode = 'COL-COLOR'  # measure colour
-                self.csbr.mode = 'COL-COLOR'
                 lval = self.csfl.value()
                 rval = self.csfr.value()
 
@@ -120,15 +126,16 @@ class FollowLine:
 
                 # returns 3 if green, 2 if blue
                 marker_colour = self.detect_marking(colour_left, colour_right)
-                if marker_colour == 3:
+                if marker_colour == self.green:
                     # stop after given number of greens
+                    self.ignore_blue = False
                     marker_counter += 1
                     ev3.Sound.beep()
                     start_time = time()
                     if marker_counter >= number_of_markers:
                         # self.stop()
                         return
-                elif marker_colour == 2:
+                elif marker_colour == self.blue and not self.ignore_blue:
                     # stop on blue marker
                     # self.stop()
                     # self.reverse = not self.reverse
@@ -142,42 +149,48 @@ class FollowLine:
             reverse = True
             number_of_markers = distance * -1
 
+        if reverse:
+            self.csfl.mode = 'COL-COLOR'  # measure light intensity
+            self.csfr.mode = 'COL-REFLECT'  # measure colour
+            self.csbl.mode = 'COL-COLOR'  # measure light intensity
+            self.csbr.mode = 'COL-REFLECT'  # measure colour
+        else:
+            self.csfl.mode = 'COL-REFLECT'  # measure light intensity
+            self.csfr.mode = 'COL-COLOR'  # measure colour
+            self.csbl.mode = 'COL-REFLECT'  # measure light intensity
+            self.csbr.mode = 'COL-COLOR'  # measure colour
+
         marker_counter = 0
         start_time = time()
         while not self.shut_down:
             if reverse:
-                self.csfl.mode = 'COL-REFLECT'  # measure light intensity
-                self.csfr.mode = 'COL-COLOR'  # measure colour
-                self.csbl.mode = 'COL-REFLECT'  # measure light intensity
-                self.csbr.mode = 'COL-COLOR'  # measure colour
-                self.cm.run_timed(time_sp=self.DT, speed_sp=300)
+                self.cm.run_timed(time_sp=self.DT, speed_sp=-400)
             else:
-                self.csfl.mode = 'COL-COLOR'  # measure light intensity
-                self.csfr.mode = 'COL-REFLECT'  # measure colour
-                self.csbl.mode = 'COL-COLOR'  # measure light intensity
-                self.csbr.mode = 'COL-REFLECT'  # measure colour
-                self.cm.run_timed(time_sp=self.DT, speed_sp=-300)
+                self.cm.run_timed(time_sp=self.DT, speed_sp=400)
+            sleep(self.DT / 1000)
 
             if time() - start_time > self.MARKING_INTERVAL:
                 if reverse:
-                    colour_left = self.csbr.value()
-                    colour_right = self.csfr.value()
-                else:
                     colour_left = self.csfl.value()
                     colour_right = self.csbl.value()
+                else:
+                    colour_left = self.csbr.value()
+                    colour_right = self.csfr.value()
+
 
                 # returns 3 if green, 2 if blue
                 marker_colour = self.detect_marking(colour_left, colour_right)
-                if marker_colour == 2:
-                    # stop after given number of greens
+                if marker_colour == self.blue:
+                    # stop after given number of blues
                     marker_counter += 1
                     ev3.Sound.beep()
                     start_time = time()
                     if marker_counter >= number_of_markers:
                         # self.stop()
+                        self.ignore_blue = True
                         return
-                elif marker_colour == 3:
-                    # stop on blue marker
+                elif marker_colour == self.green:
+                    # stop on green marker
                     # self.stop()
                     # self.reverse = not self.reverse
                     return
