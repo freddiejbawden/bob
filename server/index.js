@@ -8,6 +8,9 @@ const auth = require('./auth')
 
 const PORT = process.env.PORT || 9000
 
+const API_LEVEL = 'v1'
+console.log('Using api level ' + API_LEVEL)
+
 db.init()
     .then(db => console.log('Initialized database connection.'))
     .catch(err => console.error('Error initializing database connection.', err))

@@ -2,6 +2,7 @@
 import traceback
 #check that the robot packages are present
 print("Starting Client")
+print("Using API level v1")
 ev3_package_check = True
 try:
     import ev3dev.ev3 as ev3
@@ -30,7 +31,6 @@ print("threading imported")
 from zeroconf import ServiceBrowser, Zeroconf
 print("zeroconf imported")
 #remove me
-
 
 last_json = {}
 
