@@ -35,10 +35,7 @@ app.get(
     auth.customer((req, res, next) =>
         model
             .getOrders(req.user._id)
-            .then(orders => {
-                if (orders) res.json({ success: true, orders })
-                else res.status(404).json({ success: false, orders: null })
-            })
+            .then(orders => res.json({ success: true, orders }))
             .catch(next)
     )
 )
@@ -72,19 +69,13 @@ app.post(
 app.get('/warehouse', (req, res, next) => {
     model
         .getWarehouses()
-        .then(warehouses => {
-            if (warehouses) res.json({ success: true, warehouses })
-            else res.status(404).json({ success: true, warehouses: null })
-        })
+        .then(warehouses => res.json({ success: true, warehouses }))
         .catch(next)
 })
 app.get('/warehouse/:warehouseId', (req, res, next) => {
     model
         .getWarehouseById(req.params.warehouseId)
-        .then(warehouse => {
-            if (warehouse) res.json({ success: true, warehouse })
-            else res.status(404).json({ success: true, warehouse: null })
-        })
+        .then(warehouse => res.status(warehouse ? 200 : 404).json({ success: true, warehouse }))
         .catch(next)
 })
 
