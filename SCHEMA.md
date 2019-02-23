@@ -95,20 +95,13 @@ Robot {
 | `GET` | `/getmovement` | `Robot` | Gets the current task for the robot. |
 | `PUT` | `/updatemovement` | `Robot` | Signals the server that robot is finished with current movement task. The server should assign a new task here. |
 
-#### Internal Server Error (Status 500)
+#### Error Handling
+All requests that complete successfully respond with a JSON object with `"success": true`. Any failure to fulfill the request results in the following response with an appropriate status code >= 400:
 ```javascript
 ===== Output =====
 {
     "success": false,
     "error": String
-}
-```
-#### Unauthorized (Status 401)
-```javascript
-===== Output =====
-{
-    "success": false,
-    "error": "You are not authorized to use this resource."
 }
 ```
 
