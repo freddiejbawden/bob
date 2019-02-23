@@ -19,7 +19,8 @@ For requests that require authentication, include an http header called `"userna
 User {
     "_id": String,
     "username": String,
-    "type": "merchant" or "customer" or "robot"
+    "type": "merchant" or "customer" or "robot",
+    "robotId": String // Only for type: robot
 }
 
 Item {
@@ -27,13 +28,16 @@ Item {
     "warehouseId": String,
     "name": String,
     "image": Base64 encoded String (or null for default image),
-    "position": {
-        "x": Int, // Perpendicular to robot's initial position.
-        "y": Int, // Parallel to robot's initial position.
-        "z": Int // Vertical
-    },
+    "position": Position,
     "quantity": Double,
-    "unit": String (or null if there is no unit)
+    "unit": String (or null if there is no unit),
+    "price": Double // In GBP
+}
+
+Position {
+    "x": Int, // Perpendicular to robot's initial position.
+    "y": Int, // Parallel to robot's initial position.
+    "z": Int // Vertical
 }
 
 Order {
@@ -72,6 +76,34 @@ Robot {
         "z": Int // Vertical
     }
 }
+
+Job {
+    "_id": String,
+    "start": Position,
+    "finish": Position,
+    "instruction_set": [Instruction]
+}
+
+// Instruction object can be one of the following:
+Instruction {
+    "command": "move",
+    "parameters": {
+        "blocks": Int, // Positive
+        "direction": "forward" or "backward" or "left" or "right"
+    }
+}
+// or
+Instruction {
+    "command": "lift",
+    "parameters": {
+        "height": Double // in meters
+    }
+}
+// or
+Instruction {
+    "command": "grab",
+    "parameters": {}
+}
 ```
 
 
@@ -86,15 +118,17 @@ Robot {
 | `GET` | `/order/:orderId` | `Customer` | Gets `Order` with given id. |
 | `POST` | `/order` | `Customer` | Adds given `Order`. |
 | `GET` | `/warehouse` | | Gets all `Warehouse`s. |
+| `POST` | `/warehouse` | `Merchant` | Create/edit a warehouse. |
 | `GET` | `/warehouse/:warehouseId` | | Gets given `Warehouse` with its items. |
 | `POST` | `/warehouse/:warehouseId/items` | `Merchant` | Adds an `Item` to a `Warehouse`. |
 | `GET` | `/warehouse/:warehouseId/orders` | `Merchant` | Gets all orders in the given `Warehouse`. |
 | `GET` | `/warehouse/:warehouseId/robot` | `Merchant` | Gets the state of the robot(s). |
+| `GET` | `/robot` | `Robot` | Get details of the current Robot. |
+| `GET` | `/robot/:robotId` | `Merchant` | Get details about the robot with given `robotId` |
+| `POST` | `/robot/:robotId/sethome` | `Merchant` | Set the home location of the robot. |
+| `GET` | `/robotjob` | `Robot` | Gets the next job the robot needs to do. |
 | `PUT` | `/turnon/:n` | | Starts moving the robot. Robot stops after seeing `n` markers. |
 | `PUT` | `/turnoff` | | Stops the robot. |
-| `GET` | `/getmovement` | `Robot` | Gets the current task for the robot. |
-| `PUT` | `/updatemovement` | `Robot` | Signals the server that robot is finished with current movement task. The server should assign a new task here. |
-
 #### Error Handling
 All requests that complete successfully respond with a JSON object with `"success": true`. Any failure to fulfill the request results in the following response with an appropriate status code >= 400:
 ```javascript
@@ -176,6 +210,17 @@ Order // without _id field
 }
 ```
 
+#### `POST /warehouse`
+```javascript
+===== Input =====
+Warehouse //With _id if updating an existing warehouse, or without _id if creating a new one.
+===== Output =====
+{
+    "success": true,
+    "warehouse": Warehouse
+}
+```
+
 #### `GET /warehouse/:warehouseId`
 ```javascript
 ===== Output =====
@@ -191,7 +236,8 @@ Order // without _id field
 Item //With _id if updating an existing item, or without _id if creating a new one.
 ===== Output =====
 {
-    "success": true
+    "success": true,
+    "item": Item
 }
 ```
 
@@ -213,6 +259,43 @@ Item //With _id if updating an existing item, or without _id if creating a new o
 }
 ```
 
+#### `GET /robot`
+```javascript
+===== Output =====
+{
+    "success": true,
+    "robot": Robot
+}
+```
+
+#### `GET /robot/:robotId`
+```javascript
+===== Output =====
+{
+    "success": true,
+    "robot": Robot
+}
+```
+
+#### `POST /robot/:robotId/sethome`
+```javascript
+===== Input =====
+Position
+===== Output =====
+{
+    "success": true
+}
+```
+
+#### `GET /robotjob`
+```javascript
+===== Output =====
+{
+    "success": true,
+    "job": Job
+}
+```
+
 #### `PUT /turnon/:n`
 ```javascript
 ===== Output =====
@@ -223,28 +306,6 @@ Item //With _id if updating an existing item, or without _id if creating a new o
 
 #### `PUT /turnoff`
 ```javascript
-===== Output =====
-{
-    "success": true
-}
-```
-
-#### `GET /getmovement`
-```javascript
-===== Output =====
-{
-    "success": true,
-    "status": {
-        "moving": Boolean,
-        "markers": Int (or null if not moving)
-    }
-}
-```
-
-#### `PUT /updatemovement`
-```javascript
-===== Input =====
-// TODO: Put information about the robot's current state, so the server can provide proper instructions.
 ===== Output =====
 {
     "success": true
