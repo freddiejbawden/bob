@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 import ev3dev.ev3 as ev3
-from followLineServer import FollowLine
+from followLine import FollowLine
 from threading import Thread
 
 
