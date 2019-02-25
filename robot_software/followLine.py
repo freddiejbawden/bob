@@ -141,7 +141,7 @@ class FollowLine:
                     # self.reverse = not self.reverse
                     return
 
-    def run_backwards(self, distance, reverse):
+    def run_sideways(self, distance, reverse):
 
         if reverse:
             self.csfl.mode = 'COL-COLOR'  # measure light intensity

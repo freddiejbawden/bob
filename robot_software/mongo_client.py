@@ -30,8 +30,10 @@ from threading import Thread
 print("threading imported")
 from zeroconf import ServiceBrowser, Zeroconf
 print("zeroconf imported")
-from bob_translation import extract
-print("bob_translation imported")
+from bobTranslation import extract
+print("bobTranslation imported")
+from followPath import FollowPath
+print("followPath imported")
 #remove me
 
 last_json = {}
@@ -46,12 +48,14 @@ def polling(ip_addr, port, run_robot,username):
             headers = {'username':username}
             r = requests.get("http://{}:{}/robotjob".format(ip_addr,port),headers=headers)
             path = json.loads(r.text)
-            if (path["job"] == []):
+            if path["job"] == []:
                 print("No order")
             else:
                 print(path['job'])
-                print(extract(path['job']['instruction_set']))
-                #TODO: pass to robot
+                path_tuples = extract(path['job']['instruction_set'])
+                print("Path tuples: ", path_tuples)
+                robot_boy = FollowPath()
+                robot_boy.start(path_tuples)
             
         except:
             
