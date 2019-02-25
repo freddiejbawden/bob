@@ -52,6 +52,7 @@ Order {
 Warehouse {
     "_id": String,
     "merchantId": String, // The merchant that owns this warehouse.
+    "name": String,
     "image": Base64 encoded String (or null for default image),
     "location": {
         "latitude": Double,
@@ -70,6 +71,8 @@ Robot {
     "warehouseId": String,
     "last_seen": ISO-8601 formatted date String,
     "status": "WAITING" or "ON_JOB" or "MIA" or "NOT_RESPONDING" or "MANUAL_CONTROL",
+    "home_x": Int,
+    "home_y": Int,
     "location": {
         "x": Int, // Perpendicular to robot's initial position.
         "y": Int, // Parallel to robot's initial position.
