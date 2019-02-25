@@ -1,6 +1,9 @@
 const MongoClient = require('mongodb').MongoClient
-
-const mongo_url = process.env.MONGO || 'mongodb://localhost:27017/db'
+const MongoMemoryServer = require('mongodb-memory-server').MongoMemoryServer
+const FAKE_DB = process.env.DB === 'fake'
+const MONGO_URL = process.env.MONGO || 'mongodb://localhost:27017/db'
+const fakeData = require('./fake_db.json')
+const loadDBwithData = require('./utils').loadDBwithData
 
 let client = null
 let db = null
@@ -12,32 +15,24 @@ module.exports = () => {
     return db
 }
 
-const model = require('./model')
-
-module.exports.init = () => {
+module.exports.init = async () => {
+    let mongo_url = MONGO_URL
+    if (FAKE_DB) {
+        console.log('Using fake mongo in memory.')
+        const mongod = new MongoMemoryServer()
+        mongo_url = await mongod.getConnectionString()
+    } else {
+        console.log('Using real mongo at ' + mongo_url)
+    }
     client = new MongoClient(mongo_url, {
         useNewUrlParser: true
     })
-    return new Promise((res, rej) => {
-        client.connect(function(err) {
-            if (err) {
-                rej(err)
-                return
-            }
-            db = client.db('bob')
-            //FOR DEMO 1
+    await client.connect()
+    db = client.db('bob')
 
-            db.collection('bob_movement').insertOne({ _id: 'movement', moving: false, markers: 1 }, (err, doc) => {
-                if (err) {
-                    console.log('Movment already in database')
-                    model
-                        .turnOff()
-                        .then(() => console.log('Robot Stopped'))
-                        .catch(err => console.error(err))
-                }
-            })
-            res(db)
-            //console.log(`Initialized database connection on ${mongo_url}.`)
-        })
-    })
+    if (FAKE_DB) {
+        await loadDBwithData(db, fakeData)
+        console.log('Initialized database with fake data.')
+    }
+    return db
 }
