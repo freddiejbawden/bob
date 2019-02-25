@@ -50,11 +50,11 @@ def polling(ip_addr, port, run_robot,username):
                 print("No order")
             else:
                 print(path['job'])
+                print(extract(path['job']['instruction_set']))
                 #TODO: pass to robot
             
         except:
-            url = "http://{}:{}/getmovement".format(ip_addr,port)
-            print("GET request: {} failed at {}".format(url,datetime.datetime.now()))
+            
             traceback.print_exc()
 
         time.sleep(5)

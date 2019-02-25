@@ -37,7 +37,8 @@ generate_drop_instruction = () => {
 }
 generate_grab_instruction = () => {
     return {
-        command: 'grab'
+        command: 'grab',
+        parameters: {}
     }
 }
 
@@ -64,15 +65,15 @@ generate_movement_instruction = (start, end) => {
         var num_blocks = end[1] - start[1]
         var direction = ''
         if (num_blocks < 0) {
-            direction = 'backwards'
+            direction = 'backward'
             num_blocks = num_blocks * -1
         } else {
-            direction = 'forwards'
+            direction = 'forward'
         }
     }
     return {
         command: 'move',
-        parameter: {
+        parameters: {
             blocks: num_blocks,
             direction: direction
         }
