@@ -30,6 +30,8 @@ from threading import Thread
 print("threading imported")
 from zeroconf import ServiceBrowser, Zeroconf
 print("zeroconf imported")
+from bob_translation import extract
+print("bob_translation imported")
 #remove me
 
 last_json = {}
