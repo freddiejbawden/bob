@@ -7,6 +7,7 @@
     "start": "node index.js",
     "dev": "DB=fake nodemon index.js",
     "dev-real": "nodemon index.js",
+    "randomid": "node getrandomid.js",
     "test": "jest"
   },
   "repository": {
