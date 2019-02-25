@@ -34,37 +34,28 @@ print("zeroconf imported")
 
 last_json = {}
 
-def polling(ip_addr, port, run_robot):
+def polling(ip_addr, port, run_robot,username):
     running = True
     movement = False
     if run_robot:
         bob_bot = FollowLine()
     while running:
         try:
-            r = requests.get("http://{}:{}/getmovement".format(ip_addr,port))
-            robot = json.loads(r.text)['status']
-            print(robot['moving'],movement)
-            if (robot['moving'] == True and movement == False):
-                #fire motors
-                print("Turned on!")
-                if (run_robot):
-
-                    bob_bot.start(int(robot['markers']))
-                    # TODO: Find out a way to halt this call
-                    # so we can start and stop the robot
-            elif(robot['moving'] == False and movement == True):
-                bob_bot.stop()
-                # ev3.Sound.speak("yeet")
-                if (run_robot):
-                    ev3.Sound.beep()
-                print("Turned Off!")
-            movement = robot['moving']
+            headers = {'username':username}
+            r = requests.get("http://{}:{}/robotjob".format(ip_addr,port),headers=headers)
+            path = json.loads(r.text)
+            if (path["job"] == []):
+                print("No order")
+            else:
+                print(path['job'])
+                #TODO: pass to robot
+            
         except:
             url = "http://{}:{}/getmovement".format(ip_addr,port)
             print("GET request: {} failed at {}".format(url,datetime.datetime.now()))
             traceback.print_exc()
 
-        time.sleep(1)
+        time.sleep(5)
 
 class MyListener:
     def __init__(self,run_robot):
@@ -80,16 +71,27 @@ class MyListener:
         if (name == "assis10t._http._tcp.local."):
             #TODO: call get 3 times
             try:
-                r = requests.get("http://{}:{}/ping".format(ip_addr,port))
+                base_url = "http://{}:{}".format(ip_addr,port)
+                
+                r = requests.get("http://{}:{}/ping".format(ip_addr, port))
                 # wait for response
                 if (r.text == "pong"):
                     print("Server running on {}:{}".format(ip_addr,port))
-
+                    username = "bob_test"
+                    body = {'username':username,'type':'robot'}
+                    r = requests.post('http://{}:{}/register'.format(ip_addr,port),json=body)
+                    if (json.loads(r.text)["success"]):
+                        print('Registered bob_test')
+                    else:
+                        print(r.text)
+                    
+                    r = requests.get('http://{}:{}/robot'.format(ip_addr,port),headers={'username':'bob_test'})
+                    print(r.text)
                     if (self.run_robot):
                         ev3.Sound.tone([(1000, 250, 0),(1500, 250, 0),(2000, 250, 0)]).wait()
                         ev3.Sound.speak("i am bob. Beep. i collect your shopping").wait()
                         # TODO: add light to indicate status
-                    poller = Thread(target=polling, name="poller",args=(ip_addr,port,self.run_robot))
+                    poller = Thread(target=polling, name="poller",args=(ip_addr,port,self.run_robot,username))
                     poller.start()
                 else:
                     print("Server did not respond!")

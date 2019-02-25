@@ -41,5 +41,58 @@
     "bob_movement": [{
         "moving": false,
         "markers": 1
+    }],
+    "warehouse":[{
+        "_id" : "warehouse_01",
+        "dimensions" : {
+            "x" : 5,
+            "y" : 5,
+            "z" : 1
+        }
+    }],
+    "users":[{
+        "_id": "5c71577f9eef777736ce92fd",
+        "username": "test_01",
+        "type": "customer"
+    }],
+    "orders":[
+        {
+            "_id": "order_01",
+            "items": [
+                {
+                    "_id": "item_01",
+                    "name": "apple",
+                    "quantity": 1,
+                    "position": {
+                        "x": 2,
+                        "y": 1,
+                        "z": 2
+                    }
+                },
+                {
+                    "_id": "item_02",
+                    "warehouseId": "1,1,1",
+                    "name": "banana",
+                    "quantity": 2,
+                    "position": {
+                        "x": 1,
+                        "y": 0,
+                        "z": 1
+                    }
+                }
+            ],
+            "status": "PENDING",
+            "userId": "5c71577f9eef777736ce92fd"
+        }
+    ],
+    "robot":[{
+        "_id" : "robot_03",
+        "home_x" : 0,
+        "home_y" : 0,
+        "location" : {
+            "x" : 0,
+            "y" : 0,
+            "z" : 0
+        }
     }]
 }
