@@ -72,12 +72,15 @@ app.get('/warehouse', (req, res, next) => {
         .then(warehouses => res.json({ success: true, warehouses }))
         .catch(next)
 })
-app.post('/warehouse', (req, res, next) => {
-    model
-        .addWarehouse(req.body)
-        .then(warehouse => res.json({ success: true, warehouse }))
-        .catch(next)
-})
+app.post(
+    '/warehouse',
+    auth.merchant((req, res, next) => {
+        model
+            .addWarehouse({ ...req.body, merchantId: req.user._id })
+            .then(warehouse => res.json({ success: true, warehouse }))
+            .catch(next)
+    })
+)
 app.get('/warehouse/:warehouseId', (req, res, next) => {
     model
         .getWarehouseById(req.params.warehouseId)
@@ -89,7 +92,7 @@ app.post(
     '/warehouse/:warehouseId/items',
     auth.merchant((req, res, next) => {
         model
-            .getWarehouseById(warehouseId)
+            .getWarehouseById(req.params.warehouseId)
             .then(warehouse => {
                 if (!warehouse) {
                     res.status(404).json({
@@ -98,7 +101,7 @@ app.post(
                     })
                     throw null
                 }
-                if (warehouse.merchantId !== req.user._id) {
+                if (!req.user._id.equals(warehouse.merchantId)) {
                     res.status(403).json({
                         success: false,
                         error: 'You cannot modify items in a warehouse you dont own.'
