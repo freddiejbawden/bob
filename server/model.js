@@ -17,7 +17,28 @@ const factory = db => ({
         db()
             .collection('orders')
             .insertOne(orderData)
-            .then(() => Promise.all(orderData.items.map(i => factory(db).removeItem(i))))
+            .then(() =>
+                Promise.all(
+                    orderData.items.map(i =>
+                        db()
+                            .collection('inventory')
+                            .findOne({ _id: ObjectID(i._id) })
+                    )
+                )
+            )
+            .then(items =>
+                orderData.items.map((item, i) => ({
+                    _id: ObjectID(item._id),
+                    quantity: items[i].quantity - item.quantity
+                }))
+            )
+            .then(updatedItems => {
+                if (!updatedItems.every(i => i.quantity >= 0)) {
+                    throw Error('One of the items in the order is more than available stock.')
+                }
+                return updatedItems
+            })
+            .then(updatedItems => Promise.all(updatedItems.map(i => factory(db).addItem(i))))
             .then(() => factory(db).turnOn(1))
             .then(() => orderData),
     turnOn: markers =>
@@ -75,8 +96,8 @@ const factory = db => ({
             .collection('orders')
             .find({ warehouseId })
             .toArray(),
-    addItem: item => {
-        if (!item._id) {
+    addItem: ({ _id, ...item }) => {
+        if (!_id) {
             item = { _id: new ObjectID(), ...item }
             return db()
                 .collection('inventory')
@@ -85,7 +106,7 @@ const factory = db => ({
         } else {
             return db()
                 .collection('inventory')
-                .updateOne({ _id: ObjectID(item._id) }, { $set: item })
+                .updateOne({ _id: ObjectID(_id) }, { $set: item })
                 .then(modifiedCount => (modifiedCount ? item : null))
         }
     },
@@ -99,27 +120,25 @@ const factory = db => ({
             .collection('users')
             .insertOne(user)
             .then(() => user)
-        
-    
     },
     authUser: username =>
         db()
             .collection('users')
             .findOne({ username }),
-    setHome: (robot_id,home_x,home_y) => 
-    new Promise((res, rej) => {
-        db()
-            .collection('robot')
-            .updateOne({_id : robot_id}, {$set: {"home_x": home_x, "home_y":home_y}}, (err, warehouse) => {
-                err ? rej(err) : res(warehouse);
-            });
-    }),
-    getRobot: (robot_id) => {
+    setHome: (robot_id, home_x, home_y) =>
+        new Promise((res, rej) => {
+            db()
+                .collection('robot')
+                .updateOne({ _id: robot_id }, { $set: { home_x, home_y } }, (err, warehouse) => {
+                    err ? rej(err) : res(warehouse)
+                })
+        }),
+    getRobot: robot_id => {
         return new Promise((res, rej) => {
             db()
                 .collection('robot')
-                .find({_id:robot_id})
-                .toArray((err,robot) => {
+                .find({ _id: robot_id })
+                .toArray((err, robot) => {
                     console.log(robot)
                     console.log(err)
                     if (err) {
@@ -131,71 +150,99 @@ const factory = db => ({
         })
     },
     addRobot: (robot_id, home_x, home_y) =>
-        new Promise((res,rej) => {
+        new Promise((res, rej) => {
             db()
                 .collection('robot')
                 .insertOne(
-                            {   
-                                _id: robot_id, 
-                                status: 'WAITING',
-                                home_x:home_x,
-                                home_y:home_y,
-                                location: {
-                                    x:0,
-                                    y:0,
-                                    z:0
-                                }
-                            }, (err,robot) => {
-                    err ? rej(err) : res(robot)
-                });
+                    {
+                        _id: robot_id,
+                        status: 'WAITING',
+                        home_x: home_x,
+                        home_y: home_y,
+                        location: {
+                            x: 0,
+                            y: 0,
+                            z: 0
+                        }
+                    },
+                    (err, robot) => {
+                        err ? rej(err) : res(robot)
+                    }
+                )
         }),
-    getNextJob: (robot_id) =>
-        new Promise((res,rej) => {
-           
-            db().collection('robot')
-            .findOne({"_id":robot_id})
-            .then((robot,err) => {
-               
-                if (err) {
-                    rej(err)
-                } else {
-                    db()
-                        .collection('warehouse')
-                        .find({})
-                        .toArray((err,warehouse) => {
-                            db()
-                                .collection('orders')
-                                .find({"status":"PENDING"})
-                                .toArray((err, orders) => {
-                                    if (err) {
-                                        rej(err)
-                                    } else {
-                                        //console.log(orders.length)
-                                        if (orders.length == 0) {
-                                            res([])
+    getNextJob: robot_id =>
+        new Promise((res, rej) => {
+            db()
+                .collection('robot')
+                .findOne({ _id: robot_id })
+                .then((robot, err) => {
+                    if (err) {
+                        rej(err)
+                    } else {
+                        db()
+                            .collection('warehouse')
+                            .find({})
+                            .toArray((err, warehouse) => {
+                                db()
+                                    .collection('orders')
+                                    .find({ status: 'PENDING' })
+                                    .toArray((err, orders) => {
+                                        if (err) {
+                                            rej(err)
                                         } else {
-                                            const robot_job = robotPathfinding.get_robot_path(orders[0],robot,warehouse[0])
-                                        
-                                            db()
-                                                .collection('orders')
-                                                .updateOne({"_id":orders[0]._id},{$set:{"status":"IN_TRANSIT"}}, (err) => {
-                                                    if (err) {
-                                                        rej(err)
-                                                    } else {
-                                                        db()
-                                                            .collection('robot')
-                                                            .updateOne({"_id":robot_id}, {'$set':{'status':'ON_JOB'}})
-                                                            .then(() => res(robot_job))
-                                                       
-                                                    }
-                                                })
-                                        }       
-                                    }
-                                })          
-                        })
-                }
+                                            //console.log(orders.length)
+                                            if (orders.length == 0) {
+                                                res([])
+                                            } else {
+                                                const robot_job = robotPathfinding.get_robot_path(
+                                                    orders[0],
+                                                    robot,
+                                                    warehouse[0]
+                                                )
+
+                                                db()
+                                                    .collection('orders')
+                                                    .updateOne(
+                                                        { _id: orders[0]._id },
+                                                        { $set: { status: 'IN_TRANSIT' } },
+                                                        err => {
+                                                            if (err) {
+                                                                rej(err)
+                                                            } else {
+                                                                db()
+                                                                    .collection('robot')
+                                                                    .updateOne(
+                                                                        { _id: robot_id },
+                                                                        { $set: { status: 'ON_JOB' } }
+                                                                    )
+                                                                    .then(() => res(robot_job))
+                                                            }
+                                                        }
+                                                    )
+                                            }
+                                        }
+                                    })
+                            })
+                    }
+                })
+        }),
+    getWholeDB: () => {
+        const collections = ['users', 'warehouses', 'inventory', 'bob_movement', 'orders', 'robot']
+        return Promise.all(
+            collections.map(c =>
+                db()
+                    .collection(c)
+                    .find()
+                    .toArray()
+            )
+        ).then(datas => {
+            const result = {}
+            datas.forEach((data, i) => {
+                result[collections[i]] = data
             })
+            return result
         })
+    }
 })
 
 module.exports = factory(db)

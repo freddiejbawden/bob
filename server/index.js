@@ -149,8 +149,8 @@ app.post('/register', (req, res, next) => {
         .then(user => {
             if (req.body.type == 'robot') {
                 model
-                    .addRobot(user.username, 0,0)
-                    .then(res.json({ success: true, user}))
+                    .addRobot(user.username, 0, 0)
+                    .then(res.json({ success: true, user }))
                     .catch(next)
             } else {
                 res.json({ success: true, user })
@@ -159,43 +159,58 @@ app.post('/register', (req, res, next) => {
         .catch(next)
 })
 app.post('/login', (req, res, next) => {
-    model
-        .authUser(req.body.username)
-        .then(user => {
-            if (user) res.json({ success: true, user })
-            else res.status(401).json({ success: false, error: 'Username or password is incorrect.' })
-        })
+    model.authUser(req.body.username).then(user => {
+        if (user) res.json({ success: true, user })
+        else res.status(401).json({ success: false, error: 'Username or password is incorrect.' })
+    })
 })
-app.get('/robot', auth.robot((req,res,next) => {
-    var currentUser = req.user
-    model
-        .getRobot(currentUser.username)
-        .then(robot => res.json({success: true, robot}))
-        .catch(next)
-}))
+app.get(
+    '/robot',
+    auth.robot((req, res, next) => {
+        var currentUser = req.user
+        model
+            .getRobot(currentUser.username)
+            .then(robot => res.json({ success: true, robot }))
+            .catch(next)
+    })
+)
 
 app.get(
     '/robot/:robotId',
     auth.merchant((req, res, next) => {
-       model
-        .getRobot(req.params.robotId)
-        .then(robot => res.json({success:true,robot}))
-        .catch(next)
+        model
+            .getRobot(req.params.robotId)
+            .then(robot => res.json({ success: true, robot }))
+            .catch(next)
     })
 )
-app.post('/robot/:robotid/sethome', auth.merchant((req,res,next) => {
-    model
-        .setHome(req.params.robotid, req.body.home_x, req.body.home_y)
-        .then(robot => res.json({success: true, robot}))
-        .catch(next)
-}))
+app.post(
+    '/robot/:robotid/sethome',
+    auth.merchant((req, res, next) => {
+        model
+            .setHome(req.params.robotid, req.body.home_x, req.body.home_y)
+            .then(robot => res.json({ success: true, robot }))
+            .catch(next)
+    })
+)
 
-app.get('/robotjob', auth.robot((req,res,next) => {
-    model 
-        .getNextJob(req.user.username)
-        .then(job => res.json({success:true, job}))
+app.get(
+    '/robotjob',
+    auth.robot((req, res, next) => {
+        model
+            .getNextJob(req.user.username)
+            .then(job => res.json({ success: true, job }))
+            .catch(next)
+    })
+)
+
+// For imaging the database and updating fake_db.json
+app.get('/db', (req, res, next) => {
+    model
+        .getWholeDB()
+        .then(data => res.json(data))
         .catch(next)
-}))
+})
 
 //Logs all responses.
 app.use((req, res, next) => {

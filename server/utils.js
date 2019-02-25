@@ -43,6 +43,8 @@ module.exports.loadDBwithData = (db, data) => {
                 _id: doc._id ? ObjectID(doc._id) : new ObjectID()
             }))
         }))
-        .map(({ collection, data }) => db.collection(collection).insertMany(data))
+        .map(({ collection, data }) =>
+            data.length > 0 ? db.collection(collection).insertMany(data) : Promise.resolve()
+        )
     return Promise.all(promises)
 }
