@@ -16,7 +16,9 @@ Instead of `npm start`, use:
 ```
 npm run dev
 ```
-This will restart the server whenever you change a file.
+This will restart the server whenever you change a file. It also creates and uses a fake mongodb instance in memory with data in `fake_db.json`. To use a real database, use `npm run dev-real` instead.
+
+If you want to specify specific ids to documents in `fake_db.json`, you need to provide real ids that mongodb likes. You can use `npm run randomid` to generate a random id compatible with mongodb.
 
 *Note: Please install the [Prettier Plugin](https://prettier.io/docs/en/editors.html) on your preferred text editor, and set it up to __format on save__. This will automatically format the code to be more readable.*
 
@@ -30,6 +32,7 @@ Change these environment variables before running the server:
 ```bash
 PORT=9000                            # Port the server will run on.
 MONGO=mongodb://localhost:27017/db   # URL of the mongo instance
+DB=fake                              # Use fake in-memory mongodb instance with pre-defined data in fake_db.json. (Overrides MONGO=...)
 ```
 
 ## Documentation

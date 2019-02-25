@@ -4,11 +4,12 @@ const db = require('./db')
 const model = require('./model')
 const bonjour = require('bonjour')()
 const utils = require('./utils')
-const auth = require('./auth')
-
+const robot_path = require('./robot-pathfinding.js')
 const PORT = process.env.PORT || 9000
 
-const API_LEVEL = 'v1'
+const auth = require('./auth')
+
+const API_LEVEL = 'v2'
 console.log('Using api level ' + API_LEVEL)
 
 db.init()
@@ -30,67 +31,99 @@ app.use((req, res, next) => {
 app.get('/ping', (req, res) => {
     res.send('pong')
 })
-app.get('/order', (req, res, next) =>
-    model
-        .getAllOrders()
-        .then(orders => {
-            if (orders) res.json({ success: true, orders })
-            else res.status(404).json({ success: false, orders: null })
-        })
-        .catch(next)
+app.get(
+    '/order',
+    auth.customer((req, res, next) =>
+        model
+            .getOrders(req.user._id)
+            .then(orders => res.json({ success: true, orders }))
+            .catch(next)
+    )
 )
 
-app.get('/order/:orderId', (req, res, next) => {
-    const orderId = req.params.orderId
+app.get(
+    '/order/:orderId',
+    auth.customer((req, res, next) =>
+        model
+            .getOrderById(req.params.orderId)
+            .then(order => {
+                if (order && req.user._id.equals(order.userId)) res.json({ success: true, order })
+                else if (order)
+                    res.status(403).json({ success: false, error: 'You cannot view details on this order.' })
+                else res.status(404).json({ success: true, order: null })
+            })
+            .catch(next)
+    )
+)
+// TODO: Check if ordered items exist.
+// TODO: Reduce amount on items ordered.
+app.post(
+    '/order',
+    auth.customer((req, res, next) => {
+        const order = { ...req.body, userId: req.user._id }
+        model
+            .addOrder(order)
+            .then(order => res.json({ success: true, order }))
+            .catch(next)
+    })
+)
+app.get('/warehouse', (req, res, next) => {
     model
-        .getOrderById(orderId)
-        .then(order => {
-            if (order) res.json({ success: true, order })
-            else res.status(404).json({ success: true, order: null })
-        })
+        .getWarehouses()
+        .then(warehouses => res.json({ success: true, warehouses }))
+        .catch(next)
+})
+app.post(
+    '/warehouse',
+    auth.merchant((req, res, next) => {
+        model
+            .addWarehouse({ ...req.body, merchantId: req.user._id })
+            .then(warehouse => res.json({ success: true, warehouse }))
+            .catch(next)
+    })
+)
+app.get('/warehouse/:warehouseId', (req, res, next) => {
+    model
+        .getWarehouseById(req.params.warehouseId)
+        .then(warehouse => res.status(warehouse ? 200 : 404).json({ success: true, warehouse }))
         .catch(next)
 })
 
-app.post('/order', (req, res, next) => {
-    //verification steps?
-    model
-        .addOrder(req.body)
-        .then(order => res.json({ success: true, order }))
-        .catch(next)
-})
-
-app.post('/jobs', (req, res, next) => {
-    model
-        .addJob(req.body)
-        .then(job => res.json({ success: true, job }))
-        .catch(next)
-})
-
-app.get('/jobs', (req, res, next) => {
-    model
-        .getAllJobs(req.body)
-        .then(jobs => {
-            if (jobs) res.json({ success: true, jobs })
-            else res.status(404).json({ success: true, jobs: null })
-        })
-        .catch(next)
-})
-app.get('/items', (req, res, next) => {
-    model
-        .getItems()
-        .then(items => {
-            if (items) res.json({ success: true, items })
-            else res.status(404).json({ success: true, items: null })
-        })
-        .catch(next)
-})
-
-app.post('/items', (req, res, next) => {
-    model
-        .addItem(req.body)
-        .then(item => res.json({ success: true, item }))
-        .catch(next)
-})
+app.post(
+    '/warehouse/:warehouseId/items',
+    auth.merchant((req, res, next) => {
+        model
+            .getWarehouseById(req.params.warehouseId)
+            .then(warehouse => {
+                if (!warehouse) {
+                    res.status(404).json({
+                        success: false,
+                        error: 'Warehouse not found.'
+                    })
+                    throw null
+                }
+                if (!req.user._id.equals(warehouse.merchantId)) {
+                    res.status(403).json({
+                        success: false,
+                        error: 'You cannot modify items in a warehouse you dont own.'
+                    })
+                    throw null
+                }
+                return model.addItem({ ...req.body, warehouseId: req.params.warehouseId })
+            })
+            .then(item => res.json({ success: true, item }))
+            .catch(err => err && next(err))
+    })
+)
+app.get(
+    '/warehouse/:warehouseId/orders',
+    auth.merchant((req, res, next) => {
+        model
+            .getOrdersByWarehouseId({ warehouseId: req.params.warehouseId })
+            .then(orders => res.json({ success: true, orders }))
+            .catch(next)
+    })
+)
 app.put('/turnon/:nOfMarkers', (req, res, next) => {
     const markers = req.params.nOfMarkers
     model
@@ -113,16 +146,69 @@ app.get('/getmovement', (req, res, next) => {
 app.post('/register', (req, res, next) => {
     model
         .createUser(req.body.username, req.body.type)
-        .then(user => res.json({ success: true, user }))
+        .then(user => {
+            if (req.body.type == 'robot') {
+                model
+                    .addRobot(user.username, 0, 0)
+                    .then(res.json({ success: true, user }))
+                    .catch(next)
+            } else {
+                res.json({ success: true, user })
+            }
+        })
         .catch(next)
 })
 app.post('/login', (req, res, next) => {
+    model.authUser(req.body.username).then(user => {
+        if (user) res.json({ success: true, user })
+        else res.status(401).json({ success: false, error: 'Username or password is incorrect.' })
+    })
+})
+app.get(
+    '/robot',
+    auth.robot((req, res, next) => {
+        var currentUser = req.user
+        model
+            .getRobot(currentUser.username)
+            .then(robot => res.json({ success: true, robot }))
+            .catch(next)
+    })
+)
+
+app.get(
+    '/robot/:robotId',
+    auth.merchant((req, res, next) => {
+        model
+            .getRobot(req.params.robotId)
+            .then(robot => res.json({ success: true, robot }))
+            .catch(next)
+    })
+)
+app.post(
+    '/robot/:robotid/sethome',
+    auth.merchant((req, res, next) => {
+        model
+            .setHome(req.params.robotid, req.body.home_x, req.body.home_y)
+            .then(robot => res.json({ success: true, robot }))
+            .catch(next)
+    })
+)
+
+app.get(
+    '/robotjob',
+    auth.robot((req, res, next) => {
+        model
+            .getNextJob(req.user.username)
+            .then(job => res.json({ success: true, job }))
+            .catch(next)
+    })
+)
+
+// For imaging the database and updating fake_db.json
+app.get('/db', (req, res, next) => {
     model
-        .authUser(req.body.username)
-        .then(user => {
-            if (user) res.json({ success: true, user })
-            else res.status(401).json({ success: false, error: 'Username or password is incorrect.' })
-        })
+        .getWholeDB()
+        .then(data => res.json(data))
         .catch(next)
 })
 

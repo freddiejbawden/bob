@@ -37,8 +37,9 @@ class FollowLine:
         self.cm = ev3.LargeMotor('outD')  # centre motor
         assert self.lm.connected
         assert self.rm.connected
-
+        self.time_measure = 0
         self.consecutive_colours = 0  # counter for consecutive colour readings
+
         self.runner = None
 
     def detect_marking(self):
@@ -85,12 +86,12 @@ class FollowLine:
             u = (self.KP * error) + (self.KI * integral) + (self.KD * derivative)
 
             # limit u to safe values: [-1000, 1000] deg/sec
-             # limit u to safe values: [-1000, 1000] deg/sec
             if self.MOTOR_SPEED + abs(u) > 1000:  # reduce u if speed and torque are too high
                 if u >= 0:
                     u = 1000 - self.MOTOR_SPEED
                 else:
                     u = self.MOTOR_SPEED - 1000
+
             # run motors
             lm.run_timed(time_sp=self.DT, speed_sp=-(self.MOTOR_SPEED + u))
             rm.run_timed(time_sp=self.DT, speed_sp=-(self.MOTOR_SPEED - u))
@@ -117,7 +118,7 @@ class FollowLine:
                 elif marker_colour == 2:
                     # stop on blue marker
                     self.stop()
-                
+
     def move_sideways(self, cm):
         while not self.shut_down:
             cm.run_timed(time_sp=self.DT, speed_sp=300)
@@ -132,24 +133,18 @@ class FollowLine:
         self.shut_down = True
         self.rm.stop()
         self.lm.stop()
-        ev3.Sound.speak("yeet").wait()
+
+        print("Time:" + str(time()-self.time_measure))
+        sleep(10)
 
     def start(self, number_of_markers):
-        self.consecutive_colours = 0
-        if (self.shut_down):
-            self.shut_down = False
-            self.runner = Thread(target=self.run, name='move', args=(number_of_markers,))
-            self.runner.start()
-        else:
-            self.shut_down = True
-            self.runner = Thread(target=self.run, name='move', args=(number_of_markers,))
-            self.shut_down = False
-            self.runner.start()
-
-
+        self.time_measure = time()
+        self.shut_down = False
+        self.runner = Thread(target=self.run, name='move', args=(number_of_markers,))
+        self.runner.start()
 
 
 # Main function
 if __name__ == "__main__":
     robot = FollowLine()
-    robot.start(2)
+    robot.start(1)
