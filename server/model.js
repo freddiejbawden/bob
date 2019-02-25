@@ -38,6 +38,20 @@ const factory = db => ({
             .collection('warehouses')
             .find()
             .toArray(),
+    addWarehouse: warehouse => {
+        if (!warehouse._id) {
+            warehouse = { _id: new ObjectID(), ...warehouse }
+            return db()
+                .collection('warehouses')
+                .insertOne(warehouse)
+                .then(() => warehouse)
+        } else {
+            return db()
+                .collection('warehouses')
+                .updateOne({ _id: warehouse._id }, { $set: warehouse })
+                .then(modifiedCount => (modifiedCount ? warehouse : null))
+        }
+    },
     getWarehouseById: async warehouseId => {
         const warehouse = await db()
             .collection('warehouses')

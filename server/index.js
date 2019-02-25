@@ -72,6 +72,12 @@ app.get('/warehouse', (req, res, next) => {
         .then(warehouses => res.json({ success: true, warehouses }))
         .catch(next)
 })
+app.post('/warehouse', (req, res, next) => {
+    model
+        .addWarehouse(req.body)
+        .then(warehouse => res.json({ success: true, warehouse }))
+        .catch(next)
+})
 app.get('/warehouse/:warehouseId', (req, res, next) => {
     model
         .getWarehouseById(req.params.warehouseId)
