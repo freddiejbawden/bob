@@ -47,7 +47,8 @@ class FollowLine:
         self.green = 3
 
         self.consecutive_colours = 0  # counter for consecutive colour readings
-        self.ignore_blue = False
+        self.ignore_blue = False  # when switching from sideways to forwards
+        self.ignore_green = False  # when switching from fowards to sideways
         #self.number_of_markers = 0  # at which marker it should stop
 
     def detect_marking(self, colour_left, colour_right):
@@ -73,6 +74,7 @@ class FollowLine:
         previous_error = 0
         marker_counter = 0
         start_time = time()
+        self.ignore_green = True
 
         if reverse:
             self.csfl.mode = 'COL-COLOR'  # measure colour
@@ -144,7 +146,13 @@ class FollowLine:
 
     def run_sideways(self, distance, reverse):
         self.ignore_blue = False
-        self.correct_trajectory(99, self.REVERSE)
+
+        # If previous instruction was forwards or backwards
+        # keep moving until a blue line is seen
+        if self.ignore_green:
+            self.correct_trajectory(99, self.REVERSE)
+
+        self.ignore_green = False
 
         if reverse:
             self.csfl.mode = 'COL-COLOR'  # measure light intensity
@@ -161,10 +169,10 @@ class FollowLine:
         start_time = time()
         while not self.shut_down:
             if reverse:
-                self.cm.run_timed(time_sp=self.DT, speed_sp=-400)
+                self.cm.run_timed(time_sp=self.DT/2, speed_sp=-500)
             else:
-                self.cm.run_timed(time_sp=self.DT, speed_sp=400)
-            sleep(self.DT / 1000)
+                self.cm.run_timed(time_sp=self.DT/2, speed_sp=500)
+            sleep(self.DT / 2000)
 
             if time() - start_time > self.MARKING_INTERVAL:
                 if reverse:
