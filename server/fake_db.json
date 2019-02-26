@@ -28,7 +28,7 @@
             },
             "dimensions": {
                 "x": 5,
-                "y": 5,
+                "y": 6,
                 "z": [
                     0,
                     0.2,
@@ -93,9 +93,9 @@
                     "_id": "5c73e348f2a8700d6dea4bef",
                     "name": "Apples",
                     "position": {
-                        "x": 2,
-                        "y": 1,
-                        "z": 2
+                        "x": 0,
+                        "y": 0,
+                        "z": 0
                     },
                     "quantity": 1,
                     "price": 0.5,
@@ -105,9 +105,9 @@
                     "_id": "5c73e38d39c0ae0d8091bb50",
                     "name": "Bananas",
                     "position": {
-                        "x": 1,
-                        "y": 0,
-                        "z": 1
+                        "x": 2,
+                        "y": 5,
+                        "z": 0
                     },
                     "quantity": 2,
                     "price": 0.5,

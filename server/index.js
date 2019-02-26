@@ -149,7 +149,7 @@ app.post('/register', (req, res, next) => {
         .then(user => {
             if (req.body.type == 'robot') {
                 model
-                    .addRobot(user.username, 0, 0)
+                    .addRobot(user.username, 4, 0)
                     .then(res.json({ success: true, user }))
                     .catch(next)
             } else {

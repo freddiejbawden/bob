@@ -17,17 +17,22 @@ makeWarehouse = (width, height) => {
     // add shelves
     for (var s = 0; s < number_of_shelves; s++) {
         for (var i = 1; i < width - 1; i++) {
-            walkable_grid[s * 2 + 1][i] = 1
+            walkable_grid[s * 2][i] = 1
         }
     }
+    console.log(walkable_grid)
     return walkable_grid
 }
 
 pathfind_to_point = (current_pos, end_pos, warehouse_grid) => {
     var pf_grid = new PF.Grid(warehouse_grid)
     var finder = new PF.AStarFinder()
+   
     var path = finder.findPath(current_pos[0], current_pos[1], end_pos[0], end_pos[1], pf_grid)
     path = PF.Util.compressPath(path)
+    console.log(current_pos)
+    console.log(end_pos)
+    console.log(path)
     return path
 }
 generate_drop_instruction = () => {
@@ -56,19 +61,19 @@ generate_movement_instruction = (start, end) => {
         var num_blocks = end[0] - start[0]
         var direction = ''
         if (num_blocks < 0) {
-            direction = 'left'
+            direction = 'forward'
             num_blocks = num_blocks * -1
         } else {
-            direction = 'right'
+            direction = 'backward'
         }
     } else {
         var num_blocks = end[1] - start[1]
         var direction = ''
         if (num_blocks < 0) {
-            direction = 'backward'
+            direction = 'right'
             num_blocks = num_blocks * -1
         } else {
-            direction = 'forward'
+            direction = 'left'
         }
     }
     return {
@@ -93,7 +98,7 @@ convert_order_to_job = (order, robot, warehouse_grid) => {
     var robot_xy = [robot_pos['x'], robot_pos['y'], robot_pos['z']]
     for (var i = 0; i < item_list.length; i++) {
         var current_item = item_list[i]['position']
-        var item_xy = [current_item['x'], current_item['y'] * 2, robot_pos['z']]
+        var item_xy = [current_item['x'], current_item['y'], robot_pos['z']]
 
         var path = pathfind_to_point(robot_xy, item_xy, warehouse_grid)
         if (path == [] || path == undefined) {

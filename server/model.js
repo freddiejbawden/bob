@@ -160,8 +160,8 @@ const factory = db => ({
                         home_x: home_x,
                         home_y: home_y,
                         location: {
-                            x: 0,
-                            y: 0,
+                            x: home_x,
+                            y: home_y,
                             z: 0
                         }
                     },
