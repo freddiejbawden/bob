@@ -1,5 +1,7 @@
 package io.github.assis10t.bobandroid
 
+import android.annotation.SuppressLint
+import android.content.Context
 import com.google.gson.Gson
 import io.github.assis10t.bobandroid.pojo.*
 import okhttp3.MediaType
@@ -14,7 +16,7 @@ import javax.jmdns.JmDNS
 import javax.jmdns.ServiceEvent
 import javax.jmdns.ServiceListener
 
-// Using API level v1
+// Using API level v2
 
 class ServerConnection {
     companion object {
@@ -72,96 +74,166 @@ class ServerConnection {
             onConnectedListeners.add(onConnected)
     }
 
-    val getRequestFactory = { http: OkHttpClient ->
-        { url: String, onGetComplete: (success: Boolean, response: String?) -> Unit ->
+    val getRequestWithAuthFactory = { http: OkHttpClient, gson: Gson ->
+        { url: String, username: String, onGetComplete: (error: Exception?, response: String?) -> Unit ->
             doAsync {
                 Timber.d("Get request to $url")
                 try {
-                    val request = Request.Builder().url(url).build()
+                    val request = Request.Builder().url(url).header("username",username).build()
                     val response = http.newCall(request).execute()
                     Timber.d("Response received.")
-                    if (!response.isSuccessful) {
-                        Timber.e("Get Request failed: (${response.code()}) ${response.body().toString()}")
-                        uiThread { onGetComplete(false, null) }
+                    val responseBody = response.body()?.string()!!
+                    val failResponse = gson.fromJson(responseBody, FailResponse::class.java)
+                    if (!failResponse.success) {
+                        uiThread { onGetComplete(Exception(failResponse.error), responseBody) }
                     } else {
-                        uiThread { onGetComplete(true, response.body()?.string()) }
+                        uiThread { onGetComplete(null, responseBody) }
                     }
                 } catch (e: IOException) {
                     Timber.e(e, "Get Request failed")
-                    uiThread { onGetComplete(false, null) }
+                    uiThread { onGetComplete(e, null) }
+                }
+            }
+        }
+    }
+    val getRequestFactory = { http: OkHttpClient, gson: Gson ->
+        { url: String, onGetComplete: (error: Exception?, response: String?) -> Unit ->
+            getRequestWithAuthFactory(http, gson)(url, "", onGetComplete)
+        }
+    }
+
+    val postRequestWithAuthFactory = { http: OkHttpClient, gson: Gson ->
+        { url: String, username: String, body: Any, onPostComplete: (error: Exception?, response: String?) -> Unit ->
+            doAsync {
+                Timber.d("Post request to $url")
+                try {
+                    val JSON = MediaType.get("application/json; charset=utf-8")
+                    val requestBody = RequestBody.create(JSON, gson.toJson(body))
+                    val request = Request.Builder().header("username",username).url(url).post(requestBody).build()
+                    val response = http.newCall(request).execute()
+                    val responseBody = response.body()?.string()!!
+                    Timber.d("Response received.")
+                    val failResponse = gson.fromJson(responseBody, FailResponse::class.java)
+                    if (!failResponse.success) {
+                        uiThread { onPostComplete(Exception(failResponse.error), responseBody) }
+                    } else {
+                        uiThread { onPostComplete(null, responseBody) }
+                    }
+                } catch (e: IOException) {
+                    Timber.e(e, "Post Request failed")
+                    uiThread { onPostComplete(e, null) }
                 }
             }
         }
     }
 
     val postRequestFactory = { http: OkHttpClient, gson: Gson ->
-        { url: String, body: Any, onPostComplete: (success: Boolean, response: String?) -> Unit ->
-            doAsync {
-                Timber.d("Post request to $url")
-                try {
-                    val JSON = MediaType.get("application/json; charset=utf-8")
-                    val requestBody = RequestBody.create(JSON, gson.toJson(body))
-                    val request = Request.Builder().url(url).post(requestBody).build()
-                    val response = http.newCall(request).execute()
-                    Timber.d("Response received.")
-                    if (!response.isSuccessful) {
-                        Timber.e("Post Request failed: (${response.code()}) ${response.body().toString()}")
-                        uiThread { onPostComplete(false, null) }
-                    } else {
-                        uiThread { onPostComplete(true, response.body()?.string()) }
-                    }
-                } catch (e: IOException) {
-                    Timber.e(e, "Post Request failed")
-                    uiThread { onPostComplete(false, null) }
-                }
-            }
+        { url: String, body: Any, onPostComplete: (error: Exception?, response: String?) -> Unit ->
+            postRequestWithAuthFactory(http, gson)(url, "", body, onPostComplete)
         }
     }
 
-    val getItemsFactory = { http: OkHttpClient, gson: Gson ->
-        { onGetItems: (success: Boolean, items: List<Item>?) -> Unit ->
+    val getWarehousesFactory = { http: OkHttpClient, gson: Gson ->
+        { onGetWarehouses: (error: Exception?, warehouses: List<Warehouse>?) -> Unit ->
             connect { server ->
-                getRequestFactory(http)("$server/items") { success, str ->
-                    Timber.d("Result: $success, response: $str")
-                    if (!success) {
-                        onGetItems(success, null)
+                getRequestFactory(http, gson)("$server/warehouse") { error, str ->
+                    if (error != null) {
+                        onGetWarehouses(error, null)
                     } else {
-                        val response = gson.fromJson(str!!, GetItemsResponse::class.java)
-                        onGetItems(response.success, response.items)
+                        val response = gson.fromJson(str!!, GetWarehousesResponse::class.java)
+                        onGetWarehouses(null, response.warehouses)
                     }
                 }
             }
         }
     }
-    val getItems = getItemsFactory(httpClient, Gson())
+    val getWarehouses = getWarehousesFactory(httpClient, Gson())
 
+    val getWarehouseFactory = { http: OkHttpClient, gson: Gson ->
+        { warehouseId: String, onGetWarehouse: (error: Exception?, warehouse: Warehouse?) -> Unit ->
+            connect { server ->
+                getRequestFactory(http, gson)("$server/warehouse/$warehouseId") { error, str ->
+                    if (error != null) {
+                        onGetWarehouse(error, null)
+                    } else {
+                        val response = gson.fromJson(str!!, GetWarehouseResponse::class.java)
+                        onGetWarehouse(null, response.warehouse)
+                    }
+                }
+            }
+        }
+    }
+    val getWarehouse = getWarehouseFactory(httpClient, Gson())
+
+    //Requires login
+    val getOrdersFactory = { http: OkHttpClient, gson: Gson ->
+        { context: Context, onGetOrders: (error: Exception?, orders: List<Order>?) -> Unit ->
+            connect {server ->
+                if (!isLoggedIn(context)) {
+                    onGetOrders(Exception("This operation requires authentication."), null)
+                    return@connect
+                }
+                getRequestWithAuthFactory(http, gson)("$server/order", getCurrentUsername(context)!!) { error, str ->
+                    if (error != null) {
+                        onGetOrders(error, null)
+                    } else {
+                        val response = gson.fromJson(str, GetOrdersResponse::class.java)
+                        onGetOrders(null, response.orders)
+                    }
+                }
+            }
+        }
+    }
+    val getOrders = getOrdersFactory(httpClient, Gson())
+
+    // Requires login
     val makeOrderFactory = { http: OkHttpClient, gson: Gson ->
-        { order: Order, onOrderComplete: ((success: Boolean) -> Unit)? ->
+        { context: Context, order: Order, onOrderComplete: ((error: Exception?) -> Unit)? ->
             connect { server ->
-                postRequestFactory(http, gson)("$server/order", order) { success, str ->
-                    Timber.d("Result: $success, response: $str")
-                    if (!success) {
-                        onOrderComplete?.invoke(success)
-                    } else {
-                        val response = gson.fromJson(str!!, GenericResponse::class.java)
-                        onOrderComplete?.invoke(response.success)
-                    }
+                if (!isLoggedIn(context)) {
+                    onOrderComplete?.invoke(Exception("This operation requires authentication."))
+                    return@connect
+                }
+                postRequestWithAuthFactory(http, gson)("$server/order", getCurrentUsername(context)!!, order) { error, str ->
+                    onOrderComplete?.invoke(error)
                 }
             }
         }
     }
     val makeOrder = makeOrderFactory(httpClient, Gson())
 
+    val isLoggedIn = { context: Context -> getCurrentUsername(context) != null }
+
+    val getCurrentUsername = { context: Context ->
+        context.getSharedPreferences("bob", Context.MODE_PRIVATE).getString("username", null)
+    }
+
+    private val setCurrentUsername = { context: Context, username: String? ->
+        if (username == null) {
+            context
+                .getSharedPreferences("bob", Context.MODE_PRIVATE)
+                .edit()
+                .remove("username")
+                .apply()
+        } else {
+            context
+                .getSharedPreferences("bob", Context.MODE_PRIVATE)
+                .edit()
+                .putString("username", username)
+                .apply()
+        }
+    }
+
     val loginFactory = { http: OkHttpClient, gson: Gson ->
-        { username: String, password: String, onLoginComplete: ((success: Boolean, loggedIn: Boolean) -> Unit)? ->
+        { context: Context, username: String, onLoginComplete: ((error: Exception?, user: User?) -> Unit)? ->
             connect { server ->
-                postRequestFactory(http, gson)("$server/login", LoginRequest(username, password)) { success, str ->
-                    Timber.d("Result: $success, response: $str")
-                    if (!success) {
-                        onLoginComplete?.invoke(success, false)
+                postRequestFactory(http, gson)("$server/login", LoginRequest(username)) { error, str ->
+                    if (error != null) {
+                        onLoginComplete?.invoke(error, null)
                     } else {
                         val response = gson.fromJson(str!!, LoginResponse::class.java)
-                        onLoginComplete?.invoke(response.success, response.loggedIn)
+                        setCurrentUsername(context, response.user!!.username)
+                        onLoginComplete?.invoke(null, response.user)
                     }
                 }
             }
@@ -169,16 +241,21 @@ class ServerConnection {
     }
     val login = loginFactory(httpClient, Gson())
 
+    val logout = { context: Context, onLogoutComplete: ((error: Exception?) -> Unit)? ->
+        setCurrentUsername(context, null)
+        onLogoutComplete?.invoke(null)
+    }
+
     val registerFactory = { http: OkHttpClient, gson: Gson ->
-        { username: String, password: String, onRegisterComplete: ((success: Boolean) -> Unit)? ->
+        { context: Context, username: String, onRegisterComplete: ((error: Exception?, user: User?) -> Unit)? ->
             connect { server ->
-                postRequestFactory(http, gson)("$server/register", RegisterRequest(username, password)) { success, str ->
-                    Timber.d("Result: $success, response: $str")
-                    if (!success) {
-                        onRegisterComplete?.invoke(success)
+                postRequestFactory(http, gson)("$server/register", RegisterRequest(username)) { error, str ->
+                    if (error != null) {
+                        onRegisterComplete?.invoke(error, null)
                     } else {
-                        val response = gson.fromJson(str!!, GenericResponse::class.java)
-                        onRegisterComplete?.invoke(response.success)
+                        val response = gson.fromJson(str!!, LoginResponse::class.java)
+                        setCurrentUsername(context, response.user!!.username)
+                        onRegisterComplete?.invoke(null, response.user)
                     }
                 }
             }

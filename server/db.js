@@ -18,9 +18,9 @@ module.exports = () => {
 module.exports.init = async () => {
     let mongo_url = MONGO_URL
     if (FAKE_DB) {
-        console.log('Using fake mongo in memory.')
         const mongod = new MongoMemoryServer()
         mongo_url = await mongod.getConnectionString()
+        console.log('Using fake mongo at ' + mongo_url)
     } else {
         console.log('Using real mongo at ' + mongo_url)
     }

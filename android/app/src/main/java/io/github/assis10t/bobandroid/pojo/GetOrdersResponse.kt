@@ -1,6 +1,6 @@
 package io.github.assis10t.bobandroid.pojo
 
-class LoginResponse (
+class GetOrdersResponse (
     val success: Boolean = false,
-    val user: User? = null
+    val orders: List<Order> = listOf()
 )

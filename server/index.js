@@ -65,11 +65,14 @@ app.get(
     )
 )
 // TODO: Check if ordered items exist.
-// TODO: Reduce amount on items ordered.
 app.post(
     '/order',
     auth.customer((req, res, next) => {
-        const order = { ...req.body, userId: req.user._id }
+        const order = {
+            ...req.body,
+            userId: req.user._id,
+            timestamp: new Date().toISOString()
+        }
         model
             .addOrder(order)
             .then(order => res.json({ success: true, order }))
@@ -174,7 +177,7 @@ app.get(
     '/warehouse/:warehouseId/orders',
     auth.merchant((req, res, next) => {
         model
-            .getOrdersByWarehouseId({ warehouseId: req.params.warehouseId })
+            .getOrdersByWarehouseId(req.params.warehouseId)
             .then(orders => res.json({ success: true, orders }))
             .catch(next)
     })
