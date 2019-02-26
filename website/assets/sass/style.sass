@@ -1,0 +1,1413 @@
+@import "../../node_modules/bulma/sass/utilities/functions"
+
+/*  -- Welcome to Weband predefined CSS Sheet! --
+    Here you can set all the variables you will need in your Web Application.
+    You SHOULD enter values on each empty variable.
+    Where you see commented values, you can leave them as default (Do not delete comment value). */
+
+// Colors
+$primary:       #c045b6 
+$primary-light: #e86be5
+$link:          #00D848 
+$link-light:    #38F987
+$text:          #333
+
+// $link-invert:	$blue-invert
+$info:          #0053FF
+$white:         rgb(255, 255, 255)
+$grey-light:    rgba(112, 112, 112, 0.4)
+$grey-lighter:  #E9EDEF
+$grey:          #707070
+$grey-dark:     rgb(74, 74, 74)
+$grey-darker:   rgb(54, 54, 54)
+$black:         rgb(18, 18, 18)
+$link-hover:	$grey-darker
+
+$orange:    hsl(14, 100%, 53%)
+$yellow:    hsl(48, 100%, 67%)
+$green:     hsl(141, 71%, 48%)
+$blue:      #39BEEC
+$purple:    hsl(271, 100%, 71%)
+$red:       hsl(348, 100%, 61%)
+
+$success:           rgb(35, 209, 96)
+$warning:           rgb(255, 221, 87)
+$danger:            rgb(255, 56, 96)
+$primary-invert:    findColorInvert($primary)
+$link-invert:       findColorInvert($link)
+
+// Here you can set the font-sizes that a website has. They should be decreasing order.
+$size-1: 4rem
+$size-2: 3.5rem
+$size-3: 2.8rem
+$size-4: 2.3rem
+$size-5: 2rem
+// These sizes are optional (Exceptional sizes). They could be any size (bigger or smaller than others).
+$size-6: 1.8rem
+$size-7: 1.5rem
+$size-8: 1.3rem
+
+// Sizes
+$size-small:    $size-5
+$size-normal:   $size-4
+$size-medium:   $size-3
+$size-large:    $size-2
+
+// Use primary font. Ex: 'Roboto', Arial, sans-serif
+$family-primary:    'Open Sans', Arial, sans-serif
+$family-secondary:  'Raleway', Arial, sans-serif
+
+// Primary background color
+$background:            rgb(245, 245, 245)
+$body-background-color: $white
+
+// Set default radius
+$radius: 0.5rem
+
+// Change if needed
+$weight-light:      300
+$weight-normal:	    400
+$weight-medium:	    500
+$weight-semibold:   600
+$weight-bold:       700
+
+// Dimension settings
+$gap:               64px
+$tablet:            481px
+$desktop:           960px + (2 * $gap)
+$widescreen:        1152px + (2 * $gap)
+$widescreen-enabled: true
+$fullhd:            1344px + (2 * $gap)
+$fullhd-enabled:     true
+
+// Navigation settigns
+$navbar-height:             3.5rem
+$navbar-background-color:   $white
+$navbar-box-shadow-color:   $background
+$navbar-padding-vertical:   0
+$navbar-padding-horizontal: 1.5rem
+$navbar-item-color:         $grey
+$navbar-item-hover-color:   $link
+$navbar-item-active-color:  $black
+$navbar-burger-color:       $navbar-item-color
+
+// Section settings
+$section-padding:           4rem 1.5rem	
+$section-padding-medium:    3rem 1.5rem	
+$section-padding-large:     18rem 1.5rem
+
+// Default button settings
+$button-color:              #fff
+// $button-background-color:   $link
+$button-border-color:       transparent
+$button-border-width:       .1rem
+$button-padding-vertical:   1.3rem
+$button-padding-horizontal: 5rem
+
+// $button-hover-color:        #fff
+// $button-hover-border-color: transparent
+
+// $button-active-color:           $grey-darker
+// $button-active-border-color:    $grey-dark
+
+// $button-text-color:                     $text
+// $button-text-hover-background-color:    $background
+// $button-text-hover-color:               $grey-darker
+
+// $button-disabled-background-color:  $white
+// $button-disabled-border-color:      $grey-lighter
+// $button-disabled-shadow:            none
+// $button-disabled-opacity:           0.5
+
+
+// Dropdown settings
+$dropdown-content-background-color: $white
+$dropdown-content-arrow:    $link
+$dropdown-content-radius:   $radius
+$dropdown-content-shadow:   0 2px 3px rgba($black, 0.1), 0 0 0 1px rgba($black, 0.1)
+$dropdown-item-hover-color: $black
+$dropdown-item-hover-background-color: $background
+$dropdown-item-active-background-color: $link
+
+// Box settings
+$box-color:                 $text
+$box-background-color:      $white
+$box-radius:                $radius
+$box-shadow:                0 2px 3px rgba($black, 0.1), 0 0 0 1px rgba($black, 0.1)
+$box-padding:               1.25rem
+$box-link-hover-shadow:     0 2px 3px rgba($black, 0.1), 0 0 0 1px $link
+$box-link-active-shadow:    inset 0 1px 2px rgba($black, 0.2), 0 0 0 1px $link
+
+// Modal settigns
+$modal-content-width: 640px
+
+// Form settings
+$input-color:                       $text
+$input-background-color:            transparent
+$input-border-color:                #888
+$input-shadow:                      none
+$input-hover-color:                 $text
+$input-hover-border-color:          $link
+$input-disabled-color:              $grey
+$input-disabled-background-color:   $background
+$input-disabled-border-color:       $background
+$input-arrow:                       $link
+$input-icon-color:                  $grey-lighter
+$input-icon-active-color:           $grey
+$input-radius:                      5px
+
+// Label settings
+$label-color:   $grey-darker
+$label-weight:  $weight-bold
+$help-size:     $size-small
+
+// Breadcrumb settings
+$breadcrumb-item-color:                 $grey
+$breadcrumb-item-hover-color:           $link
+$breadcrumb-item-padding-vertical:      0
+$breadcrumb-item-padding-horizontal:    0.75rem
+$breadcrumb-item-separator-color:       $grey-light
+
+// Pagination settings
+$pagination-color:                      $grey-darker
+$pagination-border-color:               $grey-lighter
+$pagination-margin:                     -0.25rem
+$pagination-hover-color:                rgb(181, 181, 181)
+$pagination-hover-border-color:         rgb(181, 181, 181)
+$pagination-focus-color:                rgb(54, 54, 54)
+$pagination-focus-border-color:         rgb(181, 181, 181)
+$pagination-active-color:               rgb(54, 54, 54)
+$pagination-active-border-color:        rgb(181, 181, 181)
+$pagination-disabled-color:             $grey
+$pagination-disabled-background-color:  $grey-lighter
+$pagination-disabled-border-color:      $grey-lighter
+$pagination-current-color:              $link-invert
+$pagination-current-background-color:   $link
+$pagination-current-border-color:       $link
+$pagination-ellipsis-color:             $grey-light
+    
+/* Additional components you might use. You can get their settings variables from our official KB - https://kb.weband.bg/
+    - Delete (Button styles)
+    - Notification panels
+    - Progressbar
+    - Table
+    - Tag (labels)
+    - Card (Content box)
+    - Menu (Aside menu)
+    - Message (Content box)
+    - Tabs (Tab panels)
+    - File upload (Button styles) */
+
+// Do not touch ... please
+@import "../../node_modules/bulma/bulma"
+@import ./responsive.sass
+@import ./wa-fe.sass
+
+// Here you change the main properties of the elements
+body, html
+    min-height: 100vh
+    display: flex
+    flex-direction: column
+
+*
+    font-size: 1.5rem
+
+h1,
+.h1
+    font-size: $size-1
+    font-family: $family-secondary
+    font-weight: 600
+    line-height: 1.2
+    margin: 2rem 0 1rem 0
+
+    @include tablet 
+        font-size: 3rem
+
+@include tablet
+    .is-size-1
+        font-size: 3rem !important
+
+h2,
+.h2
+    font-size: $size-2
+    font-family: $family-secondary
+    font-weight: 600
+    line-height: 1.2
+
+    @include tablet 
+        font-size: 2.5rem
+
+@include tablet
+    .is-size-2
+        font-size: 2.5rem !important
+
+h3,
+.h3 
+    font-size: $size-3
+    font-family: $family-secondary
+    font-weight: 500
+
+    @include tablet 
+        font-size: 2.2rem
+
+@include tablet
+    .is-size-3
+        font-size: 2.2rem !important
+
+h4,
+.h4 
+    font-size: $size-4
+    font-family: $family-secondary
+    font-weight: 500
+
+    @include tablet 
+        font-size: 2rem
+
+@include tablet
+    .is-size-4
+        font-size: 2rem !important
+
+h5,
+.h5
+    font-size: $size-5
+    font-family: $family-secondary
+    font-weight: 500
+
+    @include tablet 
+        font-size: 1.8rem
+
+@include tablet
+    .is-size-5
+        font-size: 1.8rem !important
+
+h6,
+.h6 
+    font-size: $size-6
+    font-weight: 600
+p,
+ul li
+    font-size: $size-7
+    margin: 1rem 0
+    font-weight: 300
+    // color: #000
+a,
+.button
+    font-size: $size-7
+    font-weight: 500
+input
+    padding: 0.1rem 1rem
+    border: none
+    &:focus
+        outline: none
+
+.is-size-8
+    font-size: $size-8 !important
+
+h1, h2, h3, h4, h5, p
+    a
+        color: inherit
+        font-size: inherit
+        font-weight: inherit
+
+        &:hover
+            color: inherit
+            text-decoration: underline
+
+$gradient-primary: linear-gradient(-0.15turn, $primary, $primary-light)
+$gradient-link: linear-gradient(0.05turn, $link, $link-light)
+
+$shadow-primary: 0 .2rem .4rem 0 rgba(220, 42, 254, 0.34)
+$shadow-link: 0 .2rem .4rem 0 rgba(52, 247, 130, 0.27)
+$shadow: 0 .1rem .4rem .1rem rgba(41, 41, 41, 0.1)
+
+.button
+    min-width: 10rem
+    height: auto
+    display: inline-block
+    border-radius: 3rem
+    font-size: $size-7
+    font-weight: 600
+    transition: all .3s
+    border: none !important
+    position: relative
+
+    &:before
+        content: ""
+        position: absolute
+        top: 0.1rem
+        right: 0.1rem
+        bottom: 0.1rem
+        left: 0.1rem
+        z-index: 0
+        border-radius: 3rem
+        opacity: 0
+        transition: all .3s
+
+    &:hover
+        &:before
+            opacity: 1
+
+    &.no-span
+        &:before
+            display: none
+    &.is-primary
+        background: $gradient-primary
+        box-shadow: $shadow-primary
+
+        &:before
+            background: $primary
+    &.is-link
+        background: $gradient-link
+        box-shadow: $shadow-link
+
+        &:before
+            background: $link
+    &.is-outlined
+        color: $text 
+        box-shadow: none
+        
+        &:before
+            opacity: 1
+            background: #fff
+
+        &:hover
+            color: #fff
+
+            &:before
+                opacity: 0
+        &:focus
+            color: $text
+    &.is-smallish
+        min-width: auto
+        padding: 1rem 2rem
+
+        &:before
+            background: #F7F7F7
+
+            @include tablet
+                background: #fff !important
+
+    span
+        position: relative
+        z-index: 10
+
+.button.is-primary.is-outlined:focus
+    color: $primary
+.button.is-link.is-outlined:focus
+    color: $link
+
+.label,
+.input
+    font-size: 1.5rem
+
+.label
+    margin-top: 1.5rem
+
+#__nuxt,
+#__layout,
+#__layout > div
+    min-height: 100vh 
+    height: 100vh
+
+.is-full-width
+    width: 100%
+
+
+
+.navbar-brand
+    position: relative
+    z-index: 20
+
+    @include tablet
+        display: flex
+        align-items: center
+
+    .navbar-item
+        padding: 1rem
+    img
+        max-height: none
+        height: 5rem
+        transition: all .3s
+
+$header-height: 7rem
+
+.navbar
+    height: $header-height
+    background: #F7F7F7
+    padding: 0 1.5rem
+    transition: all .3s
+
+    .navbar-menu
+
+        @include tablet
+            height: 0
+            display: flex !important
+            flex-direction: column
+            justify-content: space-between
+            opacity: 0
+            transition: opacity .3s
+            position: fixed
+            top: 0
+            right: 0
+            bottom: 0
+            left: 0
+            z-index: 10
+            padding-top: $header-height + 1rem
+            overflow-y: scroll
+            overflow-x: hidden
+            &::-webkit-scrollbar
+                width: 5px
+            &::-webkit-scrollbar-track
+                background: #f7f7f7
+            &::-webkit-scrollbar-thumb
+                border-radius: 10px
+                background: $primary
+            &::-webkit-scrollbar-thumb:hover
+                background: $primary
+
+            &.is-active 
+                height: auto
+                opacity: 1
+
+            .navbar-end
+                padding: 1rem
+
+        .navbar-item
+            padding: 0
+            height: 100%
+        .navbar-link
+            height: 100%
+            padding: 1.5rem
+            font-size: 1.4rem
+            font-family: $family-secondary
+            color: #000
+            background: none !important
+
+            &:after
+                display: none
+            &:hover
+                // background: none
+                &:before
+                    right: 0
+                    left: 0
+
+            &:before
+                content: ""
+                height: 0.3rem
+                position: absolute
+                background: $primary
+                bottom: -.1rem
+                left: 50%
+                right: 50%
+                transition: all .3s
+
+            &.is-active
+                color: $primary
+
+            i.mdi
+                display: inline-block
+                transition: all .3s
+
+                &.is-active
+                    transform: rotate(180deg)
+
+    .navbar-dropdown
+        left: 50%
+        margin-top: 0.1rem
+        padding: 1rem 2rem
+        border-top: none
+        border-radius: 0
+        transform: translateX(-50%)
+        background: #F7F7F7
+        box-shadow: $shadow
+        flex-direction: column
+        align-items: center
+
+        @include tablet
+            left: 0
+            transform: none
+            display: none
+            align-items: flex-start
+
+            &.is-active
+                display: flex
+
+        a
+            display: inline-flex
+            white-space: nowrap
+
+    .navbar-burger
+        width: 4rem
+        height: 4rem
+        margin-right: 1rem
+
+        &.is-active
+            span
+                &:nth-child(1)
+                    top: 50%
+                    transform: rotate(45deg)
+                &:nth-child(2)
+                    opacity: 0
+                &:nth-child(3)
+                    top: 50%
+                    transform: rotate(-45deg)
+
+        span
+            width: 3rem
+            height: 0.4rem
+            right: 0.5rem
+            left: auto
+            background: $primary
+            border-radius: 1rem
+            transition: all .3s
+            
+            &:nth-child(1)
+                top: calc(50% - 1.2rem)
+            &:nth-child(3)
+                top: calc(50% + 1rem)
+
+    // h4
+    //     opacity: 0
+    //     transition: all .3s
+
+svg image
+    background-size: cover
+    background-repeat: no-repeat
+    background-position: center
+
+.navbar-item.is-hoverable:hover .navbar-dropdown
+    display: flex
+
+// .headroom.is-sticked
+
+//     &.headroom--not-top 
+//         .navbar
+//             h4
+//                 opacity: 1
+
+@include tablet
+    .headroom
+        overflow: hidden
+
+        &.headroom--pinned,
+        &.menu-open
+            transform: none !important
+
+.headroom.menu-open
+    bottom: 0
+//     // transition: all .3s
+//     overflow: hidden
+
+//     header, nav
+//         height: 100%
+//         transition: none
+
+.headroom.is-transparent
+
+    &.headroom--not-top 
+        .navbar
+            background: #f7f7f7
+
+            .navbar-brand img
+                height: 5rem
+            .is-smallish
+                &:before
+                    background: #f7f7f7
+    & + main
+        &:before,
+        &:after
+            display: none
+        .main-content 
+            padding-top: 0
+    
+    .navbar
+        background: transparent
+
+        .navbar-brand
+            display: block
+
+            @include tablet
+                display: flex
+                align-items: center
+
+            img
+                height: 10rem
+
+                @include tablet 
+                    height: 5rem
+        
+        .is-smallish
+            &:before
+                background: #fff
+
+.element-loader
+    position: relative
+
+    &:before
+        content: ""
+        width: 100%
+        height: 100%
+        position: absolute
+        top: 0
+        right: 0
+        bottom: 0
+        left: 0
+        z-index: 10000
+        background-color: #fff
+        // background: inherit
+        transition: all .3s
+        opacity: 0
+    &:after
+        content: ""
+        width: 5%
+        height: 2.5rem
+        position: absolute
+        top: 50%
+        left: 50%
+        transform: translate(-50%, -50%)
+        z-index: 10001
+        // background: url('../images/svg/loader.svg') center repeat-x
+        transition: all .3s
+        opacity: 0
+
+    &.loading:before,
+    &.loading:after
+        opacity: .90
+
+main
+    position: relative
+    overflow: hidden
+
+    .main-content 
+        padding-top: $header-height
+
+    &:before
+        content: ""
+        width: 14rem
+        height: 20rem
+        position: absolute
+        z-index: 0
+        top: 2rem
+        right: 0
+        // background: url('../images/svg/purple-mesh-rotate.svg') center no-repeat
+
+        @include tablet
+            display: none
+    &:after
+        content: ""
+        width: 30rem
+        height: 30rem
+        position: absolute
+        z-index: 0
+        top: 60%
+        right: 0
+        // background: url('../images/svg/green-donut.svg') center no-repeat
+
+        @include tablet
+            display: none
+
+.has-bckg-grey
+    background: #eee
+    
+.date-place-stamp
+    font-size: $size-8
+    font-weight: 300
+    color: #000
+
+    .divider
+        font-size: 1.5rem
+        font-weight: normal
+        color: $primary
+
+.hero-nav
+    display: flex
+    align-items: center
+    margin-top: 3rem
+    color: #969696
+
+    a
+        display: block
+        font-size: $size-2
+        color: inherit
+        transition: all .3s
+
+        &:hover
+            i
+                transform: scale(1.5)
+
+        &.is-disabled
+            cursor: default
+            opacity: 0.7
+
+            &:hover i
+                transform: none
+
+        i
+            display: block
+            transition: all .3s
+
+    p
+        margin: 0 1rem
+        font-size: $size-6
+        font-weight: 600
+        color: inherit
+
+
+.fade-enter-active, .fade-leave-active
+    transition: opacity .3s ease
+.fade-enter, .fade-leave-to
+    opacity: 0
+
+.slide-enter-active, .slide-leave-active
+    transition: all .3s ease
+.slide-enter, .slide-leave-to
+    opacity: 0
+.slide-enter
+    transform: translate(5%, 0)
+.slide-leave-to
+    transform: translate(-5%, 0)
+
+.slide-top-enter-active, .slide-top-leave-active
+    transition: all .3s ease
+.slide-top-enter, .slide-top-leave-to
+    opacity: 0
+.slide-top-enter
+    transform: translate(0, 5%)
+.slide-top-leave-to
+    transform: translate(0, -5%)
+
+.is-Ax240
+    width: auto
+    height: 24rem
+
+.has-rounded-corners
+    border-radius: .5rem
+    overflow: hidden
+
+.has-scaled-hover
+    &:hover > *
+        transform: scale(1.1)
+    & > *
+        transition: all .3s
+        
+.has-svg-corner
+    position: relative
+    // & > *
+    //     position: relative
+    //     z-index: 10
+    &:before
+        content: ""
+        width: 4.5rem
+        height: 4.5rem
+        position: absolute
+        z-index: 0
+        background-size: contain
+        background-position: center
+        background-repeat: no-repeat
+
+    &.corner-green:before
+        top: -.5rem
+        left: -.5rem
+        // background-image: url('../images/svg/green-rect.svg')
+    &.corner-purple:before
+        bottom: -.5rem
+        right: -.5rem
+        // background-image: url('../images/svg/purple-rect.svg')
+
+.img-bckg
+    width: 100%
+    height: 100%
+    position: absolute
+    top: 0
+    right: 0
+    bottom: 0
+    left: 0
+    z-index: 0
+    display: none
+    overflow: hidden
+    background-size: cover
+    background-position: center
+    background-repeat: no-repeat
+
+    @include tablet
+        display: block
+
+    &:before
+        content: ""
+        position: absolute
+        top: 0
+        right: 0
+        bottom: 0
+        left: 0
+        z-index: 5
+        background: rgba(0, 0, 0, 0.6)
+
+    img
+        max-width: none
+        width: 100% 
+
+    &.static
+        position: relative
+
+        &:before
+            display: none
+
+
+.curved-section
+    padding: 0
+    position: relative
+    // background: none !important
+
+    @include tablet
+        // background: inherit !important
+
+        svg
+            display: none
+
+    .curved-content
+        position: absolute
+        top: 0
+        right: 0
+        bottom: 0
+        left: 0
+        z-index: 10
+
+        @include tablet
+            position: relative
+
+        &:not(.has-nostyle)
+            display: flex
+            align-items: center
+            justify-content: center
+            flex-direction: column
+            color: #fff
+
+            p
+                max-width: 45rem
+                font-size: $size-6
+                font-weight: normal
+                text-align: center
+                margin: 2rem 0 4rem 0
+    
+
+.box
+    box-shadow: $shadow
+
+.story
+    height: 100%
+    margin: 1.5rem
+    padding: 0
+    transition: all .3s
+
+    &:hover
+        // box-shadow: $shadow-primary !important
+        transform: scale(1.05)
+
+    h4
+        position: relative
+        padding-left: 3.5rem
+        margin: 0 1.5rem
+        margin-top: 1.5rem
+
+        &:before
+            content: ""
+            width: 0.2rem
+            height: 100%
+            position: absolute
+            top: 0
+            bottom: 0
+            left: 1rem
+            background: $info
+    .is-flex
+        min-height: 10rem
+        position: relative
+        padding-left: 3.5rem
+        padding-bottom: 1.5rem
+        margin: 0 1.5rem
+    .date
+        position: absolute
+        top: 3.5rem
+        left: -2rem
+        display: inline-block
+        margin: 0
+        font-weight: 600
+        transform: rotate(-90deg)
+
+.hero-slide
+    min-height: 40rem
+
+.partners-carousel
+    .partner-slide
+        height: 100%
+        display: flex
+        align-items: center
+        justify-content: center
+
+        &:hover img
+            transform: scale(1.1)
+            filter: grayscale(0%)
+
+        img
+            max-width: 80%
+            transition: all .3s
+            filter: grayscale(100%)
+
+footer
+    margin-top: 10rem
+    position: relative
+    
+
+    @include tablet
+        background: $info
+        margin-top: 0
+
+    .footer-bckg
+        position: relative
+        z-index: 0
+
+        @include desktop-1280
+            width: 110%
+            margin-left: -5%
+        @include tablet
+            width: 100%
+            margin-left: 0
+            display: none
+
+    .footer-content
+        position: absolute
+        right: 0
+        bottom: 0
+        left: 0
+        z-index: 10
+        color: #fff
+        font-family: $family-secondary
+
+        @include tablet
+            position: relative
+
+            .footer-logo
+                width: 100%
+                display: flex
+                justify-content: center
+                padding-top: 2rem
+            .footer-nav
+                width: 33%
+            .footer-credits
+                text-align: center
+
+        .level
+            margin: 1rem 2.5rem 0 2.5rem
+            padding-bottom: 1rem
+        h5
+            padding: .7rem 0
+            font-weight: 600
+        ul li a
+            display: block
+            padding: .5rem 0
+        img
+            max-width: 10rem
+        a
+            color: inherit
+
+            &:hover
+                text-decoration: underline
+
+
+.weband-logo 
+    display: inline-block
+    font-family: Comfortaa,cursive
+    font-size: 22px
+    color: #fff!important
+    transition: all 1s
+
+    &:hover
+        letter-spacing: -3px
+        text-decoration: none !important
+
+    i
+        display: block
+        float: left
+        margin: -.3rem -.5rem 0 0
+
+.has-cursor-default
+    cursor: default
+
+.has-info-tooltip
+    text-decoration: underline
+    position: relative
+    cursor: pointer
+
+    &:hover .info-tooltip
+        display: block
+
+    .info-tooltip
+        max-width: 400%
+        min-width: 200%
+        position: absolute
+        bottom: 100%
+        left: 50%
+        display: none
+        padding-bottom: 1.5rem
+        transform: translateX(-50%)
+
+        @include phone
+            max-width: 100%
+            min-width: 100%
+
+        .box
+            position: relative
+            padding: 2rem 3rem
+            
+            &:after
+                content: ""
+                width: 4.2rem
+                height: 1.8rem
+                position: absolute
+                top: 100%
+                left: 50%
+                margin-left: -2.1rem
+                // background: url('../images/svg/arrow.png') center no-repeat
+
+.is-full-width
+    width: 100%
+
+.article-content
+    padding: 0 6rem
+
+    @include tablet
+        padding: 0
+
+    h4
+        margin-top: 2rem
+    img
+        max-width: 100% !important
+        margin: 5px 0
+        
+        &[style="float: left;"] 
+            padding-right: 10px
+        &[style="float: right;"] 
+            padding-left: 10px
+
+.select-input
+    border-radius: 0
+    border: none
+    font-size: $size-7
+    font-weight: 600
+    padding: 1rem 2.5rem 1rem 1rem
+    // background: transparent url('../images/svg/tri.svg') right 1rem center no-repeat
+    line-height: 1
+    background-size: 1rem auto
+    cursor: pointer
+    -moz-appearance: window
+    -webkit-appearance: none
+    transition: all .3s
+
+.purple-hyphen
+    width: 1.5rem
+    height: 0.2rem
+    margin: 0 1rem
+    background: $primary
+
+    @include tablet
+        width: 20%
+        margin: 1rem 0
+
+.is-220x220
+    width: 22rem
+    height: 22rem
+    overflow: hidden
+.is-160x160
+    width: 16rem
+    height: 16rem
+    overflow: hidden
+
+.position
+    transition: all .3s
+
+    &:hover
+        background: #fafafa
+
+    i.mdi
+        transform: rotate(0deg)
+        opacity: 1
+        transition: all .3s
+
+        &.is-not-visible
+            opacity: 0
+            transform: rotate(180deg)
+
+.input
+    width: 100%
+    height: auto
+    display: block
+    padding: 1.2rem 1.5rem
+    line-height: 1
+    font-size: $size-7
+
+    &.is-checkbox
+        width: auto
+        padding: 1rem
+        display: inline-block
+
+.help 
+    font-size: $size-7
+    font-weight: normal
+
+.oh 
+    overflow: hidden
+
+.Cookie--base
+    background: #fff !important
+    box-shadow: $shadow !important
+    padding: 3rem !important
+
+    img
+        height: 5.6rem
+        margin-right: 2.5rem
+    p
+        margin: 0
+
+#map,
+.vue-map-container
+    width: 100%
+    height: 46rem
+
+    @include tablet
+        height: 20rem
+
+.illus
+    position: absolute
+    z-index: 0
+
+    @include tablet
+        display: none
+
+    // &.purple-mesh
+    //     width: 14rem
+    //     height: 26rem
+    //     right: 0
+    //     bottom: -12rem
+    //     background: url('../images/svg/purple-mesh.svg') center no-repeat
+    // &.green-blob
+    //     width: 14rem
+    //     height: 19rem
+    //     top: 3rem
+    //     left: 0
+    //     background: url('../images/svg/green-blob.svg') center no-repeat
+    // &.green-egg
+    //     width: 28rem
+    //     height: 28rem
+    //     top: 3rem
+    //     left: 2rem
+    //     background: url('../images/svg/green-egg.svg') center no-repeat
+    // &.purple-circle
+    //     width: 13rem
+    //     height: 14rem
+    //     right: 5%
+    //     bottom: 3rem
+    //     background: url('../images/svg/purple-circle.svg') center no-repeat
+    // &.purple-dots
+    //     width: 11rem
+    //     height: 12rem
+    //     top: -5rem
+    //     left: -4rem
+    //     background: url('../images/svg/purple-dots.svg') center no-repeat
+
+    //     &.smaller
+    //         width: 9rem
+    //         height: 10rem
+    //         top: -4rem
+    //         left: -3rem
+    // &.purple-curves
+    //     width: 11rem
+    //     height: 12rem
+    //     bottom: 0rem
+    //     right: -3rem
+    //     background: url('../images/svg/purple-curves.svg') center no-repeat
+    // &.green-dashes
+    //     width: 11rem
+    //     height: 12rem
+    //     top: -5rem
+    //     left: -4rem
+    //     background: url('../images/svg/green-dashes.svg') center no-repeat
+    // &.green-donut
+    //     width: 30rem
+    //     height: 30rem
+    //     bottom: -4rem
+    //     right: 0
+    //     background: url('../images/svg/green-donut.svg') center no-repeat
+
+    &.flipped-x
+        transform: scaleX(-1)
+
+.event-holder
+    max-height: 26rem
+    display: block
+    border-radius: 0.5rem
+    box-shadow: $shadow
+    overflow: hidden
+    transition: all .3s
+    
+    img
+        display: block
+        max-width: 100%
+
+    &:hover
+        transform: scale(1.05)
+
+.pagination
+    justify-content: center !important
+
+    @include tablet
+        padding: 1.5rem
+        .pagination-previous
+            order: 1
+        .pagination-next
+            order: 2
+        .pagination-list 
+            display: block
+            line-height: 0.5
+            margin-bottom: 2rem
+            
+            li
+                display: inline-block 
+                margin: 0
+
+    .pagination-list
+        flex-grow: 0
+    .pagination-item
+        font-size: $size-7
+        height: auto
+        margin: .5rem
+        padding: 1.5rem
+        line-height: .7
+        border-color: transparent
+        box-shadow: $shadow
+        border-radius: 0.2rem
+        transition: all .3s
+
+        &:hover
+            color: $dark
+            transform: scale(1.1)
+
+        &.is-current
+            background: transparent
+            color: $dark
+            border-color: $primary
+    
+    .pagination-previous,
+    .pagination-next
+        margin: .5rem 1.5rem
+        
+        i
+            transform: scale(1.5)
+
+.is-rounded
+    border-radius: 100%
+    overflow: hidden
+
+.vm-back-top
+    display: block !important
+    bottom: -5rem
+    right: 2rem !important
+    opacity: 0
+    transition: all .3s
+
+    &.vm-back-top-show
+        opacity: 1
+        bottom: 4rem !important
+
+.lang-popup
+    position: fixed
+    right: 2rem
+    bottom: 2rem
+    left: 2rem
+    padding: 2rem
+    z-index: 99999
+
+    @include tablet
+        .is-flex
+            flex-direction: column
+
+    img
+        height: 8rem
+
+
+
+
+@include tablet
+    .hero-svg
+        width: 110%
+    .section
+        padding: 4rem 1.5rem
+    .is-Ax120-t
+        height: 12rem
+    .is-Ax200-t
+        height: 20rem
+
+.is-browser-ie
+    display: none
+
+.browser-ie
+
+    .is-browser-ie
+        display: block
+    .is-not-browser-ie
+        display: none
+
+    .curved-section
+        padding: 5rem 0
+        svg
+            display: none
+        .curved-content
+            position: relative
+        .img-bckg
+            display: block
+
+
+footer.browser-ie
+    background: $info
+    margin-top: 0
+
+    .footer-bckg
+        display: none
+    .footer-content
+        position: relative
+
+
+thead
+    font-weight: bold
+
+.small-img
+    max-width: 20rem
+
+.transparent-label
+    width: auto !important
+    font-size: inherit
+    font-weight: inherit
+    font-style: inherit
+    margin-left: -.5rem
+    padding-left: .5rem
+    color: inherit
+    border-bottom: 1px dashed #333
+
+    i
+        font-size: inherit
+.transparent-select
+    width: 100%
+    position: absolute
+    top: 0
+    right: 0
+    bottom: 0
+    left: 0
+    border: none
+    background: none
+    border-radius: none
+    apperance: none
+    // font-size: inherit
+    // font-weight: inherit
+    // font-style: inherit
+    color: transparent
+    
+    &:focus
+        outline: none

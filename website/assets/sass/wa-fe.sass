@@ -1,0 +1,462 @@
+$black: #333
+$gray: #eee
+
+html, body
+  margin: 0
+  padding: 0
+  font-size: 62.5%
+  line-height: 1.4
+
+// Font sizes from 10px to 30px
+.fz10
+  font-size: 1rem !important
+
+.fz11
+  font-size: 1.1rem !important
+
+.fz12
+  font-size: 1.2rem !important
+
+.fz13
+  font-size: 1.3rem !important
+
+.fz14
+  font-size: 1.4rem !important
+
+.fz15
+  font-size: 1.5rem !important
+
+.fz16
+  font-size: 1.6rem !important
+
+.fz17
+  font-size: 1.7rem !important
+
+.fz18
+  font-size: 1.8rem !important
+
+.fz19
+  font-size: 1.9rem !important
+
+.fz20
+  font-size: 2rem !important
+
+.fz21
+  font-size: 2.1rem !important
+
+.fz22
+  font-size: 2.2rem !important
+
+.fz23
+  font-size: 2.3rem !important
+
+.fz24
+  font-size: 2.4rem !important
+
+.fz25
+  font-size: 2.5rem !important
+
+.fz26
+  font-size: 2.6rem !important
+
+.fz27
+  font-size: 2.7rem !important
+
+.fz28
+  font-size: 2.8rem !important
+
+.fz29
+  font-size: 2.9rem !important
+
+.fz30
+  font-size: 3rem !important
+
+// Line height from 1.0 to 2.0
+.lh0-7
+  line-height: 0.7 !important
+
+.lh0-8
+  line-height: 0.8 !important
+
+.lh0-9
+  line-height: 0.9 !important
+
+.lh1
+  line-height: 1 !important
+
+.lh1-1
+  line-height: 1.1 !important
+
+.lh1-2
+  line-height: 1.2 !important
+
+.lh1-3
+  line-height: 1.3 !important
+
+.lh1-4
+  line-height: 1.4 !important
+
+.lh1-5
+  line-height: 1.5 !important
+
+.lh1-6
+  line-height: 1.6 !important
+
+.lh1-7
+  line-height: 1.7 !important
+
+.lh1-8
+  line-height: 1.8 !important
+
+.lh1-9
+  line-height: 1.9 !important
+
+.lh2
+  line-height: 2 !important
+
+// Positions
+.fixed
+  position: fixed
+
+.relative
+  position: relative
+
+.absolute
+  position: absolute
+
+// They all float.
+.left
+  float: left
+
+.right
+  float: right
+
+// Widths
+.full-width
+  width: 100%
+
+.half-width
+  width: 50% !important
+
+.third-width
+  width: 33.333333%
+
+.quarter-width
+  width: 25%
+
+.fifth-width
+  width: 20%
+
+.max-width-half
+  max-width: 50%
+
+// Heights
+
+.is-full-height
+  height: 100%
+
+.text-black
+  font-weight: 900
+
+.text-heavy
+  font-weight: 800
+
+.text-medium
+  font-weight: 500
+
+.text-thin
+  font-weight: 200
+
+.text-hairline
+  font-weight: 100
+
+.text-italic
+  font-style: italic
+
+.text-overline
+  text-decoration: overline
+
+.text-line-through
+  text-decoration: line-through
+
+.text-underline
+  text-decoration: underline
+
+// Margins
+
+.m0-a
+  margin: 0 auto
+
+@for $i from 0 through 40
+    .m#{$i*5}
+        margin: #{($i*5) / 10}rem !important
+    .m#{$i*5}-0
+        margin: #{($i*5) / 10}rem 0 !important
+    .m0-#{$i*5}
+        margin: 0 #{($i*5) / 10}rem !important
+    .mt#{$i*5}
+        margin-top: #{($i*5) / 10}rem !important
+    .mr#{$i*5}
+        margin-right: #{($i*5) / 10}rem !important
+    .mb#{$i*5}
+        margin-bottom: #{($i*5) / 10}rem !important
+    .ml#{$i*5}
+        margin-left: #{($i*5) / 10}rem !important
+    .mt-#{$i*5}
+        margin-top: -#{($i*5) / 10}rem !important
+    .mr-#{$i*5}
+        margin-right: -#{($i*5) / 10}rem !important
+    .mb-#{$i*5}
+        margin-bottom: -#{($i*5) / 10}rem !important
+    .ml-#{$i*5}
+        margin-left: -#{($i*5) / 10}rem !important
+
+    .p#{$i*5}
+        padding: #{($i*5) / 10}rem !important
+    .p#{$i*5}-0
+        padding: #{($i*5) / 10}rem 0 !important
+    .p0-#{$i*5}
+        padding: 0 #{($i*5) / 10}rem !important
+    .ptb#{$i*5}
+        padding-top: #{($i*5) / 10}rem !important
+        padding-bottom: #{($i*5) / 10}rem !important
+    .prl#{$i*5}
+        padding-right: #{($i*5) / 10}rem !important
+        padding-left: #{($i*5) / 10}rem !important
+    .pt#{$i*5}
+        padding-top: #{($i*5) / 10}rem !important
+    .pr#{$i*5}
+        padding-right: #{($i*5) / 10}rem !important
+    .pb#{$i*5}
+        padding-bottom: #{($i*5) / 10}rem !important
+    .pl#{$i*5}
+        padding-left: #{($i*5) / 10}rem !important
+    .pt-#{$i*5}
+        padding-top: -#{($i*5) / 10}rem !important
+    .pr-#{$i*5}
+        padding-right: -#{($i*5) / 10}rem !important
+    .pb-#{$i*5}
+        padding-bottom: -#{($i*5) / 10}rem !important
+    .pl-#{$i*5}
+        padding-left: -#{($i*5) / 10}rem !important
+
+@for $i from 0 through 40
+    @include tablet
+        .m#{$i*5}t
+            margin: #{($i*5) / 10}rem !important
+        .m#{$i*5}-0t
+            margin: #{($i*5) / 10}rem 0 !important
+        .m0-#{$i*5}t
+            margin: 0 #{($i*5) / 10}rem !important
+        .mt#{$i*5}t
+            margin-top: #{($i*5) / 10}rem !important
+        .mr#{$i*5}t
+            margin-right: #{($i*5) / 10}rem !important
+        .mb#{$i*5}t
+            margin-bottom: #{($i*5) / 10}rem !important
+        .ml#{$i*5}t
+            margin-left: #{($i*5) / 10}rem !important
+        .mt-#{$i*5}t
+            margin-top: -#{($i*5) / 10}rem !important
+        .mr-#{$i*5}t
+            margin-right: -#{($i*5) / 10}rem !important
+        .mb-#{$i*5}t
+            margin-bottom: -#{($i*5) / 10}rem !important
+        .ml-#{$i*5}t
+            margin-left: -#{($i*5) / 10}rem !important
+
+        .p#{$i*5}t
+            padding: #{($i*5) / 10}rem !important
+        .p#{$i*5}-0t
+            padding: #{($i*5) / 10}rem 0 !important
+        .p0-#{$i*5}t
+            padding: 0 #{($i*5) / 10}rem !important
+        .pt#{$i*5}t
+            padding-top: #{($i*5) / 10}rem !important
+        .pr#{$i*5}t
+            padding-right: #{($i*5) / 10}rem !important
+        .pb#{$i*5}t
+            padding-bottom: #{($i*5) / 10}rem !important
+        .pl#{$i*5}t
+            padding-left: #{($i*5) / 10}rem !important
+        .pt-#{$i*5}t
+            padding-top: -#{($i*5) / 10}rem !important
+        .pr-#{$i*5}t
+            padding-right: -#{($i*5) / 10}rem !important
+        .pb-#{$i*5}t
+            padding-bottom: -#{($i*5) / 10}rem !important
+        .pl-#{$i*5}t
+            padding-left: -#{($i*5) / 10}rem !important
+
+@for $i from 0 through 40
+    @include phone
+        .m#{$i*5}m
+            margin: #{($i*5) / 10}rem !important
+        .m#{$i*5}-0m
+            margin: #{($i*5) / 10}rem 0 !important
+        .m0-#{$i*5}m
+            margin: 0 #{($i*5) / 10}rem !important
+        .mt#{$i*5}m
+            margin-top: #{($i*5) / 10}rem !important
+        .mr#{$i*5}m
+            margin-right: #{($i*5) / 10}rem !important
+        .mb#{$i*5}m
+            margin-bottom: #{($i*5) / 10}rem !important
+        .ml#{$i*5}m
+            margin-left: #{($i*5) / 10}rem !important
+        .mt-#{$i*5}m
+            margin-top: -#{($i*5) / 10}rem !important
+        .mr-#{$i*5}m
+            margin-right: -#{($i*5) / 10}rem !important
+        .mb-#{$i*5}m
+            margin-bottom: -#{($i*5) / 10}rem !important
+        .ml-#{$i*5}m
+            margin-left: -#{($i*5) / 10}rem !important
+
+        .p#{$i*5}m
+            padding: #{($i*5) / 10}rem !important
+        .p#{$i*5}-0m
+            padding: #{($i*5) / 10}rem 0 !important
+        .p0-#{$i*5}m
+            padding: 0 #{($i*5) / 10}rem !important
+        .pt#{$i*5}m
+            padding-top: #{($i*5) / 10}rem !important
+        .pr#{$i*5}m
+            padding-right: #{($i*5) / 10}rem !important
+        .pb#{$i*5}m
+            padding-bottom: #{($i*5) / 10}rem !important
+        .pl#{$i*5}m
+            padding-left: #{($i*5) / 10}rem !important
+        .pt-#{$i*5}m
+            padding-top: -#{($i*5) / 10}rem !important
+        .pr-#{$i*5}m
+            padding-right: -#{($i*5) / 10}rem !important
+        .pb-#{$i*5}m
+            padding-bottom: -#{($i*5) / 10}rem !important
+        .pl-#{$i*5}m
+            padding-left: -#{($i*5) / 10}rem !important
+
+
+// Positions
+
+.is-relative
+  position: relative
+.is-absolute
+  position: absolute
+
+// Flexbox properties
+
+.align-start
+  align-items: flex-start
+
+.align-center
+  display: flex
+  align-items: center
+
+.align-end
+  align-items: flex-end
+
+.align-self-start
+  align-self: flex-start
+
+.align-self-center
+  align-self: center
+
+.align-self-end
+  align-self: flex-end
+
+.direction-column
+  display: flex
+  flex-direction: column
+.direction-row
+  display: flex
+  flex-direction: row
+
+.flex-wrap
+  flex-wrap: wrap
+
+.justify-start
+  justify-content: flex-start
+
+.justify-end
+  justify-content: flex-end
+
+.justify-center
+  justify-content: center
+
+.justify-space-between
+  justify-content: space-between
+
+.justify-space-around
+  justify-content: space-around
+
+.is-flex-center
+  display: flex
+  align-items: center
+  justify-content: center
+
+.reverse-columns
+  flex-direction: row-reverse
+
+  @include phone
+    flex-direction: row
+
+// Clearfix
+.clearfix:after
+  visibility: hidden
+  display: block
+  font-size: 0
+  content: " "
+  clear: both
+  height: 0
+.clearfix
+  display: inline-block
+* html .clearfix
+  height: 1%
+.clearfix
+  display: block
+.clearf 
+   clear: both
+
+.oh
+  overflow: hidden
+
+// Global Image holder
+.img-holder
+  position: relative
+  overflow: hidden
+
+  img
+    max-width: 100%
+    min-width: 100%
+    min-height: 100%
+    height: auto
+    display: block
+    position: absolute
+    left: 50%
+    top: 50%
+    -webkit-transform: translateY(-50%) translateX(-50%)
+    transform: translateY(-50%) translateX(-50%)
+
+.z10  
+  z-index: 10
+.z20 
+  z-index: 20 !important
+.z200
+  z-index: 200
+
+.t0
+  top: 0 !important
+
+.b30
+  bottom: 3rem !important
+.b50
+  bottom: 5rem !important
+
+@include tablet
+  .is-full-width-tablet
+    max-width: 100% !important
+  .is-block-tablet
+    display: block !important
+  .justify-center-mobile
+    justify-content: center

@@ -1,0 +1,31 @@
+{
+  "name": "Bob",
+  "version": "1.0.0",
+  "description": "B.O.B. Brilliant Online Bying robot",
+  "author": "Hristiyan Yaprakov",
+  "private": true,
+  "scripts": {
+    "dev": "cross-env NODE_ENV=development nodemon server/index.js --watch server",
+    "build": "nuxt build",
+    "start": "cross-env NODE_ENV=production node server/index.js",
+    "generate": "nuxt generate",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@nuxtjs/axios": "^5.3.6",
+    "@nuxtjs/bulma": "^1.2.1",
+    "axios": "^0.18.0",
+    "cross-env": "^5.2.0",
+    "express": "^4.16.4",
+    "firebase": "^5.8.2",
+    "node-sass": "^4.11.0",
+    "nuxt": "^2.3.4",
+    "sass-loader": "^7.1.0",
+    "vue-cookies": "^1.5.12",
+    "vue-headroom": "^0.9.0"
+  },
+  "devDependencies": {
+    "jest": "^24.1.0",
+    "nodemon": "^1.18.9"
+  }
+}
