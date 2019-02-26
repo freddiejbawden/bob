@@ -47,8 +47,8 @@ if __name__ == "__main__":
     # X = forwards
     # Y = sideways
     # G = grab
-    current_path = [('left', 1), ('forward', 2), ('backward', 2), ('left', 4), ('forward', 4), ('right', 2),
-                    ('backward', 4), ('right', 3)]
+    current_path = [('left', 1), ('forward', 2), ('backward', 2), ('left',2), ('forward', 4), ('right', 2),
+                    ('backward', 4), ('right', 1)]
     #current_path = [('Y', 1), ('X', 2), ('G', 0), ('X', -1), ('G', 0), ('X', 3), ('Y', 1), ('G', 0), ('X', -4),
     #                ('Y', -1)]
     path_follower.start(current_path)
