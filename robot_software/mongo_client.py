@@ -5,7 +5,7 @@ print("Starting Client")
 ev3_package_check = True
 try:
     import ev3dev.ev3 as ev3
-    from followLineServer import FollowLine
+    from followLine import FollowLine
     print("ev3 modules imported")
 except:
     traceback.print_exc()
