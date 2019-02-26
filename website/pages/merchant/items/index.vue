@@ -5,14 +5,15 @@
             <div class="container has-text-centered">
                 <h1 class="is-inline-block is-relative mb25">
                     All items in 
-                    <label class="transparent-label" @click="triggerSelect()">
+                    <label class="transparent-label" @click="triggerSelect()" v-if="selectedWarehouse">
                         {{ selectedWarehouse ? selectedWarehouse.name : 'loading...' }} <i class="mdi mdi-chevron-down"></i>
                     </label>
                     <select 
                         class="transparent-select" 
                         name="warehouse" 
                         v-model="selectedWarehouse"
-                        @change="getItems(selectedWarehouse._id)">
+                        @change="getItems(selectedWarehouse._id)"
+                        v-if="selectedWarehouse">
                         <option :value="warehouse" v-for="warehouse in warehouses" :key="warehouse._id" :selected="warehouse._id == selectedWarehouse._id">
                             {{ warehouse.name }}
                         </option>
@@ -26,13 +27,14 @@
                 <div class="is-flex justify-end">
                     <nuxt-link 
                         :to="'/merchant/items/create/' + (selectedWarehouse ? selectedWarehouse._id : '')" 
-                        class="button is-link mb15">
+                        class="button is-link mb15"
+                        v-if="selectedWarehouse">
                         <span>Add an item to this warehouse</span>
                     </nuxt-link>
                 </div>
 
                 <div class="box is-full-width">
-                    <table class="table is-full-width">
+                    <table class="table is-full-width" v-if="selectedWarehouse && items.length > 0">
                         <thead>
                             <tr>
                                 <td>Name</td>
@@ -46,7 +48,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="item in items" :key="item._id">
+                            <tr v-for="(item, i) in items" :key="item._id">
                                 <td>
                                     <b>{{ item.name }}</b>
                                 </td>
@@ -69,13 +71,13 @@
                                 </td>
 
                                 <td>
-                                    <a href="#" class="has-text-success">
+                                    <nuxt-link :to="'/merchant/items/edit/' + selectedWarehouse._id + '_' + item._id" class="has-text-success">
                                         <i class="mdi mdi-pencil"></i>
                                         Edit
-                                    </a>
+                                    </nuxt-link>
                                 </td>
                                 <td>
-                                    <a href="#" class="has-text-danger">
+                                    <a href="javascript:;" class="has-text-danger" @click="deleteItem(selectedWarehouse._id, item._id, i)">
                                         <i class="mdi mdi-delete"></i>
                                         Delete
                                     </a>
@@ -83,6 +85,12 @@
                             </tr>
                         </tbody>
                     </table>
+                    <h3 class="has-text-centered m30-0" v-else-if="!selectedWarehouse">
+                        You haven't added any warehouses.
+                    </h3>
+                    <h3 class="has-text-centered m30-0" v-else>
+                        You haven't added any items.
+                    </h3>
                 </div>
             </div>
         </section>
@@ -152,6 +160,24 @@ export default {
                     console.error("Error adding document: ", error);
                 });
         },
+        deleteItem: function (warehouseId, itemId, i) {
+            axios.
+                delete(
+                    'http://localhost:9000/warehouse/' + warehouseId + '/items/' + itemId, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'username': this.$store.state.user.username,
+                    }
+                })
+                .then((res) => {
+                    console.log("Server response: ", res);
+                    
+                    this.items.splice(i, 1)
+                })
+                .catch(function(error) {
+                    console.error("Error adding document: ", error);
+                });
+        }
     },
     mounted: function () {
         this.getWarehouses()

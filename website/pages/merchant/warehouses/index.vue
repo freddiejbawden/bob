@@ -14,7 +14,7 @@
                     </nuxt-link>
                 </div>
                 <div class="box is-full-width">
-                    <table class="table is-full-width">
+                    <table class="table is-full-width" v-if="warehouses.length > 0">
                         <thead>
                             <tr>
                                 <td>Warehouse name</td>
@@ -28,7 +28,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="warehouse in warehouses" :key="warehouse._id">
+                            <tr v-for="(warehouse, i) in warehouses" :key="warehouse._id">
                                 <td>
                                     <b>{{ warehouse.name }}</b>
                                 </td>
@@ -59,7 +59,7 @@
                                     </nuxt-link>
                                 </td>
                                 <td>
-                                    <a href="#" class="has-text-danger">
+                                    <a href="javascript:;" class="has-text-danger" @click="deleteWarehouse(warehouse._id, i)">
                                         <i class="mdi mdi-delete"></i>
                                         Delete
                                     </a>
@@ -67,6 +67,9 @@
                             </tr>
                         </tbody>
                     </table>
+                    <h3 class="has-text-centered m30-0" v-else>
+                        You still haven't added any warehouses.
+                    </h3>
                 </div>
             </div>
         </section>
@@ -104,6 +107,7 @@ export default {
                     console.log("Server response: ", res);
 
                     this.warehouses = this.filterWarehouses(res.data.warehouses)
+                    // this.warehouses = res.data.warehouses
 
                     // if (res.status == 200) {
                     //     this.$router.push('/merchant/orders').go(1)
@@ -112,6 +116,9 @@ export default {
                 .catch(function(error) {
                     console.error("Error adding document: ", error);
                 });
+        },
+        deleteWarehouse: function (warehouseId, i) {
+            this.warehouses.splice(i, 1)
         }
     },
     mounted: function () {

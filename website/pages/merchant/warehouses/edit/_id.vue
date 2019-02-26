@@ -100,6 +100,9 @@ export default {
         }
     },
     methods: {
+        addShelf: function () {
+            this.warehouse.dimensions.z.push(this.warehouse.dimensions.z[this.warehouse.dimensions.z.length - 1])
+        },
         uploadFile: function (event) {
             let file = event.target.files[0]
             this.createImage(file);

@@ -25,12 +25,12 @@
                                 {{ message.text }}
                             </p>
                         </div>
-                        <!-- <div class="field">
+                        <div class="field">
                             <label class="label">Password:</label>
                             <div class="control">
                                 <input class="input" type="password" v-model="password" placeholder="Enter your password">
                             </div>
-                        </div> -->
+                        </div>
                         <!-- <div class="field">
                             <label class="label">Confirm password:</label>
                             <div class="control">
@@ -42,7 +42,7 @@
                                 <a 
                                     href="javascript:;"
                                     class="button is-link" 
-                                    :disabled="!username"
+                                    :disabled="!username || !password"
                                     @click.stop.prevent="register()">
                                     <span>Sign up</span>
                                 </a>
@@ -77,7 +77,7 @@ export default {
     },
     methods: {
         register () {
-            if (this.username) {
+            if (this.username && this.password) {
                 axios.
                     post('http://localhost:9000/register/', {
                         username: this.username,
@@ -96,7 +96,7 @@ export default {
                         this.message.status = res.status == 200 ? 'success' : 'danger'
                         this.message.text = 'You have successfully created your account!'
 
-                        if (this.message.status == 200) {
+                        if (res.status == 200) {
                             this.$router.push('/merchant/orders').go(1)
                         }
                     })

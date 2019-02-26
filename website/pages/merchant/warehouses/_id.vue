@@ -69,7 +69,7 @@
                 <h3 class="has-text-centered mt50 mb20">Orders</h3>
 
                 <div class="box is-full-width">
-                    <table class="table is-full-width">
+                    <table class="table is-full-width" v-if="orders.length > 0">
                         <thead>
                             <tr>
                                 <td>Items</td>
@@ -100,12 +100,15 @@
                             </tr>
                         </tbody>
                     </table>
+                    <h3 class="has-text-centered m30-0" v-else>
+                        No orders have been placed.
+                    </h3>
                 </div>
 
                 <h3 class="has-text-centered mt50 mb20">Items</h3>
 
                 <div class="box is-full-width">
-                    <table class="table is-full-width">
+                    <table class="table is-full-width" v-if="items.length > 0">
                         <thead>
                             <tr>
                                 <td>Name</td>
@@ -119,7 +122,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="item in items" :key="item._id">
+                            <tr v-for="(item, i) in items" :key="item._id">
                                 <td>
                                     <b>{{ item.name }}</b>
                                 </td>
@@ -142,13 +145,13 @@
                                 </td>
 
                                 <td>
-                                    <a href="#" class="has-text-success">
+                                    <nuxt-link :to="'/merchant/items/edit/' + warehouseId + '_' + item._id" class="has-text-success">
                                         <i class="mdi mdi-pencil"></i>
                                         Edit
-                                    </a>
+                                    </nuxt-link>
                                 </td>
                                 <td>
-                                    <a href="#" class="has-text-danger">
+                                    <a href="javascript:;" class="has-text-danger" @click="deleteItem(warehouseId, item._id, i)">
                                         <i class="mdi mdi-delete"></i>
                                         Delete
                                     </a>
@@ -156,6 +159,9 @@
                             </tr>
                         </tbody>
                     </table>
+                    <h3 class="has-text-centered m30-0" v-else>
+                        You still haven't added any items.
+                    </h3>
                 </div>
                 <div class="is-flex justify-start align-center">
                     <nuxt-link 
@@ -215,6 +221,24 @@ export default {
                     console.log("Server response: ", res);
                     
                     this.orders = res.data.orders
+                })
+                .catch(function(error) {
+                    console.error("Error adding document: ", error);
+                });
+        },
+        deleteItem: function (warehouseId, itemId, i) {
+            axios.
+                delete(
+                    'http://localhost:9000/warehouse/' + warehouseId + '/items/' + itemId, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'username': this.$store.state.user.username,
+                    }
+                })
+                .then((res) => {
+                    console.log("Server response: ", res);
+                    
+                    this.items.splice(i, 1)
                 })
                 .catch(function(error) {
                     console.error("Error adding document: ", error);

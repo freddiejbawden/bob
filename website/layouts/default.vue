@@ -39,11 +39,7 @@
                 {
                     name: 'Home',
                     url: '/'
-                },
-                {
-                    name: 'Contact us',
-                    url: '/'
-                },
+                }
             ]"
         ></abs-footer>
 

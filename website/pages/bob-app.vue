@@ -3,6 +3,7 @@
 
         <page-title
             title="Download the Bob App"
+            desc="Information about the App used by Customers to place orders, as well as a link to download it."
         ></page-title>
 
     </div>

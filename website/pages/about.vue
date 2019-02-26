@@ -3,6 +3,7 @@
 
         <page-title
             title="About"
+            desc="Some details about Assis10t - the dedicated team behind the Bob!"
         ></page-title>
 
     </div>

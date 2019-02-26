@@ -11,15 +11,26 @@
                         <div class="field">
                             <label class="label">Username:</label>
                             <div class="control">
-                                <input class="input" type="text" placeholder="Enter your full name" v-model="username">
+                                <input 
+                                    :class="[
+                                        'input', 'is-' + message.status
+                                    ]" 
+                                    type="text" 
+                                    placeholder="Enter your full name" 
+                                    v-model="username">
                             </div>
+                            <p :class="[
+                                'help', 'is-' + message.status
+                            ]">
+                                {{ message.text }}
+                            </p>
                         </div>
-                        <!-- <div class="field">
+                        <div class="field">
                             <label class="label">Password:</label>
                             <div class="control">
                                 <input class="input" type="password" v-model="password" placeholder="Enter your password">
                             </div>
-                        </div> -->
+                        </div>
                         <!-- <div class="field">
                             <label class="label">Confirm password:</label>
                             <div class="control">
@@ -31,7 +42,7 @@
                                 <a 
                                     href="javascript:;"
                                     class="button is-link" 
-                                    :disabled="!username"
+                                    :disabled="!username || !password"
                                     @click.stop.prevent="login()">
                                     <span>Login</span>
                                 </a>
@@ -58,15 +69,19 @@ export default {
             username: null,
             password: null,
             type: 'merchant',
+            message: {
+                status: null,
+                text: null
+            }
         }
     },
     methods: {
         login () {
-            if (this.username) {
+            if (this.username && this.password) {
                 axios.
                     post('http://localhost:9000/login/', {
                         username: this.username,
-                        // password: this.password,
+                        password: this.password,
                         // type: this.type,
                     }, {
                         headers: {
@@ -80,9 +95,15 @@ export default {
     
                         if (res.status == 200) {
                             this.$router.push('/merchant/orders').go(1)
+                        } else {
+                            this.message.status = 'danger'
+                            this.message.text = 'There is no such username in our database.'
                         }
                     })
-                    .catch(function(error) {
+                    .catch((error) => {
+                        this.message.status = 'danger'
+                        this.message.text = 'There is no such username in our database.'
+
                         console.error("Error adding document: ", error);
                     });
             }

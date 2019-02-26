@@ -3,6 +3,7 @@
 
         <page-title
             title="Meet the Bob"
+            desc="Information about the idea behind Bob, the shopping assistants main features, pricing and maybe guides on usage."
         ></page-title>
 
     </div>

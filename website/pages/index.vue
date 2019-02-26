@@ -4,6 +4,7 @@
         :slides="[
             {
                 title: 'Meet the Bob',
+                img: '~/assets/images/hero.png',
                 short_description: 'Bob (Brilliant Online Buying) is a shopping assistant robot designed to help you.',
                 
             }

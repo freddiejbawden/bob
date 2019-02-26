@@ -3,6 +3,7 @@
 
         <page-title
             title="Contact us"
+            desc="Some contact information..."
         ></page-title>
 
     </div>

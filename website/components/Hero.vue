@@ -7,12 +7,12 @@
                 {'is-7': !is_carousel},
             ]">
                 
-                <div class="img-bckg is-browser-ie" 
+                <!-- <div class="img-bckg is-browser-ie" 
                     :style="{'background-image': 'url(' + slide.img + ')'}"
                     v-for="(slide, i) in slides" 
-                    :key="'img' + i"></div>
+                    :key="'img' + i"></div> -->
                 
-                <div class="is-hidden-desktop" 
+                <!-- <div class="is-hidden-desktop" 
                 v-for="(slide, i) in slides" 
                 :key="'img' + i">
                     <img :src="slide.img" alt="slide.title">
@@ -20,7 +20,7 @@
                 <div class="img-bckg static is-Ax200-t" 
                     :style="{'background-image': 'url(' + slide.img + ')'}"
                     v-for="(slide, i) in slides" 
-                    :key="'img' + i"></div>
+                    :key="'img' + i"></div> -->
                 
                 <svg class="hero-svg is-not-browser-ie is-hidden-touch" viewBox="0 0 772 606" preserveAspectRatio="xMaxYMax meet">
                     <defs>
@@ -31,10 +31,10 @@
                     </clipPath>
                     <g style="clip-path:url(#clip);">
                         <image  
-                            width="130%" 
-                            height="110%"
+                            width="120%" 
+                            height="100%"
                             x="-10%"
-                            :xlink:href="slide.img" 
+                            xlink:href="~/assets/images/hero.png" 
                             v-for="(slide, i) in slides" 
                             :key="'img' + i"></image>
                         <rect x="0" y="0" width="100%" height="100%" fill="#646464" fill-opacity="0.15"></rect>

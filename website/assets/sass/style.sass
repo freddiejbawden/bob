@@ -8,8 +8,8 @@
 // Colors
 $primary:       #c045b6 
 $primary-light: #e86be5
-$link:          #00D848 
-$link-light:    #38F987
+$link:          #529eba 
+$link-light:    #82c4dc
 $text:          #333
 
 // $link-invert:	$blue-invert
@@ -358,7 +358,11 @@ $shadow: 0 .1rem .4rem .1rem rgba(41, 41, 41, 0.1)
             background: $primary
     &.is-link
         background: $gradient-link
-        box-shadow: $shadow-link
+        // box-shadow: $shadow-link
+        color: #fff
+
+        &:hover
+            color: #fff
 
         &:before
             background: $link
@@ -681,30 +685,30 @@ main
     .main-content 
         padding-top: $header-height
 
-    &:before
-        content: ""
-        width: 14rem
-        height: 20rem
-        position: absolute
-        z-index: 0
-        top: 2rem
-        right: 0
+    // &:before
+    //     content: ""
+    //     width: 14rem
+    //     height: 20rem
+    //     position: absolute
+    //     z-index: 0
+    //     top: 2rem
+    //     right: 0
         // background: url('../images/svg/purple-mesh-rotate.svg') center no-repeat
 
-        @include tablet
-            display: none
-    &:after
-        content: ""
-        width: 30rem
-        height: 30rem
-        position: absolute
-        z-index: 0
-        top: 60%
-        right: 0
-        // background: url('../images/svg/green-donut.svg') center no-repeat
+        // @include tablet
+        //     display: none
+    // &:after
+    //     content: ""
+    //     width: 30rem
+    //     height: 30rem
+    //     position: absolute
+    //     z-index: 0
+    //     top: 60%
+    //     right: 0
+    //     // background: url('../images/svg/green-donut.svg') center no-repeat
 
-        @include tablet
-            display: none
+    //     @include tablet
+    //         display: none
 
 .has-bckg-grey
     background: #eee

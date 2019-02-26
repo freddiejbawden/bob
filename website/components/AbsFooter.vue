@@ -31,8 +31,8 @@
         <svg viewBox="0 0 1330 419" class="footer-bckg">
             <defs>
                 <linearGradient x1="105.189448%" y1="108.514767%" x2="0%" y2="21.3648885%" id="linearGradient-1">
-                    <stop stop-color="#004FFF" offset="0%"></stop>
-                    <stop stop-color="#0093FF" offset="100%"></stop>
+                    <stop stop-color="#529eba" offset="0%"></stop>
+                    <stop stop-color="#82c4dc" offset="100%"></stop>
                 </linearGradient>
                 <linearGradient x1="90.7814356%" y1="19.4594161%" x2="8.02921532%" y2="86.6485037%" id="linearGradient-2">
                     <stop stop-color="#FFFFFF" offset="0%"></stop>
