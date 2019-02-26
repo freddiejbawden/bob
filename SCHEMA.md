@@ -124,6 +124,8 @@ Instruction {
 | `POST` | `/warehouse` | `Merchant` | Create/edit a warehouse. |
 | `GET` | `/warehouse/:warehouseId` | | Gets given `Warehouse` with its items. |
 | `POST` | `/warehouse/:warehouseId/items` | `Merchant` | Adds an `Item` to a `Warehouse`. |
+| `GET` | `/warehouse/:warehouseId/items/:itemId` | `Merchant` | Gets the item with the given `itemId`. |
+| `DELETE` | `/warehouse/:warehouseId/items/:itemId` | `Merchant` | Deletes the item with the given `itemId`. |
 | `GET` | `/warehouse/:warehouseId/orders` | `Merchant` | Gets all orders in the given `Warehouse`. |
 | `GET` | `/warehouse/:warehouseId/robot` | `Merchant` | Gets the state of the robot(s). |
 | `GET` | `/robot` | `Robot` | Get details of the current Robot. |
@@ -241,6 +243,23 @@ Item //With _id if updating an existing item, or without _id if creating a new o
 {
     "success": true,
     "item": Item
+}
+
+```
+#### `GET /warehouse/:warehouseId/items/:itemId`
+```javascript
+===== Output =====
+{
+    "success": true,
+    "item": Item
+}
+```
+
+#### `DELETE /warehouse/:warehouseId/items`
+```javascript
+===== Output =====
+{
+    "success": true
 }
 ```
 

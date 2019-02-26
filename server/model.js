@@ -91,6 +91,14 @@ const factory = db => ({
             .collection('inventory')
             .find({ warehouseId })
             .toArray(),
+    getItemById: id =>
+        db()
+            .collection('inventory')
+            .findOne({ _id: ObjectID(id) }),
+    deleteItemById: id =>
+        db()
+            .collection('inventory')
+            .deleteOne({ _id: ObjectID(id) }),
     getOrdersByWarehouseId: warehouseId =>
         db()
             .collection('orders')
