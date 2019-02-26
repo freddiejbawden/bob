@@ -15,6 +15,7 @@ class FollowLine:
 
     MARKING_NUMBER = 2  # number of consecutive colour readings to detect marking
     MARKING_INTERVAL = 1  # time between marking checks in seconds
+    REVERSE = False
 
     # Constructor
     def __init__(self):
@@ -142,6 +143,8 @@ class FollowLine:
                     return
 
     def run_sideways(self, distance, reverse):
+        self.ignore_blue = False
+        self.correct_trajectory(99, self.REVERSE)
 
         if reverse:
             self.csfl.mode = 'COL-COLOR'  # measure light intensity
@@ -191,6 +194,7 @@ class FollowLine:
 
     # move forwards/backwards
     def run_forwards(self, distance, reverse):
+        self.REVERSE = reverse
         self.correct_trajectory(distance, reverse)
 
     def stop(self):
@@ -203,4 +207,4 @@ class FollowLine:
 # Main function
 if __name__ == "__main__":
     robot = FollowLine()
-    robot.run_x(2)
+    robot.run_forwards(2, False)
