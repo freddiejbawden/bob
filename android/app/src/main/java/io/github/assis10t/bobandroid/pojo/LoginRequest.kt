@@ -1,6 +1,5 @@
 package io.github.assis10t.bobandroid.pojo
 
 class LoginRequest (
-    val username: String,
-    val password: String
+    val username: String
 )

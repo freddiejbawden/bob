@@ -1,130 +1,256 @@
 const db = require('./db')
 const assert = require('assert')
 const ObjectID = require('mongodb').ObjectID
+const robotPathfinding = require('./robot-pathfinding')
 const factory = db => ({
-    getAllOrders: () =>
-        new Promise((res, rej) => {
-            db()
-                .collection('orders')
-                .find({})
-                .toArray((err, docs) => {
-                    err ? rej(err) : res(docs)
-                })
-        }),
+    getOrders: userId =>
+        db()
+            .collection('orders')
+            .find({ userId })
+            .toArray(),
     getOrderById: orderId =>
+        db()
+            .collection('orders')
+            .findOne({ _id: ObjectID(orderId) }),
+    addOrder: orderData =>
+        // TODO: Check stock before finishing the order.
+        db()
+            .collection('orders')
+            .insertOne(orderData)
+            .then(() =>
+                Promise.all(
+                    orderData.items.map(i =>
+                        db()
+                            .collection('inventory')
+                            .findOne({ _id: ObjectID(i._id) })
+                    )
+                )
+            )
+            .then(items =>
+                orderData.items.map((item, i) => ({
+                    _id: ObjectID(item._id),
+                    quantity: items[i].quantity - item.quantity
+                }))
+            )
+            .then(updatedItems => {
+                if (!updatedItems.every(i => i.quantity >= 0)) {
+                    throw Error('One of the items in the order is more than available stock.')
+                }
+                return updatedItems
+            })
+            .then(updatedItems => Promise.all(updatedItems.map(i => factory(db).addItem(i))))
+            .then(() => factory(db).turnOn(1))
+            .then(() => orderData),
+    turnOn: markers =>
+        db()
+            .collection('bob_movement')
+            .updateOne({}, { $set: { moving: true, markers: parseInt(markers) } })
+            .then(() => 'on'),
+    turnOff: () =>
+        db()
+            .collection('bob_movement')
+            .updateOne({}, { $set: { moving: false } })
+            .then(() => 'off'),
+    getMovement: () =>
+        db()
+            .collection('bob_movement')
+            .findOne(),
+    getWarehouses: () =>
+        db()
+            .collection('warehouses')
+            .find()
+            .toArray(),
+    addWarehouse: ({ _id, ...warehouse }) => {
+        if (!_id) {
+            warehouse = { _id: new ObjectID(), ...warehouse }
+            return db()
+                .collection('warehouses')
+                .insertOne(warehouse)
+                .then(() => warehouse)
+        } else {
+            return db()
+                .collection('warehouses')
+                .updateOne({ _id: ObjectID(_id) }, { $set: warehouse })
+                .then(() => factory(db).getWarehouseById(_id))
+        }
+    },
+    getWarehouseById: async warehouseId => {
+        const warehouse = await db()
+            .collection('warehouses')
+            .findOne({ _id: ObjectID(warehouseId) })
+        if (!warehouse) return null
+
+        const items = await factory(db).getItemsByWarehouseId(warehouseId)
+        return {
+            ...warehouse,
+            items
+        }
+    },
+    getItemsByWarehouseId: warehouseId =>
+        db()
+            .collection('inventory')
+            .find({ warehouseId })
+            .toArray(),
+    getItemById: id =>
+        db()
+            .collection('inventory')
+            .findOne({ _id: ObjectID(id) }),
+    deleteItemById: id =>
+        db()
+            .collection('inventory')
+            .deleteOne({ _id: ObjectID(id) }),
+    getOrdersByWarehouseId: warehouseId =>
+        db()
+            .collection('orders')
+            .find({ warehouseId })
+            .toArray(),
+    addItem: ({ _id, ...item }) => {
+        if (!_id) {
+            item = { _id: new ObjectID(), ...item }
+            return db()
+                .collection('inventory')
+                .insertOne(item)
+                .then(() => item)
+        } else {
+            return db()
+                .collection('inventory')
+                .updateOne({ _id: ObjectID(_id) }, { $set: item })
+                .then(modifiedCount => (modifiedCount ? item : null))
+        }
+    },
+    removeItem: item =>
+        db()
+            .collection('inventory')
+            .deleteOne({ _id: ObjectID(item._id) }),
+    createUser: (username, type) => {
+        const user = { _id: new ObjectID(), username, type }
+        return db()
+            .collection('users')
+            .insertOne(user)
+            .then(() => user)
+    },
+    authUser: username =>
+        db()
+            .collection('users')
+            .findOne({ username }),
+    setHome: (robot_id, home_x, home_y) =>
         new Promise((res, rej) => {
             db()
-                .collection('orders')
-                .find({ _id: new ObjectID(orderId) })
-                .toArray((err, docs) => {
-                    err ? rej(err) : res(docs[0])
+                .collection('robot')
+                .updateOne({ _id: robot_id }, { $set: { home_x, home_y } }, (err, warehouse) => {
+                    err ? rej(err) : res(warehouse)
                 })
         }),
-    addOrder: orderData =>
-        new Promise((res, rej) => {
+    getRobot: robot_id => {
+        return new Promise((res, rej) => {
             db()
-                .collection('orders')
-                .insertOne(orderData, (err, order) => {
+                .collection('robot')
+                .find({ _id: robot_id })
+                .toArray((err, robot) => {
+                    console.log(robot)
+                    console.log(err)
                     if (err) {
                         rej(err)
-                        return
+                    } else {
+                        res(robot)
                     }
-                    Promise.all(orderData.items.map(i => factory(db).removeItem(i)))
-                        .then(() => factory(db).turnOn(1))
-                        .then(() => res(orderData))
-                        .catch(err => rej(err))
                 })
-        }),
-    addJob: jobData =>
+        })
+    },
+    addRobot: (robot_id, home_x, home_y) =>
         new Promise((res, rej) => {
             db()
-                .collection('jobs')
-                .insertOne(jobData, (err, job) => {
-                    err ? rej(err) : res(jobData)
-                })
-        }),
-    getAllJobs: () =>
-        new Promise((res, rej) => {
-            db()
-                .collection('jobs')
-                .find({})
-                .toArray((err, docs) => {
-                    err ? rej(err) : res(docs)
-                })
-        }),
-    turnOn: markers =>
-        new Promise((res, rej) => {
-            db()
-                .collection('bob_movement')
-                .updateOne(
-                    { _id: 'movement' },
-                    { $set: { moving: true, markers: parseInt(markers) } },
-                    (err, count_modified) => {
-                        err ? rej(err) : res('on')
+                .collection('robot')
+                .insertOne(
+                    {
+                        _id: robot_id,
+                        status: 'WAITING',
+                        home_x: home_x,
+                        home_y: home_y,
+                        location: {
+                            x: 0,
+                            y: 0,
+                            z: 0
+                        }
+                    },
+                    (err, robot) => {
+                        err ? rej(err) : res(robot)
                     }
                 )
         }),
-    turnOff: () =>
+    getNextJob: robot_id =>
         new Promise((res, rej) => {
             db()
-                .collection('bob_movement')
-                .updateOne({ _id: 'movement' }, { $set: { moving: false } }, (err, count_modified) => {
-                    err ? rej(err) : res('off')
-                })
-        }),
-    getMovement: () =>
-        new Promise((res, rej) => {
-            db()
-                .collection('bob_movement')
-                .find({})
-                .toArray((err, docs) => {
-                    err ? rej(err) : res(docs[0])
-                })
-        }),
+                .collection('robot')
+                .findOne({ _id: robot_id })
+                .then((robot, err) => {
+                    if (err) {
+                        rej(err)
+                    } else {
+                        db()
+                            .collection('warehouse')
+                            .find({})
+                            .toArray((err, warehouse) => {
+                                db()
+                                    .collection('orders')
+                                    .find({ status: 'PENDING' })
+                                    .toArray((err, orders) => {
+                                        if (err) {
+                                            rej(err)
+                                        } else {
+                                            //console.log(orders.length)
+                                            if (orders.length == 0) {
+                                                res([])
+                                            } else {
+                                                const robot_job = robotPathfinding.get_robot_path(
+                                                    orders[0],
+                                                    robot,
+                                                    warehouse[0]
+                                                )
 
-    addItem: item =>
-        new Promise((res, rej) => {
-            db()
-                .collection('inventory')
-                .insertOne({ _id: new ObjectID(), ...item }, (err, item) => {
-                    err ? rej(err) : res(item)
+                                                db()
+                                                    .collection('orders')
+                                                    .updateOne(
+                                                        { _id: orders[0]._id },
+                                                        { $set: { status: 'IN_TRANSIT' } },
+                                                        err => {
+                                                            if (err) {
+                                                                rej(err)
+                                                            } else {
+                                                                db()
+                                                                    .collection('robot')
+                                                                    .updateOne(
+                                                                        { _id: robot_id },
+                                                                        { $set: { status: 'ON_JOB' } }
+                                                                    )
+                                                                    .then(() => res(robot_job))
+                                                            }
+                                                        }
+                                                    )
+                                            }
+                                        }
+                                    })
+                            })
+                    }
                 })
         }),
-    removeItem: item =>
-        new Promise((res, rej) => {
-            db()
-                .collection('inventory')
-                .deleteOne({ _id: new ObjectID(item._id) }, (err, item) => {
-                    err ? rej(err) : res(item)
-                })
-        }),
-    getItems: () =>
-        new Promise((res, rej) => {
-            db()
-                .collection('inventory')
-                .find({})
-                .toArray((err, items) => {
-                    err ? rej(err) : res(items)
-                })
-        }),
-    createUser: (uname, pass) =>
-        new Promise((res, rej) => {
-            db()
-                .collection('users')
-                .insertOne({ _id: new ObjectID(), username: uname, password: pass }, (err, user) => {
-                    err ? rej(err) : res(user)
-                })
-        }),
-    authUser: (uname, pass) =>
-        new Promise((res, rej) => {
-            db()
-                .collection('users')
-                .find({ username: uname, password: pass })
-                .toArray((err, users) => {
-                    console.log(users)
-                    err ? rej(err) : res(users.length > 0)
-                })
+    getWholeDB: () => {
+        const collections = ['users', 'warehouses', 'inventory', 'bob_movement', 'orders', 'robot']
+        return Promise.all(
+            collections.map(c =>
+                db()
+                    .collection(c)
+                    .find()
+                    .toArray()
+            )
+        ).then(datas => {
+            const result = {}
+            datas.forEach((data, i) => {
+                result[collections[i]] = data
+            })
+            return result
         })
+    }
 })
 
 module.exports = factory(db)

@@ -1,4 +1,5 @@
 const os = require('os')
+const ObjectID = require('mongodb').ObjectID
 
 let ips = null
 
@@ -31,4 +32,19 @@ module.exports.getIp = () => {
     })
     console.log('=== END IP ADDRESSES ===')
     return ips[0]
+}
+
+module.exports.loadDBwithData = (db, data) => {
+    const promises = Object.keys(data)
+        .map(collection => ({
+            collection,
+            data: data[collection].map(doc => ({
+                ...doc,
+                _id: doc._id ? ObjectID(doc._id) : new ObjectID()
+            }))
+        }))
+        .map(({ collection, data }) =>
+            data.length > 0 ? db.collection(collection).insertMany(data) : Promise.resolve()
+        )
+    return Promise.all(promises)
 }
