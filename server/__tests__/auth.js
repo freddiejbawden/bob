@@ -11,7 +11,7 @@ beforeEach(db.init)
 
 afterEach(db.close)
 
-describe('/register', () => {
+describe('POST /register', () => {
     it('works', async () => {
         const response = await request(app)
             .post('/register')
