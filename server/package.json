@@ -8,7 +8,7 @@
     "dev": "DB=fake nodemon index.js",
     "dev-real": "nodemon index.js",
     "randomid": "node getrandomid.js",
-    "test": "jest"
+    "test": "DB=fake jest --runInBand --verbose"
   },
   "repository": {
     "type": "git",
@@ -22,7 +22,8 @@
   "homepage": "https://github.com/Assis10t/assis10t#readme",
   "devDependencies": {
     "jest": "^24.0.0",
-    "nodemon": "^1.18.9"
+    "nodemon": "^1.18.9",
+    "supertest": "^3.4.2"
   },
   "dependencies": {
     "body-parser": "^1.18.3",
