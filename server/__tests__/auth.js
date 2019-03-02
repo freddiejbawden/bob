@@ -139,10 +139,10 @@ describe('Auth Library', () => {
         utils.loadDBwithData(db(), {
             users: [user]
         })
-        app.get('/__test__/auth/rejectsUnknownUsers', auth.customer((req, res) => res.json(req.user)))
+        app.get('/__test__/auth/rejectsIncorrectType', auth.customer((req, res) => res.json(req.user)))
 
         const response = await request(app)
-            .get('/__test__/auth/rejectsUnknownUsers')
+            .get('/__test__/auth/rejectsIncorrectType')
             .set('username', 'test')
 
         expect(response.statusCode).toBe(403)
