@@ -168,8 +168,8 @@ const factory = db => ({
                         home_x: home_x,
                         home_y: home_y,
                         location: {
-                            x: 0,
-                            y: 0,
+                            x: home_x,
+                            y: home_y,
                             z: 0
                         }
                     },
@@ -188,7 +188,7 @@ const factory = db => ({
                         rej(err)
                     } else {
                         db()
-                            .collection('warehouse')
+                            .collection('warehouses')
                             .find({})
                             .toArray((err, warehouse) => {
                                 db()
