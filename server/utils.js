@@ -48,5 +48,3 @@ module.exports.loadDBwithData = (db, data) => {
         )
     return Promise.all(promises)
 }
-
-module.exports.clearDB = db => db.dropDatabase()
