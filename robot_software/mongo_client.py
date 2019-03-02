@@ -6,7 +6,7 @@ print("Using API level v1")
 ev3_package_check = True
 try:
     import ev3dev.ev3 as ev3
-    from followLineServer import FollowLine
+    from followLine import FollowLine
     print("ev3 modules imported")
 except:
     traceback.print_exc()
@@ -30,6 +30,10 @@ from threading import Thread
 print("threading imported")
 from zeroconf import ServiceBrowser, Zeroconf
 print("zeroconf imported")
+from bobTranslation import extract
+print("bobTranslation imported")
+from followPath import FollowPath
+print("followPath imported")
 #remove me
 
 last_json = {}
@@ -44,15 +48,17 @@ def polling(ip_addr, port, run_robot,username):
             headers = {'username':username}
             r = requests.get("http://{}:{}/robotjob".format(ip_addr,port),headers=headers)
             path = json.loads(r.text)
-            if (path["job"] == []):
+            if path["job"] == []:
                 print("No order")
             else:
                 print(path['job'])
-                #TODO: pass to robot
+                path_tuples = extract(path['job']['instruction_set'])
+                print("Path tuples: ", path_tuples)
+                robot_boy = FollowPath()
+                robot_boy.start(path_tuples)
             
         except:
-            url = "http://{}:{}/getmovement".format(ip_addr,port)
-            print("GET request: {} failed at {}".format(url,datetime.datetime.now()))
+            
             traceback.print_exc()
 
         time.sleep(5)
