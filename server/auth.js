@@ -13,7 +13,7 @@ const authFactory = model => (userTypes, routeHandler) => (req, res, next) => {
         .authUser(username)
         .then(user => {
             if (!user) {
-                res.status(401).json({
+                rej.status(401).json({
                     success: false,
                     error: 'User not found.'
                 })

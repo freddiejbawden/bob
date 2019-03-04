@@ -240,6 +240,15 @@ app.post(
             .catch(next)
     })
 )
+app.put(
+    '/robot/status',
+    auth.robot((req,res,next) => {
+        model
+            .updateRobotStatus(req.user.username, req.body.status)
+            .then(robot => res.json({success: true}))
+            .catch(next)
+    })
+)
 
 app.get(
     '/robotjob',

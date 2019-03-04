@@ -178,6 +178,24 @@ const factory = db => ({
                     }
                 )
         }),
+    updateRobotStatus : (robot_id, status) =>
+        new Promise((res, rej) => {
+            // remove hard coded variable
+            var possibleStates = ["WAITING", "ON_JOB", "MIA", "NOT_RESPONDING", "MANUAL_CONTROL"]
+            if (!possibleStates.includes(status)) {
+                rej('"Status must be: WAITING or ON_JOB or MIA or NOT_RESPONDING or MANUAL_CONTROL"')
+            }
+            db()
+                .collection('robot')
+                .updateOne({_id:robot_id},{$set:{'status':status}})
+                .then((robot, err) => {
+                    if (err) {
+                        rej(err)
+                    } else {
+                        res(robot)
+                    }
+                })
+        }),
     getNextJob: robot_id =>
         new Promise((res, rej) => {
             db()
