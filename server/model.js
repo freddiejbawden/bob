@@ -74,10 +74,12 @@ const factory = db => ({
                 .then(() => factory(db).getWarehouseById(_id))
         }
     },
-    getWarehouseById: async warehouseId => {
-        const warehouse = await db()
+    getWarehouseById: warehouseId =>
+        db()
             .collection('warehouses')
-            .findOne({ _id: ObjectID(warehouseId) })
+            .findOne({ _id: ObjectID(warehouseId) }),
+    getWarehouseWithItemsById: async warehouseId => {
+        const warehouse = await factory(db).getWarehouseById(warehouseId)
         if (!warehouse) return null
 
         const items = await factory(db).getItemsByWarehouseId(warehouseId)
