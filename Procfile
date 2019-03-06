@@ -1,0 +1,1 @@
+web: DB=fake cd server && npm i && npm start
