@@ -22,7 +22,7 @@ module.exports.init = async () => {
         mongo_url = await mongod.getConnectionString()
         console.log('Using fake mongo at ' + mongo_url)
     } else {
-        console.log('Using real mongo at ' + mongo_url)
+        console.log('Using real mongo.')
     }
     client = new MongoClient(mongo_url, {
         useNewUrlParser: true
