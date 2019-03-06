@@ -11,7 +11,7 @@ matrix:
 deploy:
   provider: script
   on: beta
-  before-deploy:
+  before-script:
     - echo -e "Host *\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
     - echo -e "$travis_ssh_private_key" > ~/.ssh/id_rsa
     - echo -e "$travis_ssh_public_key" > ~/.ssh/id_rsa.pub
