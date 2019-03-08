@@ -15,7 +15,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             data = conn.recv(1024)
             if data:
                 print(data)
-                conn.sendall(data)
+                conn.sendall(b'done')
                 robot = FollowLine()
                 robot.run_forwards(2, False)
                 
