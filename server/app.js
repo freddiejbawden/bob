@@ -216,7 +216,7 @@ app.get(
     auth.robot((req, res, next) => {
         var currentUser = req.user
         model
-            .getRobot(currentUser.username)
+            .getRobotByUsername(currentUser.username)
             .then(robot => res.json({ success: true, robot }))
             .catch(next)
     })
