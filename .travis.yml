@@ -16,6 +16,8 @@ jobs:
         - echo "Deploying to heroku"
         - echo -e "$TRAVIS_COMMIT" > ./server/COMMIT
         - cat ./server/COMMIT
+        - git add ./server/COMMIT
+        - git commit -m "Travis: Added COMMIT"
         - echo -e "Host *\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
         - echo -e "$travis_ssh_private_key" > ~/.ssh/id_rsa.heroku
         - echo -e "$travis_ssh_public_key" > ~/.ssh/id_rsa.heroku.pub
