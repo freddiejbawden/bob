@@ -23,7 +23,7 @@ module.exports.init = async () => {
         const mongod = new MongoMemoryServer()
         mongo_url = await mongod.getConnectionString()
     } else {
-        console.log('Using real mongo at ' + mongo_url)
+        console.log('Using real mongo.')
     }
     client = new MongoClient(mongo_url, {
         useNewUrlParser: true
