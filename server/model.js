@@ -60,8 +60,8 @@ const factory = db => ({
             .collection('warehouses')
             .find()
             .toArray(),
-    addWarehouse: warehouse => {
-        if (!warehouse._id) {
+    addWarehouse: ({ _id, ...warehouse }) => {
+        if (!_id) {
             warehouse = { _id: new ObjectID(), ...warehouse }
             return db()
                 .collection('warehouses')
@@ -70,8 +70,8 @@ const factory = db => ({
         } else {
             return db()
                 .collection('warehouses')
-                .updateOne({ _id: warehouse._id }, { $set: warehouse })
-                .then(modifiedCount => (modifiedCount ? warehouse : null))
+                .updateOne({ _id: ObjectID(_id) }, { $set: warehouse })
+                .then(() => factory(db).getWarehouseById(_id))
         }
     },
     getWarehouseById: async warehouseId => {
@@ -91,6 +91,14 @@ const factory = db => ({
             .collection('inventory')
             .find({ warehouseId })
             .toArray(),
+    getItemById: id =>
+        db()
+            .collection('inventory')
+            .findOne({ _id: ObjectID(id) }),
+    deleteItemById: id =>
+        db()
+            .collection('inventory')
+            .deleteOne({ _id: ObjectID(id) }),
     getOrdersByWarehouseId: warehouseId =>
         db()
             .collection('orders')
@@ -133,27 +141,11 @@ const factory = db => ({
                     err ? rej(err) : res(warehouse)
                 })
         }),
-        getRobot: robot_id => {
-            return new Promise((res, rej) => {
-                db()
-                    .collection('robot')
-                    .find({ _id: robot_id })
-                    .toArray((err, robot) => {
-                        console.log(robot)
-                        console.log(err)
-                        if (err) {
-                            rej(err)
-                        } else {
-                            res(robot)
-                        }
-                    })
-            })
-        },
-    getRobotByUsername: robot_username => {
+    getRobot: robot_id => {
         return new Promise((res, rej) => {
             db()
                 .collection('robot')
-                .find({ username: robot_username })
+                .find({ _id: robot_id })
                 .toArray((err, robot) => {
                     console.log(robot)
                     console.log(err)
@@ -186,29 +178,11 @@ const factory = db => ({
                     }
                 )
         }),
-    updateRobotStatus : (robot_id, status) =>
-        new Promise((res, rej) => {
-            // remove hard coded variable
-            var possibleStates = ["WAITING", "ON_JOB", "MIA", "NOT_RESPONDING", "MANUAL_CONTROL"]
-            if (!possibleStates.includes(status)) {
-                rej('"Status must be: WAITING or ON_JOB or MIA or NOT_RESPONDING or MANUAL_CONTROL"')
-            }
-            db()
-                .collection('robot')
-                .updateOne({_id:robot_id},{$set:{'status':status}})
-                .then((robot, err) => {
-                    if (err) {
-                        rej(err)
-                    } else {
-                        res(robot)
-                    }
-                })
-        }),
-    getNextJob: robot_username =>
+    getNextJob: robot_id =>
         new Promise((res, rej) => {
             db()
                 .collection('robot')
-                .findOne({ username: robot_username })
+                .findOne({ _id: robot_id })
                 .then((robot, err) => {
                     if (err) {
                         rej(err)
@@ -246,7 +220,7 @@ const factory = db => ({
                                                                 db()
                                                                     .collection('robot')
                                                                     .updateOne(
-                                                                        { username: robot_username },
+                                                                        { _id: robot_id },
                                                                         { $set: { status: 'ON_JOB' } }
                                                                     )
                                                                     .then(() => res(robot_job))

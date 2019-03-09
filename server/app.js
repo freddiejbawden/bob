@@ -216,7 +216,7 @@ app.get(
     auth.robot((req, res, next) => {
         var currentUser = req.user
         model
-            .getRobotByUsername(currentUser.username)
+            .getRobot(currentUser.username)
             .then(robot => res.json({ success: true, robot }))
             .catch(next)
     })
@@ -237,15 +237,6 @@ app.post(
         model
             .setHome(req.params.robotid, req.body.home_x, req.body.home_y)
             .then(robot => res.json({ success: true, robot }))
-            .catch(next)
-    })
-)
-app.put(
-    '/robot/status',
-    auth.robot((req,res,next) => {
-        model
-            .updateRobotStatus(req.user.username, req.body.status)
-            .then(robot => res.json({success: true}))
             .catch(next)
     })
 )

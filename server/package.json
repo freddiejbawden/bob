@@ -8,7 +8,7 @@
     "dev": "DB=fake nodemon index.js",
     "dev-real": "nodemon index.js",
     "randomid": "node getrandomid.js",
-    "test": "jest"
+    "test": "DB=fake jest --runInBand --verbose"
   },
   "repository": {
     "type": "git",
