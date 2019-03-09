@@ -8,17 +8,17 @@ jobs:
       install:
       - npm install
     - stage: deploy
-      script: skip
-      deploy:
-        provider: script
-        on: beta
-        script:
-          - echo "Deploying to heroku"
-          - echo -e "Host *\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
-          - echo -e "$travis_ssh_private_key" > ~/.ssh/id_rsa.heroku
-          - echo -e "$travis_ssh_public_key" > ~/.ssh/id_rsa.heroku.pub
-          - chmod 600 ~/.ssh/id_rsa.heroku
-          - eval `ssh-agent -s`
-          - ssh-add ~/.ssh/id_rsa.heroku
-          - git remote add heroku git@heroku.com:sdp-10-beta.git
-          - git subtree push --prefix server heroku master
+      if: branch = beta AND type = push
+      language: node_js
+      node_js: 
+        - "11.10.1"
+      script:
+        - echo "Deploying to heroku"
+        - echo -e "Host *\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+        - echo -e "$travis_ssh_private_key" > ~/.ssh/id_rsa.heroku
+        - echo -e "$travis_ssh_public_key" > ~/.ssh/id_rsa.heroku.pub
+        - chmod 600 ~/.ssh/id_rsa.heroku
+        - eval `ssh-agent -s`
+        - ssh-add ~/.ssh/id_rsa.heroku
+        - git remote add heroku git@heroku.com:sdp-10-beta.git
+        - git subtree push --prefix server heroku master
