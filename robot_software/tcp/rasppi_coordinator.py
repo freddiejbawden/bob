@@ -21,7 +21,6 @@ class RobotJobListener():
             r = requests.get('http://{}:{}/robotjob'.format(self.server_info['ip'],self.server_info['port']), headers=header)
             path = json.loads(r.text)
             if path['job'] != []:
-                print(path['job'])
                 self.job_handler(path['job']['instruction_set'])
             sleep(5)
     def job_handler(self,instruction_set):
@@ -33,11 +32,10 @@ class RobotJobListener():
                 self.open_and_send(self.rasp_target,str(instruction))
             else:
                 self.open_and_send(self.ev3_target,str(instruction))
-    
+            print("sent")
     def open_and_send(self, target,payload):
         HOST = None
         PORT = None
-        print(self.ev3_info)
         if target == self.rasp_target:
             HOST = self.rasp_info['ip']
             PORT = self.rasp_info['port']
@@ -48,12 +46,12 @@ class RobotJobListener():
         #convert instruction to payload
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.connect((HOST, PORT))
-            print(payload)
             s.sendall(str.encode(payload))
             instruction_ack = s.recv(1024)
-            #TODO: handle lost etc.
-            if instruction_ack == b'done':
-                print('done')
+            while instruction_ack != b'done':
+                  instruction_ack = s.recv(1024)
+            print('done')
+        
 
 
 
