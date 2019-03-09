@@ -6,8 +6,6 @@ matrix:
     before_install:
     - cd server
     install:
-    - nvm install node
-    - node -v
     - npm install
 deploy:
   provider: script
