@@ -20,7 +20,7 @@ db.init()
         }
 
         app.get('/commit', (req, res) => {
-            const commit = fs.readFileSync(COMMIT, 'utf8')
+            const commit = fs.readFileSync('COMMIT', 'utf8')
             if (commit) {
                 res.redirect('https://github.com/Assis10t/assis10t/commit/' + commit)
             } else {
