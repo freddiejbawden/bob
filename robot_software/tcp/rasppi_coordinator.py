@@ -19,12 +19,17 @@ class RobotJobListener():
         self.ev3_target = 'ev'
     def listen_to_server(self,username):
         while True:
-            header = {'username':username}
+            print('elsendo')
+            header = {'username':'robot'}
             r = requests.get('http://{}:{}/robotjob'.format(self.server_info['ip'],self.server_info['port']), headers=header)
             path = json.loads(r.text)
-            if path['job'] != []:
-                self.job_handler(path['job']['instruction_set'])
+            print(path)
+            if path['success'] != False:
+                print(path)
+                if path['job'] != []:
+                    self.job_handler(path['job']['instruction_set'])
             sleep(5)
+            
     def job_handler(self,instruction_set):
         # TODO, open this on a new thread
         i = 0
@@ -59,9 +64,10 @@ class RobotJobListener():
 
 if __name__ == "__main__":
 
-    thread = Thread(target = Listener.listen())
+    thread = Thread(target = Listener.listen)
     thread.start()
-    rjl = RobotJobListener(['192.168.105.139',9000],['192.168.105.38',65432],['192.168.105.139',65432])
+    print('hello')
+    rjl = RobotJobListener(['192.168.105.38',9000],['192.168.105.38',65432],['192.168.105.94',65432])
     rjl.listen_to_server('robot')
 
     
