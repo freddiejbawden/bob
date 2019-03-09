@@ -3,6 +3,7 @@ const db = require('./db')
 const bonjour = require('bonjour')()
 const utils = require('./utils')
 const fakeData = require('./fake_db.json')
+const fs = require('fs')
 
 const PORT = process.env.PORT || 9000
 const FAKE_DB = process.env.DB === 'fake'
@@ -19,8 +20,9 @@ db.init()
         }
 
         app.get('/commit', (req, res) => {
-            if (process.env.TRAVIS_COMMIT) {
-                res.redirect('https://github.com/Assis10t/assis10t/commit/' + process.env.TRAVIS_COMMIT)
+            const commit = fs.readFileSync(COMMIT, 'utf8')
+            if (commit) {
+                res.redirect('https://github.com/Assis10t/assis10t/commit/' + commit)
             } else {
                 res.status(404).send('This isnt a travis build, so commit id is unavailable.')
             }
