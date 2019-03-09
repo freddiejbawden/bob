@@ -18,6 +18,14 @@ db.init()
             console.log('Initialized database with fake data.')
         }
 
+        app.get('/commit', (req, res) => {
+            if (process.env.TRAVIS_COMMIT) {
+                res.redirect('https://github.com/Assis10t/assis10t/commit/' + process.env.TRAVIS_COMMIT)
+            } else {
+                res.status(404).send('This isnt a travis build, so commit id is unavailable.')
+            }
+        })
+
         app.listen(PORT, () => {
             console.log(`Listening on port ${PORT}.`)
         })
