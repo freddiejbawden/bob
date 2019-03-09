@@ -25,4 +25,4 @@ jobs:
         - eval `ssh-agent -s`
         - ssh-add ~/.ssh/id_rsa.heroku
         - git remote add heroku git@heroku.com:sdp-10-beta.git
-        - git subtree push --prefix server heroku master
+        - git subtree push --prefix server heroku master --force
