@@ -3,6 +3,7 @@
 import socket
 from followPath import FollowPath
 from bobTranslation import extract
+import ev3dev.ev3 as ev3
 
 import json
  # Get local machine name
@@ -15,6 +16,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.bind((HOST, PORT))
     print("Listening on {}:{}".format(HOST,PORT))
+    ev3.Sound.tone([(1000, 250, 0),(1500, 250, 0),(2000, 250, 0)]).wait()
     while True:
         s.listen(2)
         conn, addr = s.accept()
