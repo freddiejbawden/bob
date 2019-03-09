@@ -4,6 +4,8 @@ import socket
 import sys
 import requests
 import json
+from rasppi_listener import Listener
+from threading import Thread
 from time import sleep
 from bobTranslation import extract
 
@@ -56,7 +58,10 @@ class RobotJobListener():
 
 
 if __name__ == "__main__":
-    rjl = RobotJobListener(['192.168.105.38',9000],['192.168.105.38',65432],['192.168.105.94',65432])
+
+    thread = Thread(target = Listener.listen())
+    thread.start()
+    rjl = RobotJobListener(['192.168.105.139',9000],['192.168.105.38',65432],['192.168.105.139',65432])
     rjl.listen_to_server('robot')
 
     
