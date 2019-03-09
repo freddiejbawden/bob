@@ -20,10 +20,10 @@ db.init()
         }
 
         app.get('/commit', (req, res) => {
-            const commit = fs.readFileSync('COMMIT', 'utf8')
-            if (commit) {
+            try {
+                const commit = fs.readFileSync('./COMMIT', 'utf8')
                 res.redirect('https://github.com/Assis10t/assis10t/commit/' + commit)
-            } else {
+            } catch (e) {
                 res.status(404).send('This isnt a travis build, so commit id is unavailable.')
             }
         })
