@@ -26,7 +26,8 @@ class Toddler:
         time.sleep(5)
 
     def vision(self):
-        image = self.camera.getFrame()
-        self.camera.imshow('Camera', image)
+        #image = self.camera.getFrame()
+        #self.camera.imshow('Camera', image)
         time.sleep(0.05)
+        return
 
