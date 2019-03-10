@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="96dp"
+        app:cardElevation="4dp"
+        android:layout_margin="4dp"
+        app:cardCornerRadius="8dp">
+    <ImageView
+            android:id="@+id/image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/banana"
+            android:scaleType="center"
+    />
+    <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/gradient_item_overlay">
+        <TextView
+                style="@style/TextAppearance.MaterialComponents.Headline6"
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Bananas"
+                android:layout_gravity="start|bottom"
+                android:textColor="@color/white"
+                android:layout_margin="8dp"
+        />
+        <TextView
+                style="@style/TextAppearance.MaterialComponents.Caption"
+                android:id="@+id/price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="£5.99"
+                android:layout_gravity="end|bottom"
+                android:textColor="@color/white"
+                android:layout_margin="8dp"
+        />
+    </FrameLayout>
+</android.support.v7.widget.CardView>

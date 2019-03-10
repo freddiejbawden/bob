@@ -124,10 +124,14 @@ Instruction {
 | `POST` | `/warehouse` | `Merchant` | Create/edit a warehouse. |
 | `GET` | `/warehouse/:warehouseId` | | Gets given `Warehouse` with its items. |
 | `POST` | `/warehouse/:warehouseId/items` | `Merchant` | Adds an `Item` to a `Warehouse`. |
+| `GET` | `/warehouse/:warehouseId/items/:itemId` | `Merchant` | Gets the item with the given `itemId`. |
+| `DELETE` | `/warehouse/:warehouseId/items/:itemId` | `Merchant` | Deletes the item with the given `itemId`. |
 | `GET` | `/warehouse/:warehouseId/orders` | `Merchant` | Gets all orders in the given `Warehouse`. |
 | `GET` | `/warehouse/:warehouseId/robot` | `Merchant` | Gets the state of the robot(s). |
 | `GET` | `/robot` | `Robot` | Get details of the current Robot. |
+| `PUT` | `/robot/status` | `Robot` | Update Status of robot
 | `GET` | `/robot/:robotId` | `Merchant` | Get details about the robot with given `robotId` |
+| `PUT` | `/robot/status` | `Robot` | Update Status of robot
 | `POST` | `/robot/:robotId/sethome` | `Merchant` | Set the home location of the robot. |
 | `GET` | `/robotjob` | `Robot` | Gets the next job the robot needs to do. |
 | `PUT` | `/turnon/:n` | | Starts moving the robot. Robot stops after seeing `n` markers. |
@@ -242,6 +246,23 @@ Item //With _id if updating an existing item, or without _id if creating a new o
     "success": true,
     "item": Item
 }
+
+```
+#### `GET /warehouse/:warehouseId/items/:itemId`
+```javascript
+===== Output =====
+{
+    "success": true,
+    "item": Item
+}
+```
+
+#### `DELETE /warehouse/:warehouseId/items`
+```javascript
+===== Output =====
+{
+    "success": true
+}
 ```
 
 #### `GET /warehouse/:warehouseId/orders`
@@ -277,6 +298,18 @@ Item //With _id if updating an existing item, or without _id if creating a new o
 {
     "success": true,
     "robot": Robot
+}
+```
+
+#### `PUT /robot/status`
+```javascript
+===== Input =====
+{
+    "status":"WAITING" or "ON_JOB" or "MIA" or "NOT_RESPONDING" or "MANUAL_CONTROL"
+}
+===== Output =====
+{
+    "success": true
 }
 ```
 

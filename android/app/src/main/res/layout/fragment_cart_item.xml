@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:padding="8dp">
+    <TextView
+            android:id="@+id/name"
+            style="@style/TextAppearance.MaterialComponents.Body2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="Bananas"
+            android:textColor="#AA000000"/>
+    <TextView
+            android:id="@+id/quantity"
+            style="@style/TextAppearance.MaterialComponents.Body2"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@id/price"
+            android:text="1"
+            android:layout_marginEnd="60dp"
+            android:layout_alignParentEnd="true"
+            android:gravity="center"
+            android:textColor="#AA000000"/>
+    <TextView
+            android:id="@+id/price"
+            style="@style/TextAppearance.MaterialComponents.Body2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true"
+            android:text="£5.99"
+            android:textColor="#AA000000"/>
+</RelativeLayout>

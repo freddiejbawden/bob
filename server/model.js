@@ -60,8 +60,8 @@ const factory = db => ({
             .collection('warehouses')
             .find()
             .toArray(),
-    addWarehouse: warehouse => {
-        if (!warehouse._id) {
+    addWarehouse: ({ _id, ...warehouse }) => {
+        if (!_id) {
             warehouse = { _id: new ObjectID(), ...warehouse }
             return db()
                 .collection('warehouses')
@@ -70,8 +70,8 @@ const factory = db => ({
         } else {
             return db()
                 .collection('warehouses')
-                .updateOne({ _id: warehouse._id }, { $set: warehouse })
-                .then(modifiedCount => (modifiedCount ? warehouse : null))
+                .updateOne({ _id: ObjectID(_id) }, { $set: warehouse })
+                .then(() => factory(db).getWarehouseById(_id))
         }
     },
     getWarehouseById: async warehouseId => {
@@ -91,6 +91,14 @@ const factory = db => ({
             .collection('inventory')
             .find({ warehouseId })
             .toArray(),
+    getItemById: id =>
+        db()
+            .collection('inventory')
+            .findOne({ _id: ObjectID(id) }),
+    deleteItemById: id =>
+        db()
+            .collection('inventory')
+            .deleteOne({ _id: ObjectID(id) }),
     getOrdersByWarehouseId: warehouseId =>
         db()
             .collection('orders')
@@ -133,11 +141,11 @@ const factory = db => ({
                     err ? rej(err) : res(warehouse)
                 })
         }),
-    getRobot: robot_id => {
+    getRobot: robot_username => {
         return new Promise((res, rej) => {
             db()
                 .collection('robot')
-                .find({ _id: robot_id })
+                .find({ 'username': robot_username })
                 .toArray((err, robot) => {
                     console.log(robot)
                     console.log(err)
@@ -174,7 +182,7 @@ const factory = db => ({
         new Promise((res, rej) => {
             db()
                 .collection('robot')
-                .findOne({ _id: robot_id })
+                .findOne({ 'username': robot_id })
                 .then((robot, err) => {
                     if (err) {
                         rej(err)
@@ -212,7 +220,7 @@ const factory = db => ({
                                                                 db()
                                                                     .collection('robot')
                                                                     .updateOne(
-                                                                        { _id: robot_id },
+                                                                        { 'username': robot_id },
                                                                         { $set: { status: 'ON_JOB' } }
                                                                     )
                                                                     .then(() => res(robot_job))
