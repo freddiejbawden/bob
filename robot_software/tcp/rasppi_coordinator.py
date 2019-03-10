@@ -17,8 +17,10 @@ class RobotJobListener():
         self.ev3_info = {'ip':ev3_info[0],'port':ev3_info[1]}
         self.rasp_target = 'ra'
         self.ev3_target = 'ev'
+        self.socket_listener = None
     def listen_to_server(self,username):
-        while True:
+        try:
+            
             print('elsendo')
             header = {'username':'robot'}
             r = requests.get('http://{}:{}/robotjob'.format(self.server_info['ip'],self.server_info['port']), headers=header)
@@ -29,6 +31,9 @@ class RobotJobListener():
                 if path['job'] != []:
                     self.job_handler(path['job']['instruction_set'])
             sleep(5)
+        except KeyboardInterrupt:
+            print('Stop!')
+            return
             
     def job_handler(self,instruction_set):
         # TODO, open this on a new thread
@@ -62,13 +67,7 @@ class RobotJobListener():
 
 
 
-if __name__ == "__main__":
 
-    thread = Thread(target = Listener.listen)
-    thread.start()
-    print('hello')
-    rjl = RobotJobListener(['192.168.105.38',9000],['192.168.105.38',65432],['192.168.105.94',65432])
-    rjl.listen_to_server('robot')
 
     
 
