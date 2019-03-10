@@ -14,31 +14,34 @@ class FollowPath:
 
     def go(self, path):
         line_follower = FollowLine()
-        for direction, distance in path:
-            print(direction, distance)
-            # direction move in forwards axis or side axis
-            if direction == 'forward':
-                line_follower.run_forwards(distance, False)
-            elif direction == 'backward':
-                line_follower.run_forwards(distance, True)
-            elif direction == 'left':
-                line_follower.run_sideways(distance, False)
-            elif direction == 'right':
-                line_follower.run_sideways(distance, True)
-            elif direction == 'G':
-                ev3.Sound.speak("Grab").wait()
-            else:
-                ev3.Sound.speak("Wrong command given. What does", direction, "mean?").wait()
+        direction, distance = path
+        print(direction, distance)
+        # direction move in forwards axis or side axis
+        if direction == 'forward':
+            line_follower.run_forwards(distance, False)
+        elif direction == 'backward':
+            line_follower.run_forwards(distance, True)
+        elif direction == 'left':
+            line_follower.run_sideways(distance, False)
+        elif direction == 'right':
+            line_follower.run_sideways(distance, True)
+        elif direction == 'G':
+            ev3.Sound.speak("Grab").wait()
+        else:
+            ev3.Sound.speak("Wrong command given. What does", direction, "mean?").wait()
+        
         line_follower.stop()
+        
 
     # TODO: possibly move start and stop to FollowPath or move correct trajectory to a separate file instead
     def start(self, path):
         self.shut_down = False
+        print(path)
         if len(path) == 0:
             ev3.Sound.speak("No instructions given").wait()
         else:
-            self.runner = Thread(target=self.go, args=(path,), name='go')
-            self.runner.start()
+            self.go(path)
+            
 
 
 # Main function

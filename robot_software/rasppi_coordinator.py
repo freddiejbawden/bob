@@ -7,7 +7,7 @@ import json
 from rasppi_listener import Listener
 from threading import Thread
 from time import sleep
-from bobTranslation import extract
+from robot_software.tcp.bobTranslation import extract
 
 
 class RobotJobListener():

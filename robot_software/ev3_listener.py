@@ -1,8 +1,8 @@
 #! /usr/bin/env python3
 
 import socket
-from followPath import FollowPath
-from bobTranslation import extract
+from robot_software.tcp.followPath import FollowPath
+from robot_software.tcp.bobTranslation import extract
 import ev3dev.ev3 as ev3
 
 import json
