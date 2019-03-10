@@ -15,6 +15,7 @@ db.init()
         console.log('Initialized database connection.')
 
         if (FAKE_DATA) {
+            await db.dropDatabase()
             await utils.loadDBwithData(db, fakeData)
             console.log('Initialized database with fake data.')
         }
@@ -32,7 +33,7 @@ db.init()
             await db.dropDatabase()
             if (FAKE_DATA) {
                 await utils.loadDBwithData(db, fakeData)
-                res.send('Loaded with fake data.')
+                res.send('Deleted all data and reloaded with fake data.')
             } else {
                 res.send('Deleted all data.')
             }
