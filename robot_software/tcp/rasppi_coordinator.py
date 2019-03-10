@@ -4,6 +4,7 @@ import socket
 import sys
 import requests
 import json
+import time
 from rasppi_listener import Listener
 from threading import Thread
 from time import sleep
@@ -20,17 +21,17 @@ class RobotJobListener():
         self.socket_listener = None
     def listen_to_server(self,username):
         try:
-            
-            print('elsendo')
-            header = {'username':'robot'}
-            r = requests.get('http://{}:{}/robotjob'.format(self.server_info['ip'],self.server_info['port']), headers=header)
-            path = json.loads(r.text)
-            print(path)
-            if path['success'] != False:
+            while True:
+                print('elsendo')
+                header = {'username':'robot'}
+                r = requests.get('http://{}:{}/robotjob'.format(self.server_info['ip'],self.server_info['port']), headers=header)
+                path = json.loads(r.text)
                 print(path)
-                if path['job'] != []:
-                    self.job_handler(path['job']['instruction_set'])
-            sleep(5)
+                if path['success'] != False:
+                    print(path)
+                    if path['job'] != []:
+                        self.job_handler(path['job']['instruction_set'])
+                sleep(5)
         except KeyboardInterrupt:
             print('Stop!')
             return
@@ -45,27 +46,31 @@ class RobotJobListener():
             else:
                 self.open_and_send(self.ev3_target,str(instruction))
             print("sent")
+            time.sleep(2)
     def open_and_send(self, target,payload):
         HOST = None
         PORT = None
         if target == self.rasp_target:
             HOST = self.rasp_info['ip']
             PORT = self.rasp_info['port']
+            
         elif target == self.ev3_target:
             HOST = self.ev3_info['ip']
             PORT = self.ev3_info['port']
-
+        print('connecting to {}:{}'.format(HOST,PORT))
         #convert instruction to payload
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.connect((HOST, PORT))
-            s.sendall(str.encode(payload))
-            instruction_ack = s.recv(1024)
-            while instruction_ack != b'done':
-                  instruction_ack = s.recv(1024)
-            print('done')
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
+        s.connect((HOST, PORT))
+        s.sendall(str.encode(payload))
+        instruction_ack = s.recv(1024)
+        while instruction_ack != b'done':
+                instruction_ack = s.recv(1024)
+        print('done')
+        s.close()
         
-
-
+        
+rjr = RobotJobListener(('192.168.105.38',9000),('192.168.105.139',65432),('192.168.105.94',65432))
+rjr.listen_to_server('robot')
 
 
 
