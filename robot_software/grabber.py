@@ -19,6 +19,7 @@ class Grabber():
 	def grab(self):
 		self.mc.setMotor(self.mc_id, self.MC_SPEED)
 		time.sleep(self.OUTWARD_SCOOP_TIME)
+        self.sc.setPosition(self.GRAB_ANGLE)
 
 
 	print('{}\t{}'.format(self.getSensors(), self.getInputs()))
