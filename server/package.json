@@ -5,10 +5,10 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "DB=fake nodemon index.js",
+    "dev": "DB=memory DATA=fake nodemon index.js",
     "dev-real": "nodemon index.js",
     "randomid": "node getrandomid.js",
-    "test": "DB=fake jest --runInBand --verbose"
+    "test": "DB=memory jest --runInBand --verbose"
   },
   "repository": {
     "type": "git",
