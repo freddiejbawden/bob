@@ -30,7 +30,7 @@ class Logger(object):
 
 class Toddler:
 
-    MOTOR_PORT = 0
+    MOTOR_PORT = 1
 
     def __init__(self, onRobot):
         IO = IOTools(onRobot)
@@ -40,11 +40,12 @@ class Toddler:
         self.getSensors = IO.interface_kit.getSensors
         self.mc = IO.motor_control
         self.sc = IO.servo_control
-        self.grabber = Grabber(self.mc, 0, self.sc)
-        self.mc.setMotor(1, 100)
-        time.sleep(5)
-        self.mc.stopMotors()
-        self.sc.disengage()
+        self.grabber = Grabber(self.mc, self.MOTOR_PORT, self.sc)
+        self.grabber.grab()
+        self.grabber.prepare_grabber()
+        #self.mc.setMotor(self.MOTOR_PORT, 100)
+        #time.sleep(3)
+        #self.mc.stopMotors()
 
     def listen(self):
         PORT = 65432  # Port to listen on (non-privileged ports are > 1023)
