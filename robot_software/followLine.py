@@ -8,14 +8,18 @@ import control
 class FollowLine:
     # From https://gist.github.com/CS2098/ecb3a078ed502c6a7d6e8d17dc095b48
     MOTOR_SPEED = 700
-    KP = 10
-    KD = 0.5  # derivative gain   medium
-    KI = 0  # integral gain       lowest
     DT = 50  # milliseconds  -  represents change in time since last sensor reading/
 
-    MARKING_NUMBER = 2  # number of consecutive colour readings to detect marking
+    MARKING_NUMBER = 1  # number of consecutive colour readings to detect marking
     MARKING_INTERVAL = 1  # time between marking checks in seconds
-    REVERSE = False
+    reverse = False
+
+    BLACK = 1  # black reading from colour sensor in COL-COLOR mode
+    BLUE = 2  # blue reading from colour sensor in COL-COLOR mode
+    GREEN = 3  # green reading from colour sensor in COL-COLOR mode
+
+    CORRECTION_TIME = 100  # time in millisecond Bob moves away from blue line to correct sideways movement
+    SIDEWAYS_SPEED = 800  # how fast Bob moves when moving sideways
 
     # Constructor
     def __init__(self):
@@ -31,10 +35,7 @@ class FollowLine:
         assert self.csfr.connected
         assert self.csbl.connected
         assert self.csbr.connected
-        self.csfl.mode = 'COL-REFLECT'  # measure light intensity
-        self.csfr.mode = 'COL-REFLECT'  # measure light intensity
-        self.csbl.mode = 'COL-COLOR'  # measure colour
-        self.csbr.mode = 'COL-COLOR'
+
         # motors
         self.lm = ev3.LargeMotor('outA')  # left motor
         self.rm = ev3.LargeMotor('outC')  # right motor
@@ -43,171 +44,157 @@ class FollowLine:
         assert self.rm.connected
         assert self.cm.connected
 
-        self.blue = 2
-        self.green = 3
-
         self.consecutive_colours = 0  # counter for consecutive colour readings
         self.ignore_blue = False  # when switching from sideways to forwards
-        self.ignore_green = False  # when switching from fowards to sideways
-        #self.number_of_markers = 0  # at which marker it should stop
+        self.ignore_green = False  # when switching from forwards to sideways
+        # self.number_of_markers = 0  # at which marker it should stop
 
-    def detect_marking(self, colour_left, colour_right):
-        if (colour_right == 3 and colour_left == 3) or (colour_right == 2 and colour_left == 2):  # 3 = green 2 = blue
+        self.start_time = 0  # when robot starts doing a command
+        self.marker_counter = 0  # how many markers have been passed in current command
+
+        self.reverse = 1  # 1 if Bob is reversing, -1 if not
+
+    def detect_marking(self, colour_left, colour_right, desired_colour):
+        # print(colour_left, colour_right)
+        if colour_right == desired_colour and colour_left == desired_colour:
             self.consecutive_colours += 1
-            # print("CONSECUTIVE COLOURS: ", self.consecutive_colours)
-            if self.consecutive_colours > self.MARKING_NUMBER:
-                return colour_right
+            print("CONSECUTIVE COLOURS: ", self.consecutive_colours)
+            if self.consecutive_colours >= self.MARKING_NUMBER:
+                self.consecutive_colours = 0
+                return True
         else:
             self.consecutive_colours = 0
-        return -1
+        return False
 
     # limit motor speed to safe values: [-1000, 1000] deg/sec
-    def limit_speed(self, speed):
+    @staticmethod
+    def limit_speed(speed):
         if speed > 1000:
             return 1000
         if speed < -1000:
             return -1000
         return speed
 
-    def correct_trajectory(self, number_of_markers, reverse):
-        integral = 0
-        previous_error = 0
-        marker_counter = 0
-        start_time = time()
-        time_off_line = 0
-        self.ignore_green = True
-
-        if reverse:
-            self.csfl.mode = 'COL-COLOR'  # measure colour
-            self.csfr.mode = 'COL-COLOR'  # measure colour
-            self.csbl.mode = 'COL-REFLECT'  # measure light intensity
-            self.csbr.mode = 'COL-REFLECT'  # measure light intensity
-        else:
-            self.csfl.mode = 'COL-REFLECT'  # measure light intensity
-            self.csfr.mode = 'COL-REFLECT'  # measure light intensity
-            self.csbl.mode = 'COL-COLOR'  # measure colour
+    # adjust modes of colour sensors depending on the direction of Bob
+    # COL-REFLECT: measure light intensity
+    # COL-COLOR: measure colour
+    def set_cs_modes(self, direction):
+        if direction == 'forward':
+            self.csfl.mode = 'COL-REFLECT'
+            self.csfr.mode = 'COL-REFLECT'
+            self.csbl.mode = 'COL-COLOR'
             self.csbr.mode = 'COL-COLOR'
-
-        # Assign sensors to act as front or back
-        while not self.shut_down:
-            if reverse:
-                lval = self.csbr.value()  # back right becomes front left
-                rval = self.csbl.value()
-            else:
-                lval = self.csfl.value()
-                rval = self.csfr.value()
-
-            # most likely off line, may need to recalibrate numbers later
-            time_off_line = self.get_back_on_line(lval, rval, time_off_line)
-
-            # Calculate torque using PID control
-            u, integral, previous_error = control.calculate_torque\
-                (lval, rval, self.DT, integral, previous_error)
-            # Set the speed of the motors
-            speed_left = self.limit_speed(self.MOTOR_SPEED + u)
-            speed_right = self.limit_speed(self.MOTOR_SPEED - u)
-
-            # run motors
-            if reverse:
-                self.lm.run_timed(time_sp=self.DT, speed_sp=speed_right)
-                self.rm.run_timed(time_sp=self.DT, speed_sp=speed_left)
-            else:
-                self.lm.run_timed(time_sp=self.DT, speed_sp=-speed_left)
-                self.rm.run_timed(time_sp=self.DT, speed_sp=-speed_right)
-            sleep(self.DT / 1000)
-
-            # print("u {}".format(u))
-            # print("lm {}\n".format(lm.speed_sp))
-            # print("rm {}".format(rm.speed_sp))
-            # print("PID:", lval, rval)
-
-            # Check markers
-            # Wait before checking for colour again
-            if time() - start_time > self.MARKING_INTERVAL:
-                if reverse:
-                    colour_left = self.csfr.value()
-                    colour_right = self.csfl.value()
-                else:
-                    colour_left = self.csbl.value()
-                    colour_right = self.csbr.value()
-
-                # returns 3 if green, 2 if blue
-                marker_colour = self.detect_marking(colour_left, colour_right)
-                if marker_colour == self.green:
-                    # stop after given number of greens
-                    self.ignore_blue = False
-                    marker_counter += 1
-                    ev3.Sound.beep()
-                    start_time = time()
-                    if marker_counter >= number_of_markers:
-                        # self.stop()
-                        return
-                elif marker_colour == self.blue and not self.ignore_blue:
-                    # stop on blue marker
-                    # self.stop()
-                    # self.reverse = not self.reverse
-                    return
-
-    def run_sideways(self, distance, reverse):
-        self.ignore_blue = False
-
-        # If previous instruction was forwards or backwards
-        # keep moving until a blue line is seen
-        if self.ignore_green:
-            self.correct_trajectory(99, self.REVERSE)
-
-        self.ignore_green = False
-
-        if reverse:
-            self.csfl.mode = 'COL-COLOR'  # measure light intensity
-            self.csfr.mode = 'COL-REFLECT'  # measure colour
-            self.csbl.mode = 'COL-COLOR'  # measure light intensity
-            self.csbr.mode = 'COL-REFLECT'  # measure colour
+        elif direction == 'backward':
+            self.csfl.mode = 'COL-COLOR'
+            self.csfr.mode = 'COL-COLOR'
+            self.csbl.mode = 'COL-REFLECT'
+            self.csbr.mode = 'COL-REFLECT'
+        elif direction == 'left' or direction == 'right':
+            self.csfl.mode = 'COL-COLOR'
+            self.csfr.mode = 'COL-COLOR'
+            self.csbl.mode = 'COL-COLOR'
+            self.csbr.mode = 'COL-COLOR'
         else:
-            self.csfl.mode = 'COL-REFLECT'  # measure light intensity
-            self.csfr.mode = 'COL-COLOR'  # measure colour
-            self.csbl.mode = 'COL-REFLECT'  # measure light intensity
-            self.csbr.mode = 'COL-COLOR'  # measure colour
+            return False  # wrong direction command sent
+        return True
 
-        marker_counter = 0
-        start_time = time()
+    # increase marker counter when seeing desired colour
+    def count_markings(self, cs_left, cs_right, desired_colour):
+        # Wait before checking for colour again
+        if time() - self.start_time > self.MARKING_INTERVAL:
+            # marking of desired colour detected
+            if self.detect_marking(cs_left.value(), cs_right.value(), desired_colour):
+                self.marker_counter += 1
+                ev3.Sound.beep()
+                self.start_time = time()
+        return
+
+    # follows a line and corrects trajectory continually
+    # uses light sensors to follow line and colour sensors to detect markings
+    def correct_trajectory(self, light_left, light_right, motor_left, motor_right, pid_controller):
+        # most likely off line, may need to recalibrate numbers later
+        # time_off_line = self.get_back_on_line(light_left, light_right, time_off_line)
+
+        # Calculate torque using PID control
+        torque = pid_controller.calculate_torque(light_left.value(), light_right.value())
+        # Set the speed of the motors
+        speed_left = self.limit_speed(self.MOTOR_SPEED + torque)
+        speed_right = self.limit_speed(self.MOTOR_SPEED - torque)
+        print('Speed left:', speed_left)
+        print('Speed right:', speed_right)
+
+        # run motors
+        motor_left.run_timed(time_sp=self.DT, speed_sp=speed_left * self.reverse)
+        motor_right.run_timed(time_sp=self.DT, speed_sp=speed_right * self.reverse)
+        sleep(self.DT / 1000)
+
+        return
+
+    # move forward
+    def run_forward(self, distance, desired_colour):
+        self.reverse = -1
+        self.start_time = time()
+        self.marker_counter = 0
+        pid_controller = control.Control(self.DT)
+
         while not self.shut_down:
-            if reverse:
-                self.cm.run_timed(time_sp=self.DT/2, speed_sp=-500)
+            self.correct_trajectory(self.csfl, self.csfr, self.lm, self.rm, pid_controller)
+            self.count_markings(self.csbl, self.csbr, desired_colour)
+            if self.marker_counter >= distance:
+                return
+
+    # move backward
+    def run_backward(self, distance, desired_colour):
+        self.reverse = 1
+        self.start_time = time()
+        self.marker_counter = 0
+        pid_controller = control.Control(self.DT)
+
+        while not self.shut_down:
+            self.correct_trajectory(self.csbr, self.csbl, self.rm, self.lm, pid_controller)
+            self.count_markings(self.csfr, self.csfl, desired_colour)
+            if self.marker_counter >= distance:
+                return
+
+    # move sideways between two blue lines
+    def run_sideways(self, distance, direction, last_direction):
+        self.start_time = time()
+        self.marker_counter = 0
+
+        while not self.shut_down:
+            # if a colour sensor is on a blue line, correct position to be between them again
+            if self.detect_marking(self.csbl.value(), self.csbr.value(), self.BLUE):
+                # back sensors on blue line, so move forward for some time
+                self.lm.run_timed(time_sp=self.CORRECTION_TIME, speed_sp=-self.SIDEWAYS_SPEED)
+                self.rm.run_timed(time_sp=self.CORRECTION_TIME, speed_sp=-self.SIDEWAYS_SPEED)
+                sleep(self.CORRECTION_TIME / 1000)
+            if self.detect_marking(self.csfl.value(), self.csfr.value(), self.BLUE):
+                # front sensors on blue line, so move backward for some time
+                self.lm.run_timed(time_sp=self.CORRECTION_TIME, speed_sp=self.SIDEWAYS_SPEED)
+                self.rm.run_timed(time_sp=self.CORRECTION_TIME, speed_sp=self.SIDEWAYS_SPEED)
+                sleep(self.CORRECTION_TIME / 1000)
+
+            # colour sensor for marking detection needs to be at front or back dependng on the last direction
+            if last_direction == 'forward':
+                cs_left = self.csbr
+                cs_right = self.csbl
             else:
-                self.cm.run_timed(time_sp=self.DT/2, speed_sp=500)
-            sleep(self.DT / 2000)
+                # if last direction is backward, left, or right
+                cs_left = self.csfr
+                cs_right = self.csfl
 
-            if time() - start_time > self.MARKING_INTERVAL:
-                if reverse:
-                    colour_left = self.csfl.value()
-                    colour_right = self.csbl.value()
-                else:
-                    colour_left = self.csbr.value()
-                    colour_right = self.csfr.value()
+            # move sideways for a bit while counting black markings
+            if direction == 'left':
+                self.cm.run_timed(time_sp=self.DT, speed_sp=self.SIDEWAYS_SPEED)
+                sleep(self.DT / 1000)
+                self.count_markings(cs_left, cs_left, self.BLACK)
+            if direction == 'right':
+                self.cm.run_timed(time_sp=self.DT, speed_sp=-self.SIDEWAYS_SPEED)
+                sleep(self.DT / 1000)
+                self.count_markings(cs_right, cs_right, self.BLACK)
 
-
-                # returns 3 if green, 2 if blue
-                marker_colour = self.detect_marking(colour_left, colour_right)
-                if marker_colour == self.blue:
-                    # stop after given number of blues
-                    marker_counter += 1
-                    ev3.Sound.beep()
-                    start_time = time()
-                    if marker_counter >= distance:
-                        # self.stop()
-                        self.ignore_blue = True
-                        return
-                elif marker_colour == self.green:
-                    # stop on green marker
-                    # self.stop()
-                    # self.reverse = not self.reverse
-                    return
-
-    # move forwards/backwards
-    def run_forwards(self, distance, reverse):
-        self.REVERSE = reverse
-        self.correct_trajectory(distance, reverse)
+            if self.marker_counter >= distance:
+                return
 
     # when line is lost oscillate side to side until it is found
     def get_back_on_line(self, lval, rval, time_off_line):
@@ -215,7 +202,7 @@ class FollowLine:
             if time_off_line == 0:
                 time_off_line = time()
             # if off line for more than a second move side-to-side until line is found
-            print(time() - time_off_line)
+            # print(time() - time_off_line)
             if time() - time_off_line > 0.5:
                 correction_speed = 200
                 correction_time = 100
@@ -237,10 +224,9 @@ class FollowLine:
         self.shut_down = True
         self.rm.stop()
         self.lm.stop()
-        ev3.Sound.speak("bruh").wait()
+        ev3.Sound.speak("whack").wait()
 
 
 # Main function
 if __name__ == "__main__":
     robot = FollowLine()
-    robot.run_forwards(2, False)
