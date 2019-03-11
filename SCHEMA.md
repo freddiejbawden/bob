@@ -46,7 +46,8 @@ Order {
     "warehouseId": String,
     "timestamp": String,
     "items": [Item],
-    "status": "PENDING", "IN_TRANSIT", "COMPLETE", "CANCELED"
+    "status": "PENDING", "IN_TRANSIT", "COMPLETE", "CANCELED",
+    "warehouse": Warehouse // On get requests to /api/order or /api/order/:orderId, this is also included. Not included in POST requests.
 }
 
 Warehouse {

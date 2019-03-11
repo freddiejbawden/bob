@@ -5,7 +5,10 @@ import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.View
 import android.widget.TextView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import io.github.assis10t.bobandroid.pojo.Item
 import kotlinx.android.synthetic.main.dialog_add_to_cart.*
 import timber.log.Timber
@@ -18,6 +21,16 @@ class AddToCartDialog(context: Context, val item: Item): Dialog(context) {
         title.text = item.name
         price.text = item.getPriceText()
         total.text = "£${"%.2f".format(item.price)}"
+
+        if (item.image == null) {
+            image.visibility = View.GONE
+        } else {
+            image.visibility = View.VISIBLE
+            Glide.with(context)
+                .load(base64ToByteArray(item.image))
+                .into(image)
+        }
+
         quantity.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {}
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}

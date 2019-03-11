@@ -6,6 +6,10 @@
         android:enabled="false"
         app:showAsAction="never" />
     <item
+            android:id="@+id/orders"
+            android:title="Orders"
+            app:showAsAction="never"/>
+    <item
             android:id="@+id/logout"
             android:title="Log out"
             app:showAsAction="never"/>

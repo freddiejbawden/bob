@@ -61,7 +61,7 @@ class ServerConnection {
 
         fun zeroconfBypass(address: String) {
             Timber.d("Bypassed zeroconf: $address")
-            serverAddress = "http://$address:9000"
+            serverAddress = address
             onConnectedListeners.forEach { it(serverAddress!!) }
             onConnectedListeners.clear()
         }

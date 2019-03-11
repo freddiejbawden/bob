@@ -28,6 +28,10 @@ open class ActivityWithLoginMenu: AppCompatActivity() {
             val username = ServerConnection().getCurrentUsername(this)
             welcome.title = "Welcome, $username!"
         }
+        val orders = menu?.findItem(R.id.orders)
+        if (orders != null) {
+            orders.isEnabled = this !is OrdersActivity
+        }
         return super.onPrepareOptionsMenu(menu)
     }
 
@@ -47,6 +51,10 @@ open class ActivityWithLoginMenu: AppCompatActivity() {
                     }
                     Toast.makeText(this, "Logged out successfully.", Toast.LENGTH_SHORT).show()
                 }
+                true
+            }
+            R.id.orders -> {
+                startActivity(Intent(this, OrdersActivity::class.java))
                 true
             }
             else -> super.onOptionsItemSelected(item)

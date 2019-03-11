@@ -2,7 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools"
           package="io.github.assis10t.bobandroid">
-
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
          Google Maps Android API v2, but you must specify either coarse or fine
@@ -21,7 +20,8 @@
             android:theme="@style/AppTheme"
             android:usesCleartextTraffic="true"
             tools:ignore="GoogleAppIndexingWarning">
-
+        <activity android:name=".OrdersActivity">
+        </activity>
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -47,11 +47,11 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".LoginActivity"
-                  android:launchMode="singleInstance">
-        </activity>
         <activity
-                android:name=".WarehouseActivity">
+                android:name=".LoginActivity"
+                android:launchMode="singleInstance">
+        </activity>
+        <activity android:name=".WarehouseActivity">
         </activity>
     </application>
 

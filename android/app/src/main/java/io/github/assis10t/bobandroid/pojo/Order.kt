@@ -1,6 +1,9 @@
 package io.github.assis10t.bobandroid.pojo
 
 import io.github.assis10t.bobandroid.getCurrentTimeString
+import io.github.assis10t.bobandroid.parseISODate
+import java.text.SimpleDateFormat
+import java.util.*
 
 class Order(
     val _id: String? = null,
@@ -8,7 +11,8 @@ class Order(
     val warehouseId: String? = null,
     val timestamp: String? = null,
     val items: List<Item> = listOf(),
-    val status: Status = Status.PENDING
+    val status: Status = Status.PENDING,
+    val warehouse: Warehouse? = null
 ) {
     enum class Status {
         PENDING, IN_TRANSIT, COMPLETE, CANCELED
@@ -44,5 +48,11 @@ class Order(
             items,
             status
         )
+    }
+
+    fun getTimeString(): String {
+        val date = parseISODate(timestamp!!)
+        val sdf = SimpleDateFormat("d MMMM yyyy HH:mm", Locale.UK)
+        return sdf.format(date)
     }
 }

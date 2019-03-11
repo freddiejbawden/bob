@@ -5,7 +5,7 @@ const cors = require('cors')
 
 const auth = require('./auth')
 
-const API_LEVEL = 'v2'
+const API_LEVEL = 'v3'
 
 const app = express()
 
@@ -34,6 +34,14 @@ app.get(
     auth.customer((req, res, next) =>
         model
             .getOrders(req.user._id)
+            .then(async orders => {
+                const warehouses = await Promise.all(orders.map(order => model.getWarehouseById(order.warehouseId)))
+                const newOrders = orders.map((order, i) => ({
+                    ...order,
+                    warehouse: warehouses[i]
+                }))
+                return newOrders
+            })
             .then(orders => res.json({ success: true, orders }))
             .catch(next)
     )
@@ -45,8 +53,11 @@ app.get(
         model
             .getOrderById(req.params.orderId)
             .then(order => {
-                if (order && req.user._id.equals(order.userId)) res.json({ success: true, order })
-                else if (order)
+                if (order && req.user._id.equals(order.userId)) {
+                    model.getWarehouseById(order.warehouseId).then(warehouse => {
+                        res.json({ success: true, order: { ...order, warehouse } })
+                    })
+                } else if (order)
                     res.status(403).json({ success: false, error: 'You cannot view details on this order.' })
                 else res.status(404).json({ success: true, order: null })
             })

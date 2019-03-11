@@ -40,12 +40,17 @@ class LoadingActivity : AppCompatActivity() {
                 input.text.insert(0, "192.168.")
                 builder.setView(input)
                 builder.setPositiveButton("Set") { dialog, which ->
-                    ServerConnection.zeroconfBypass(input.text.toString())
+                    ServerConnection.zeroconfBypass("http://${input.text}:9000")
                 }
                 builder.setNegativeButton("Cancel") { dialog, which ->
                     dialog.cancel()
                 }
                 builder.show()
+                true
+            }
+            R.id.cloud -> {
+                //TODO: Implement build-time config instead.
+                ServerConnection.zeroconfBypass("https://sdp-10-beta.herokuapp.com")
                 true
             }
             else -> super.onOptionsItemSelected(item)
