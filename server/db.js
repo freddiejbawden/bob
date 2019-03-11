@@ -1,7 +1,7 @@
 const MongoClient = require('mongodb').MongoClient
 const MongoMemoryServer = require('mongodb-memory-server').MongoMemoryServer
 
-const MEMORY_DB = process.env.DB === 'memory'
+const MEMORY_DB = process.env.DB === 'fake'
 const MONGO_URL = process.env.MONGO || 'mongodb://localhost:27017/db'
 
 let mongod = null

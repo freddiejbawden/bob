@@ -17,6 +17,7 @@
             "location": { "latitude": 55.944592, "longitude": -3.18706 },
             "dimensions": { "x": 5, "y": 6, "z": [0, 0.2, 0.4] },
             "items": [],
+            "lockers": [],
             "merchantId": "5c755f2cbfcf4c592bfd00a5"
         }
     ],

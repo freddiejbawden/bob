@@ -122,6 +122,34 @@ const factory = db => ({
         db()
             .collection('inventory')
             .deleteOne({ _id: ObjectID(item._id) }),
+    getLockers: (warehouseId) => {
+        return db()
+        .collection('warehouses')
+        .findOne({_id: ObjectID(warehouseId)})["lockers"];
+    },
+    updateLockers: (warehouseId, lockers) => {
+          db()
+          .collection('warehouses')
+          .update({_id: ObjectID(warehouseId)}, {$unset: {"lockers": lockers}});
+    },
+    useLocker: (warehouseId) => {
+          var lockers = factory(db).getLockers(warehouseId);
+
+          if (!lockers) return null;
+
+          var returnLocker = lockers.shift();
+          factory(db).updateLockers(lockers);
+          return returnLocker;
+    },
+    addLocker: (warehouseId, lockerNumber) => {
+          var lockers = factory(db).getLockers(warehouseId);
+
+          if (!lockers) return null;
+
+          lockers.push(lockerNumber);
+          factory(db).updateLockers(lockers);
+          return returnLocker;
+    },
     createUser: (username, type) => {
         const user = { _id: new ObjectID(), username, type }
         return db()

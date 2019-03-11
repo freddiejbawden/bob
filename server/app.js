@@ -2,6 +2,7 @@ const bodyParser = require('body-parser')
 const express = require('express')
 const model = require('./model')
 const cors = require('cors')
+const qr = require('qr-image')
 
 const auth = require('./auth')
 
@@ -258,6 +259,37 @@ app.get('/db', (req, res, next) => {
         .then(data => res.json(data))
         .catch(next)
 })
+
+//When the user places their order, sends them a qrcode as a png.
+app.get("/qrcode", function(req, res){
+  model.useLocker(req.params.warehouseId)
+  .then(locker => res.status(locker ? 200 : 404).json({ success: true, locker }))
+  .catch(next);
+
+  if(locker == null){
+    console.log("No free lockers!");
+    res.send("No free lockers!");
+    return;
+  }
+
+  var img = qr.imageSync(locker.toString());
+
+  res.contentType("image/png");
+  res.send(img);
+
+  console.log(locker);
+});
+
+//When a locker is now free for use.
+app.post("/addLocker", function(req, res){
+  model.addLocker(req.params.warehouseId, req.params.locker)
+  .then(res.json({ success: true, locker }))
+  .catch(next)
+});
+
+app.listen(3000, function(){
+  console.log("Server is listening on port 3000!");
+});
 
 //Logs all responses.
 app.use((req, res, next) => {

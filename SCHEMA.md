@@ -63,7 +63,8 @@ Warehouse {
         "y": Int, // Parallel to robot's initial position.
         "z": [Double] // Vertical. Each element is height of a shelf, in ascending order, in meters. (Include bottom shelf as 0.0)
     },
-    "items": [Item] // Only for GET /warehouse/:warehouseId
+    "items": [Item], // Only for GET /warehouse/:warehouseId
+    "lockers": [Int] // Used to store the available lockers for each warehouse
 }
 
 Robot {
