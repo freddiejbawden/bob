@@ -21,7 +21,7 @@ jobs:
         - echo "Building the server"
         - cd website
         - npm i
-        - npm run generate
+        - BASE_URL=https://sdp-10-beta.herokuapp.com npm run generate
         - cd ..
         - cp -r ./website/dist ./server/public
         - git add ./server/public
