@@ -10,9 +10,9 @@ beforeEach(db.init)
 
 afterEach(db.close)
 
-describe('GET /ping', () => {
+describe('GET /api/ping', () => {
     it('works', async () => {
-        const response = await request(app).get('/ping')
+        const response = await request(app).get('/api/ping')
         expect(response.statusCode).toBe(200)
         expect(response.text).toEqual('pong')
     })

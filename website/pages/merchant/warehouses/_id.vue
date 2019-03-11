@@ -195,7 +195,7 @@ export default {
     methods: {
         getWarehouse () {
             axios.
-                get('http://localhost:9000/warehouse/' + this.warehouseId, {
+                get('http://localhost:9000/api/warehouse/' + this.warehouseId, {
                     headers: {
                         'Content-Type': 'application/json'
                     }
@@ -211,7 +211,7 @@ export default {
                 });
 
             axios.
-                get('http://localhost:9000/warehouse/' + this.warehouseId + '/orders', {
+                get('http://localhost:9000/api/warehouse/' + this.warehouseId + '/orders', {
                     headers: {
                         'Content-Type': 'application/json',
                         'username': this.$store.state.user.username,
@@ -229,7 +229,7 @@ export default {
         deleteItem: function (warehouseId, itemId, i) {
             axios.
                 delete(
-                    'http://localhost:9000/warehouse/' + warehouseId + '/items/' + itemId, {
+                    'http://localhost:9000/api/warehouse/' + warehouseId + '/items/' + itemId, {
                     headers: {
                         'Content-Type': 'application/json',
                         'username': this.$store.state.user.username,

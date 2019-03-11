@@ -27,11 +27,11 @@ app.use((req, res, next) => {
     next()
 })
 
-app.get('/ping', (req, res) => {
+app.get('/api/ping', (req, res) => {
     res.send('pong')
 })
 app.get(
-    '/order',
+    '/api/order',
     auth.customer((req, res, next) =>
         model
             .getOrders(req.user._id)
@@ -41,7 +41,7 @@ app.get(
 )
 
 app.get(
-    '/order/:orderId',
+    '/api/order/:orderId',
     auth.customer((req, res, next) =>
         model
             .getOrderById(req.params.orderId)
@@ -56,7 +56,7 @@ app.get(
 )
 // TODO: Check if ordered items exist.
 app.post(
-    '/order',
+    '/api/order',
     auth.customer((req, res, next) => {
         const order = {
             ...req.body,
@@ -69,14 +69,14 @@ app.post(
             .catch(next)
     })
 )
-app.get('/warehouse', (req, res, next) => {
+app.get('/api/warehouse', (req, res, next) => {
     model
         .getWarehouses()
         .then(warehouses => res.json({ success: true, warehouses }))
         .catch(next)
 })
 app.post(
-    '/warehouse',
+    '/api/warehouse',
     auth.merchant((req, res, next) => {
         model
             .addWarehouse({ ...req.body, merchantId: req.user._id })
@@ -84,7 +84,7 @@ app.post(
             .catch(next)
     })
 )
-app.get('/warehouse/:warehouseId', (req, res, next) => {
+app.get('/api/warehouse/:warehouseId', (req, res, next) => {
     model
         .getWarehouseById(req.params.warehouseId)
         .then(warehouse => res.status(warehouse ? 200 : 404).json({ success: true, warehouse }))
@@ -92,7 +92,7 @@ app.get('/warehouse/:warehouseId', (req, res, next) => {
 })
 
 app.post(
-    '/warehouse/:warehouseId/items',
+    '/api/warehouse/:warehouseId/items',
     auth.merchant((req, res, next) => {
         model
             .getWarehouseById(req.params.warehouseId)
@@ -118,7 +118,7 @@ app.post(
     })
 )
 app.get(
-    '/warehouse/:warehouseId/items/:itemId',
+    '/api/warehouse/:warehouseId/items/:itemId',
     auth.merchant((req, res, next) => {
         model
             .getItemById(req.params.itemId)
@@ -140,7 +140,7 @@ app.get(
     })
 )
 app.delete(
-    '/warehouse/:warehouseId/items/:itemId',
+    '/api/warehouse/:warehouseId/items/:itemId',
     auth.merchant((req, res, next) => {
         model
             .getItemById(req.params.itemId)
@@ -164,7 +164,7 @@ app.delete(
     })
 )
 app.get(
-    '/warehouse/:warehouseId/orders',
+    '/api/warehouse/:warehouseId/orders',
     auth.merchant((req, res, next) => {
         model
             .getOrdersByWarehouseId(req.params.warehouseId)
@@ -172,26 +172,26 @@ app.get(
             .catch(next)
     })
 )
-app.put('/turnon/:nOfMarkers', (req, res, next) => {
+app.put('/api/turnon/:nOfMarkers', (req, res, next) => {
     const markers = req.params.nOfMarkers
     model
         .turnOn(markers)
         .then(on => res.json({ success: true, on }))
         .catch(next)
 })
-app.put('/turnoff', (req, res, next) => {
+app.put('/api/turnoff', (req, res, next) => {
     model
         .turnOff()
         .then(off => res.json({ success: true, off }))
         .catch(next)
 })
-app.get('/getmovement', (req, res, next) => {
+app.get('/api/getmovement', (req, res, next) => {
     model
         .getMovement()
         .then(status => res.json({ success: true, status }))
         .catch(next)
 })
-app.post('/register', (req, res, next) => {
+app.post('/api/register', (req, res, next) => {
     model
         .createUser(req.body.username, req.body.type)
         .then(user => {
@@ -206,14 +206,14 @@ app.post('/register', (req, res, next) => {
         })
         .catch(next)
 })
-app.post('/login', (req, res, next) => {
+app.post('/api/login', (req, res, next) => {
     model.authUser(req.body.username).then(user => {
         if (user) res.json({ success: true, user })
         else res.status(401).json({ success: false, error: 'Username or password is incorrect.' })
     })
 })
 app.get(
-    '/robot',
+    '/api/robot',
     auth.robot((req, res, next) => {
         var currentUser = req.user
         model
@@ -224,7 +224,7 @@ app.get(
 )
 
 app.get(
-    '/robot/:robotId',
+    '/api/robot/:robotId',
     auth.merchant((req, res, next) => {
         model
             .getRobot(req.params.robotId)
@@ -233,7 +233,7 @@ app.get(
     })
 )
 app.post(
-    '/robot/:robotid/sethome',
+    '/api/robot/:robotid/sethome',
     auth.merchant((req, res, next) => {
         model
             .setHome(req.params.robotid, req.body.home_x, req.body.home_y)
@@ -243,7 +243,7 @@ app.post(
 )
 
 app.get(
-    '/robotjob',
+    '/api/robotjob',
     auth.robot((req, res, next) => {
         model
             .getNextJob(req.user.username)
@@ -253,7 +253,7 @@ app.get(
 )
 
 // For imaging the database and updating fake_db.json
-app.get('/db', (req, res, next) => {
+app.get('/api/db', (req, res, next) => {
     model
         .getWholeDB()
         .then(data => res.json(data))

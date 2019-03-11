@@ -94,7 +94,7 @@ export default {
         },
         getWarehouses () {
             axios.
-                get('http://localhost:9000/warehouse/', {
+                get('http://localhost:9000/api/warehouse/', {
                     headers: {
                         'Content-Type': 'application/json'
                     }
@@ -113,7 +113,7 @@ export default {
         },
         getOrders: function (id) {
             axios.
-                get('http://localhost:9000/warehouse/' + id + '/orders', {
+                get('http://localhost:9000/api/warehouse/' + id + '/orders', {
                     headers: {
                         'Content-Type': 'application/json',
                         'username': this.$store.state.user.username

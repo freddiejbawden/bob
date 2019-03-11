@@ -143,7 +143,7 @@ export default {
     methods: {
         getWarehouse () {
             axios.
-                get('http://localhost:9000/warehouse/' + this.warehouseId, {
+                get('http://localhost:9000/api/warehouse/' + this.warehouseId, {
                     headers: {
                         'Content-Type': 'application/json'
                     }
@@ -174,7 +174,7 @@ export default {
         addItem () {
             if (this.can_submit) {
                 axios.
-                    post('http://localhost:9000/warehouse/' + this.warehouseId + '/items', {
+                    post('http://localhost:9000/api/warehouse/' + this.warehouseId + '/items', {
                         name: this.name,
                         image: this.image,
                         position: this.position,

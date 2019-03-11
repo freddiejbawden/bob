@@ -16,7 +16,7 @@ import javax.jmdns.JmDNS
 import javax.jmdns.ServiceEvent
 import javax.jmdns.ServiceListener
 
-// Using API level v2
+// Using API level v3
 
 class ServerConnection {
     companion object {
@@ -136,7 +136,7 @@ class ServerConnection {
     val getWarehousesFactory = { http: OkHttpClient, gson: Gson ->
         { onGetWarehouses: (error: Exception?, warehouses: List<Warehouse>?) -> Unit ->
             connect { server ->
-                getRequestFactory(http, gson)("$server/warehouse") { error, str ->
+                getRequestFactory(http, gson)("$server/api/warehouse") { error, str ->
                     if (error != null) {
                         onGetWarehouses(error, null)
                     } else {
@@ -152,7 +152,7 @@ class ServerConnection {
     val getWarehouseFactory = { http: OkHttpClient, gson: Gson ->
         { warehouseId: String, onGetWarehouse: (error: Exception?, warehouse: Warehouse?) -> Unit ->
             connect { server ->
-                getRequestFactory(http, gson)("$server/warehouse/$warehouseId") { error, str ->
+                getRequestFactory(http, gson)("$server/api/warehouse/$warehouseId") { error, str ->
                     if (error != null) {
                         onGetWarehouse(error, null)
                     } else {
@@ -173,7 +173,7 @@ class ServerConnection {
                     onGetOrders(Exception("This operation requires authentication."), null)
                     return@connect
                 }
-                getRequestWithAuthFactory(http, gson)("$server/order", getCurrentUsername(context)!!) { error, str ->
+                getRequestWithAuthFactory(http, gson)("$server/api/order", getCurrentUsername(context)!!) { error, str ->
                     if (error != null) {
                         onGetOrders(error, null)
                     } else {
@@ -194,7 +194,7 @@ class ServerConnection {
                     onOrderComplete?.invoke(Exception("This operation requires authentication."))
                     return@connect
                 }
-                postRequestWithAuthFactory(http, gson)("$server/order", getCurrentUsername(context)!!, order) { error, str ->
+                postRequestWithAuthFactory(http, gson)("$server/api/order", getCurrentUsername(context)!!, order) { error, str ->
                     onOrderComplete?.invoke(error)
                 }
             }
@@ -227,7 +227,7 @@ class ServerConnection {
     val loginFactory = { http: OkHttpClient, gson: Gson ->
         { context: Context, username: String, onLoginComplete: ((error: Exception?, user: User?) -> Unit)? ->
             connect { server ->
-                postRequestFactory(http, gson)("$server/login", LoginRequest(username)) { error, str ->
+                postRequestFactory(http, gson)("$server/api/login", LoginRequest(username)) { error, str ->
                     if (error != null) {
                         onLoginComplete?.invoke(error, null)
                     } else {
@@ -249,7 +249,7 @@ class ServerConnection {
     val registerFactory = { http: OkHttpClient, gson: Gson ->
         { context: Context, username: String, onRegisterComplete: ((error: Exception?, user: User?) -> Unit)? ->
             connect { server ->
-                postRequestFactory(http, gson)("$server/register", RegisterRequest(username)) { error, str ->
+                postRequestFactory(http, gson)("$server/api/register", RegisterRequest(username)) { error, str ->
                     if (error != null) {
                         onRegisterComplete?.invoke(error, null)
                     } else {

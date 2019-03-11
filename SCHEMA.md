@@ -1,6 +1,6 @@
 # API Schema
 ```bash
-Schema Version: v2 # Increase this number whenever the schema changes.
+Schema Version: v3 # Increase this number whenever the schema changes.
 ```
 
 The interactions with the server and data storage in the database are all done using JSON objects. The file that contains code for these interactions should have the version number in a comment. This will make any API level incompability easily noticable.
@@ -115,26 +115,26 @@ Instruction {
 
 | Method | Path | Auth | Description |
 |-|-|:-:|-
-| `GET` | `/ping` | | Returns `Pong`. |
-| `POST` | `/register` | | Registers a new `User`. |
-| `POST` | `/login` | | Logs in existing `User`. |
-| `GET` | `/order` | `Customer` | Gets all `Order`s of current `User`. |
-| `GET` | `/order/:orderId` | `Customer` | Gets `Order` with given id. |
-| `POST` | `/order` | `Customer` | Adds given `Order`. |
-| `GET` | `/warehouse` | | Gets all `Warehouse`s. |
-| `POST` | `/warehouse` | `Merchant` | Create/edit a warehouse. |
-| `GET` | `/warehouse/:warehouseId` | | Gets given `Warehouse` with its items. |
-| `POST` | `/warehouse/:warehouseId/items` | `Merchant` | Adds an `Item` to a `Warehouse`. |
-| `GET` | `/warehouse/:warehouseId/items/:itemId` | `Merchant` | Gets the item with the given `itemId`. |
-| `DELETE` | `/warehouse/:warehouseId/items/:itemId` | `Merchant` | Deletes the item with the given `itemId`. |
-| `GET` | `/warehouse/:warehouseId/orders` | `Merchant` | Gets all orders in the given `Warehouse`. |
-| `GET` | `/warehouse/:warehouseId/robot` | `Merchant` | Gets the state of the robot(s). |
-| `GET` | `/robot` | `Robot` | Get details of the current Robot. |
-| `GET` | `/robot/:robotId` | `Merchant` | Get details about the robot with given `robotId` |
-| `POST` | `/robot/:robotId/sethome` | `Merchant` | Set the home location of the robot. |
-| `GET` | `/robotjob` | `Robot` | Gets the next job the robot needs to do. |
-| `PUT` | `/turnon/:n` | | Starts moving the robot. Robot stops after seeing `n` markers. |
-| `PUT` | `/turnoff` | | Stops the robot. |
+| `GET` | `/api/ping` | | Returns `Pong`. |
+| `POST` | `/api/register` | | Registers a new `User`. |
+| `POST` | `/api/login` | | Logs in existing `User`. |
+| `GET` | `/api/order` | `Customer` | Gets all `Order`s of current `User`. |
+| `GET` | `/api/order/:orderId` | `Customer` | Gets `Order` with given id. |
+| `POST` | `/api/order` | `Customer` | Adds given `Order`. |
+| `GET` | `/api/warehouse` | | Gets all `Warehouse`s. |
+| `POST` | `/api/warehouse` | `Merchant` | Create/edit a warehouse. |
+| `GET` | `/api/warehouse/:warehouseId` | | Gets given `Warehouse` with its items. |
+| `POST` | `/api/warehouse/:warehouseId/items` | `Merchant` | Adds an `Item` to a `Warehouse`. |
+| `GET` | `/api/warehouse/:warehouseId/items/:itemId` | `Merchant` | Gets the item with the given `itemId`. |
+| `DELETE` | `/api/warehouse/:warehouseId/items/:itemId` | `Merchant` | Deletes the item with the given `itemId`. |
+| `GET` | `/api/warehouse/:warehouseId/orders` | `Merchant` | Gets all orders in the given `Warehouse`. |
+| `GET` | `/api/warehouse/:warehouseId/robot` | `Merchant` | Gets the state of the robot(s). |
+| `GET` | `/api/robot` | `Robot` | Get details of the current Robot. |
+| `GET` | `/api/robot/:robotId` | `Merchant` | Get details about the robot with given `robotId` |
+| `POST` | `/api/robot/:robotId/sethome` | `Merchant` | Set the home location of the robot. |
+| `GET` | `/api/robotjob` | `Robot` | Gets the next job the robot needs to do. |
+| `PUT` | `/api/turnon/:n` | | Starts moving the robot. Robot stops after seeing `n` markers. |
+| `PUT` | `/api/turnoff` | | Stops the robot. |
 #### Error Handling
 All requests that complete successfully respond with a JSON object with `"success": true`. Any failure to fulfill the request results in the following response with an appropriate status code >= 400:
 ```javascript
@@ -145,13 +145,13 @@ All requests that complete successfully respond with a JSON object with `"succes
 }
 ```
 
-#### `GET /ping`
+#### `GET /api/ping`
 ```javascript
 ===== Output =====
 pong
 ```
 
-#### `POST /register`
+#### `POST /api/register`
 ```javascript
 ===== Input =====
 {
@@ -165,7 +165,7 @@ pong
 }
 ```
 
-#### `POST /login`
+#### `POST /api/login`
 ```javascript
 ===== Input =====
 {
@@ -178,7 +178,7 @@ pong
 }
 ```
 
-#### `GET /order`
+#### `GET /api/order`
 ```javascript
 ===== Output =====
 {
@@ -187,7 +187,7 @@ pong
 }
 ```
 
-#### `GET /order/:orderId`
+#### `GET /api/order/:orderId`
 ```javascript
 ===== Output =====
 {
@@ -196,7 +196,7 @@ pong
 }
 ```
 
-#### `POST /order`
+#### `POST /api/order`
 ```javascript
 ===== Input =====
 Order // without _id field
@@ -207,7 +207,7 @@ Order // without _id field
 }
 ```
 
-#### `GET /warehouse`
+#### `GET /api/warehouse`
 ```javascript
 ===== Output =====
 {
@@ -216,7 +216,7 @@ Order // without _id field
 }
 ```
 
-#### `POST /warehouse`
+#### `POST /api/warehouse`
 ```javascript
 ===== Input =====
 Warehouse //With _id if updating an existing warehouse, or without _id if creating a new one.
@@ -227,7 +227,7 @@ Warehouse //With _id if updating an existing warehouse, or without _id if creati
 }
 ```
 
-#### `GET /warehouse/:warehouseId`
+#### `GET /api/warehouse/:warehouseId`
 ```javascript
 ===== Output =====
 {
@@ -236,7 +236,7 @@ Warehouse //With _id if updating an existing warehouse, or without _id if creati
 }
 ```
 
-#### `POST /warehouse/:warehouseId/items`
+#### `POST /api/warehouse/:warehouseId/items`
 ```javascript
 ===== Input =====
 Item //With _id if updating an existing item, or without _id if creating a new one.
@@ -247,7 +247,7 @@ Item //With _id if updating an existing item, or without _id if creating a new o
 }
 
 ```
-#### `GET /warehouse/:warehouseId/items/:itemId`
+#### `GET /api/warehouse/:warehouseId/items/:itemId`
 ```javascript
 ===== Output =====
 {
@@ -256,7 +256,7 @@ Item //With _id if updating an existing item, or without _id if creating a new o
 }
 ```
 
-#### `DELETE /warehouse/:warehouseId/items`
+#### `DELETE /api/warehouse/:warehouseId/items`
 ```javascript
 ===== Output =====
 {
@@ -264,7 +264,7 @@ Item //With _id if updating an existing item, or without _id if creating a new o
 }
 ```
 
-#### `GET /warehouse/:warehouseId/orders`
+#### `GET /api/warehouse/:warehouseId/orders`
 ```javascript
 ===== Output =====
 {
@@ -273,7 +273,7 @@ Item //With _id if updating an existing item, or without _id if creating a new o
 }
 ```
 
-#### `GET /warehouse/:warehouseId/robot`
+#### `GET /api/warehouse/:warehouseId/robot`
 ```javascript
 ===== Output =====
 {
@@ -282,7 +282,7 @@ Item //With _id if updating an existing item, or without _id if creating a new o
 }
 ```
 
-#### `GET /robot`
+#### `GET /api/robot`
 ```javascript
 ===== Output =====
 {
@@ -291,7 +291,7 @@ Item //With _id if updating an existing item, or without _id if creating a new o
 }
 ```
 
-#### `GET /robot/:robotId`
+#### `GET /api/robot/:robotId`
 ```javascript
 ===== Output =====
 {
@@ -300,7 +300,7 @@ Item //With _id if updating an existing item, or without _id if creating a new o
 }
 ```
 
-#### `POST /robot/:robotId/sethome`
+#### `POST /api/robot/:robotId/sethome`
 ```javascript
 ===== Input =====
 Position
@@ -310,7 +310,7 @@ Position
 }
 ```
 
-#### `GET /robotjob`
+#### `GET /api/robotjob`
 ```javascript
 ===== Output =====
 {
@@ -319,7 +319,7 @@ Position
 }
 ```
 
-#### `PUT /turnon/:n`
+#### `PUT /api/turnon/:n`
 ```javascript
 ===== Output =====
 {
@@ -327,7 +327,7 @@ Position
 }
 ```
 
-#### `PUT /turnoff`
+#### `PUT /api/turnoff`
 ```javascript
 ===== Output =====
 {

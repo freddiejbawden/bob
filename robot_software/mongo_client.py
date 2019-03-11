@@ -2,7 +2,7 @@
 import traceback
 #check that the robot packages are present
 print("Starting Client")
-print("Using API level v1")
+print("Using API level v3")
 ev3_package_check = True
 try:
     import ev3dev.ev3 as ev3
@@ -46,7 +46,7 @@ def polling(ip_addr, port, run_robot,username):
     while running:
         try:
             headers = {'username':username}
-            r = requests.get("http://{}:{}/robotjob".format(ip_addr,port),headers=headers)
+            r = requests.get("http://{}:{}/api/robotjob".format(ip_addr,port),headers=headers)
             path = json.loads(r.text)
             if path["job"] == []:
                 print("No order")
@@ -79,19 +79,19 @@ class MyListener:
             try:
                 base_url = "http://{}:{}".format(ip_addr,port)
                 
-                r = requests.get("http://{}:{}/ping".format(ip_addr, port))
+                r = requests.get("http://{}:{}/api/ping".format(ip_addr, port))
                 # wait for response
                 if (r.text == "pong"):
                     print("Server running on {}:{}".format(ip_addr,port))
                     username = "bob_test"
                     body = {'username':username,'type':'robot'}
-                    r = requests.post('http://{}:{}/register'.format(ip_addr,port),json=body)
+                    r = requests.post('http://{}:{}/api/register'.format(ip_addr,port),json=body)
                     if (json.loads(r.text)["success"]):
                         print('Registered bob_test')
                     else:
                         print(r.text)
                     
-                    r = requests.get('http://{}:{}/robot'.format(ip_addr,port),headers={'username':'bob_test'})
+                    r = requests.get('http://{}:{}/api/robot'.format(ip_addr,port),headers={'username':'bob_test'})
                     print(r.text)
                     if (self.run_robot):
                         ev3.Sound.tone([(1000, 250, 0),(1500, 250, 0),(2000, 250, 0)]).wait()

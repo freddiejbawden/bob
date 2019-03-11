@@ -131,7 +131,7 @@ export default {
         addWarehouse () {
             if (this.can_submit) {
                 axios.
-                    post('http://localhost:9000/warehouse/', {
+                    post('http://localhost:9000/api/warehouse/', {
                         name: this.name,
                         image: this.image,
                         location: this.location,
