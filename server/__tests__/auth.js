@@ -12,10 +12,10 @@ beforeEach(db.init)
 
 afterEach(db.close)
 
-describe('POST /register', () => {
+describe('POST /api/register', () => {
     it('works', async () => {
         const response = await request(app)
-            .post('/register')
+            .post('/api/register')
             .send({
                 username: 'myusername',
                 type: 'customer'
@@ -44,7 +44,7 @@ describe('POST /register', () => {
     })
 })
 
-describe('POST /login', () => {
+describe('POST /api/login', () => {
     it('retrieves the existing user', async () => {
         utils.loadDBwithData(db(), {
             users: [
@@ -56,7 +56,7 @@ describe('POST /login', () => {
             ]
         })
         const response = await request(app)
-            .post('/login')
+            .post('/api/login')
             .send({
                 username: 'test'
             })
@@ -73,7 +73,7 @@ describe('POST /login', () => {
 
     it('gives appropriate error if user is not found', async () => {
         const response = await request(app)
-            .post('/login')
+            .post('/api/login')
             .send({
                 username: 'test'
             })
@@ -95,19 +95,19 @@ describe('Auth Library', () => {
         utils.loadDBwithData(db(), {
             users: [user]
         })
-        app.get('/__test__/auth/works', auth.customer((req, res) => res.json(req.user)))
+        app.get('/api/__test__/auth/works', auth.customer((req, res) => res.json(req.user)))
 
         const response = await request(app)
-            .get('/__test__/auth/works')
+            .get('/api/__test__/auth/works')
             .set('username', 'test')
         expect(response.statusCode).toBe(200)
         expect(response.body).toMatchObject(user)
     })
 
     it('rejects requests without username header', async () => {
-        app.get('/__test__/auth/rejectsWithoutUsername', auth.customer((req, res) => res.json(req.user)))
+        app.get('/api/__test__/auth/rejectsWithoutUsername', auth.customer((req, res) => res.json(req.user)))
 
-        const response = await request(app).get('/__test__/auth/rejectsWithoutUsername')
+        const response = await request(app).get('/api/__test__/auth/rejectsWithoutUsername')
 
         expect(response.statusCode).toBe(401)
         expect(response.body).toMatchObject({
@@ -117,10 +117,10 @@ describe('Auth Library', () => {
     })
 
     it('rejects unknown users', async () => {
-        app.get('/__test__/auth/rejectsUnknownUsers', auth.customer((req, res) => res.json(req.user)))
+        app.get('/api/__test__/auth/rejectsUnknownUsers', auth.customer((req, res) => res.json(req.user)))
 
         const response = await request(app)
-            .get('/__test__/auth/rejectsUnknownUsers')
+            .get('/api/__test__/auth/rejectsUnknownUsers')
             .set('username', 'test')
 
         expect(response.statusCode).toBe(401)
@@ -139,10 +139,10 @@ describe('Auth Library', () => {
         utils.loadDBwithData(db(), {
             users: [user]
         })
-        app.get('/__test__/auth/rejectsIncorrectType', auth.customer((req, res) => res.json(req.user)))
+        app.get('/api/__test__/auth/rejectsIncorrectType', auth.customer((req, res) => res.json(req.user)))
 
         const response = await request(app)
-            .get('/__test__/auth/rejectsIncorrectType')
+            .get('/api/__test__/auth/rejectsIncorrectType')
             .set('username', 'test')
 
         expect(response.statusCode).toBe(403)

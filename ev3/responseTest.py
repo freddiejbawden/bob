@@ -4,7 +4,7 @@ from threading import Thread
 y = []
 def ping():
     start = time.time()
-    nf = requests.get('http://192.168.105.38:9000/ping')
+    nf = requests.get('http://192.168.105.38:9000/api/ping')
     page = nf.text
     end = time.time()
     y.append(((end - start) * 1000))

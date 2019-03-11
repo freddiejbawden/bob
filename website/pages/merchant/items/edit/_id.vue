@@ -133,7 +133,7 @@ export default {
     methods: {
         getWarehouse () {
             axios.
-                get('http://localhost:9000/warehouse/' + this.warehouseId, {
+                get('http://localhost:9000/api/warehouse/' + this.warehouseId, {
                     headers: {
                         'Content-Type': 'application/json'
                     }
@@ -149,7 +149,7 @@ export default {
         },
         getItem () {
             axios.
-                get('http://localhost:9000/warehouse/' + this.warehouseId + '/items/' + this.itemId, {
+                get('http://localhost:9000/api/warehouse/' + this.warehouseId + '/items/' + this.itemId, {
                     headers: {
                         'Content-Type': 'application/json',
                         'username': this.$store.state.user.username,
@@ -180,7 +180,7 @@ export default {
         },
         updateItem () {
             axios.
-                post('http://localhost:9000/warehouse/' + this.warehouseId + '/items', this.item, {
+                post('http://localhost:9000/api/warehouse/' + this.warehouseId + '/items', this.item, {
                     headers: {
                         'Content-Type': 'application/json',
                         'username': this.$store.state.user.username,
