@@ -28,8 +28,8 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 str_instruction = data.decode('utf-8')
                 str_instruction = str_instruction.replace('\'', '\"')
                 print(str_instruction)
-                robot = FollowPath()
-                robot.start(extract(json.loads(str_instruction)))
-                print('done')
+                #robot = FollowPath()
+                #robot.start(extract(json.loads(str_instruction)))
+                #print('done')
                 conn.sendall(b'done')
                     

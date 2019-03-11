@@ -2,33 +2,34 @@ import time
 import numpy
 import cv2
 import sys
+import os
 import socket
 from threading import Thread
 from rasppi_coordinator import RobotJobListener
 from iotools import IOTools
 
 class Logger(object):
-    def __init__(self, onRobot):
-        self.useTerminal = not onRobot
-        self.terminal = sys.stdout
-        self.log = 0
-        if os.path.isdir('/tmp/sandbox'):
-            self.log = open('/tmp/sandbox/log.txt', 'a+')
+	def __init__(self, onRobot):
+		self.useTerminal = not onRobot
+		self.terminal = sys.stdout
+		self.log = 0
+		if os.path.isdir('/tmp/sandbox'):
+			self.log = open('/tmp/sandbox/log.txt', 'a+')
 
-    def write(self, message):
-        if self.useTerminal:
-            self.terminal.write(message)
-        if self.log:
-            self.log.write(message)
-            self.log.flush()
+	def write(self, message):
+		if self.useTerminal:
+			self.terminal.write(message)
+		if self.log:
+			self.log.write(message)
+			self.log.flush()
 
-    def flush(self):
-        pass
+	def flush(self):
+		pass
 
 class Toddler:
 
 	def __init__(self, onRobot):
-		IO = IOTools()
+		IO = IOTools(onRobot)
 		print('Grabber initialised')
 		self.camera = IO.camera.initCamera('pi', 'low')
 		self.getInputs = IO.interface_kit.getInputs
@@ -76,7 +77,7 @@ class Toddler:
 		self.sc.setPosition(90)
 		time.sleep(2)
 		self.sc.setPosition(180)
-		time.sleep(2)
+		time.sleep(5)
 
 	def vision(self):
 	   # image = self.camera.getFrame()
@@ -86,6 +87,7 @@ class Toddler:
 
 if __name__ == '__main__':
 	onRobot = bool(sys.argv.count('-rss'))
-    sys.stdout = Logger(onRobot)
-    sys.stderr = sys.stdout
-    t = Toddler(onRobot)
+	sys.stdout = Logger(onRobot)
+	sys.stderr = sys.stdout
+	t = Toddler(onRobot)
+	t.grabber()

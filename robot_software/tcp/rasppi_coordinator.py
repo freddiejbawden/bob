@@ -65,7 +65,8 @@ class RobotJobListener():
             print('done')
         
 
-
+if __name__ == "__main__":
+    rjl = RobotJobListener(('192.168.105.38',9000),('192.168.105.139',65432),('192.168.105.38',65432))
 
 
 
