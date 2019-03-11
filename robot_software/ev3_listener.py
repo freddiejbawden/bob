@@ -25,11 +25,14 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         
             data = conn.recv(1024)
             if data:
+
                 str_instruction = data.decode('utf-8')
+                print(str_instruction)
                 str_instruction = str_instruction.replace('\'', '\"')
+                str_instruction = str_instruction.replace('u\"', '\"')
                 print(str_instruction)
                 #robot = FollowPath()
                 #robot.start(extract(json.loads(str_instruction)))
-                #print('done')
+                print('done')
                 conn.sendall(b'done')
                     
