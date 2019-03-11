@@ -23,7 +23,7 @@ jobs:
         - npm i
         - npm run generate
         - cd ..
-        - cp ./website/dist ./server/public
+        - cp -r ./website/dist ./server/public
         - git add ./server/public
         - git commit -m "[Travis] Built website"
         - echo "Setting up heroku deployment on local repo."
