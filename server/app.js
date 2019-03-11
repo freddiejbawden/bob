@@ -11,7 +11,7 @@ const app = express()
 
 app.use(bodyParser.json({ limit: '50mb' }))
 
-app.use(express.static('../website/dist'))
+app.use(express.static('./public'))
 
 app.use(
     cors({
