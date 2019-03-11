@@ -7,7 +7,8 @@ class Grabber():
     GRAB_ANGLE = 180
 
     MC_SPEED = 100  # speed for the outward and inward scoop
-    OUTWARD_SCOOP_TIME = 0.28  # time in seconds for the motor to move towards the shelf
+    OUTWARD_SCOOP_TIME = 3  # time in seconds for the motor to move towards the shelf
+    INWARD_SCOOP_TIME = OUTWARD_SCOOP_TIME-0.1
     SERVO_TIME = 1  # time in seconds for the servo to move into position
 
     def __init__(self, mc, mc_id, sc):
@@ -31,10 +32,14 @@ class Grabber():
         time.sleep(1)
 
         self.sc.setPosition(self.GRAB_ANGLE)
-
         time.sleep(self.SERVO_TIME)
+
         self.mc.setMotor(self.mc_id, -self.MC_SPEED)
-        time.sleep(self.OUTWARD_SCOOP_TIME)
+        time.sleep(self.INWARD_SCOOP_TIME)
         self.mc.stopMotors()
 
-        self.sc.disengage()
+    def yeet(self):
+        self.mc.setMotor(self.mc_id, -self.MC_SPEED)
+        time.sleep(1)
+        self.mc.stopMotors()
+
