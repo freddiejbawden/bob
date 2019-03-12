@@ -53,6 +53,9 @@ module.exports = {
     '@nuxtjs/axios',
   ],
 
+  env: {
+    baseUrl: process.env.BASE_URL || 'http://localhost:9000'
+  },
 
   axios: {
     // proxyHeaders: false

@@ -119,7 +119,7 @@ export default {
         },
         getWarehouse () {
             axios.
-                get('http://localhost:9000/api/warehouse/' + this.warehouseId, {
+                get(process.env.baseUrl + '/api/warehouse/' + this.warehouseId, {
                     headers: {
                         'Content-Type': 'application/json'
                     }
@@ -135,7 +135,7 @@ export default {
         },
         updateWarehouse: function () {
             axios.
-                post('http://localhost:9000/api/warehouse/', this.warehouse, {
+                post(process.env.baseUrl + '/api/warehouse/', this.warehouse, {
                     headers: {
                         'Content-Type': 'application/json',
                         'username': this.$store.state.user.username,

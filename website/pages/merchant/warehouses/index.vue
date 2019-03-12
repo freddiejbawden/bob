@@ -98,7 +98,7 @@ export default {
         },
         getWarehouses () {
             axios.
-                get('http://localhost:9000/api/warehouse/', {
+                get(process.env.baseUrl + '/api/warehouse/', {
                     headers: {
                         'Content-Type': 'application/json'
                     }

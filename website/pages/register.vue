@@ -79,7 +79,7 @@ export default {
         register () {
             if (this.username && this.password) {
                 axios.
-                    post('http://localhost:9000/api/register/', {
+                    post(process.env.baseUrl + '/api/register/', {
                         username: this.username,
                         // password: this.password,
                         type: this.type,
