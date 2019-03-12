@@ -2,9 +2,13 @@ package io.github.assis10t.bobandroid
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.graphics.Bitmap
 import android.util.TypedValue
 import android.provider.SyncStateContract.Helpers.update
 import android.util.Base64
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.MultiFormatWriter
+import com.journeyapps.barcodescanner.BarcodeEncoder
 import io.github.assis10t.bobandroid.pojo.Item
 import timber.log.Timber
 import java.security.NoSuchAlgorithmException
@@ -77,4 +81,9 @@ fun base64ToByteArray(str: String): ByteArray? {
     val pureStr = str.substring(str.indexOf(",")+1)
     val bytes = Base64.decode(pureStr, Base64.DEFAULT)
     return bytes
+}
+
+fun generateQRCode(str: String): Bitmap {
+    val bitMatrix = MultiFormatWriter().encode(str, BarcodeFormat.QR_CODE, 300, 300)
+    return BarcodeEncoder().createBitmap(bitMatrix)
 }

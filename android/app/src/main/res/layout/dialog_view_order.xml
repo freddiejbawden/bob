@@ -3,40 +3,47 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools" style="@style/Widget.MaterialComponents.CardView"
-        android:layout_width="300dp"
+        android:layout_width="350dp"
         android:layout_height="wrap_content"
         app:cardElevation="8dp">
     <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
         <TextView
-                style="@style/TextAppearance.MaterialComponents.Headline6"
+                style="@style/TextAppearance.MaterialComponents.Headline5"
                 android:id="@+id/title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Order Summary"
-                android:layout_margin="8dp"
-        />
-        <RelativeLayout
-                android:id="@+id/warehouse_container"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_below="@id/title">
-            <TextView
-                    style="@style/TextAppearance.MaterialComponents.Body1"
-                    android:id="@+id/warehouse_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Tesco Expresss"/>
-        </RelativeLayout>
+                android:layout_marginTop="8dp"
+        />
+        <TextView
+                style="@style/TextAppearance.MaterialComponents.Overline"
+                android:id="@+id/status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pending"
+                android:layout_alignParentEnd="true"
+                android:layout_margin="8dp"
+                android:layout_alignBaseline="@id/title"
+                android:textSize="16sp"
+                android:textColor="@color/statusPending"
+                />
+        <TextView
+                style="@style/TextAppearance.MaterialComponents.Subtitle2"
+                android:id="@+id/warehouse_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Appleton Tower Superstore"
+                android:layout_below="@id/title"
+                android:layout_marginStart="8dp"/>
         <RelativeLayout
                 android:id="@+id/header"
                 android:layout_width="match_parent"
                 android:layout_height="36dp"
                 android:padding="8dp"
-                android:layout_below="@id/warehouse_container">
+                android:layout_below="@id/warehouse_title">
             <TextView
                     android:id="@+id/name_header"
                     style="@style/TextAppearance.MaterialComponents.Body2"
@@ -94,13 +101,27 @@
                     android:layout_alignParentEnd="true"
                     android:text="£23.96"/>
         </RelativeLayout>
-        <android.support.design.button.MaterialButton
-                android:id="@+id/complete_order"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
-                android:layout_width="wrap_content"
+        <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Complete order"
-                android:layout_below="@id/footer"
-        />
+                android:orientation="horizontal"
+                android:layout_below="@id/footer">
+            <android.support.design.button.MaterialButton
+                    android:id="@+id/view_qr"
+                    style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Collect"
+                    android:layout_marginStart="8dp"
+            />
+            <android.support.design.button.MaterialButton
+                    android:id="@+id/get_directions"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Get Directions"
+                    android:layout_marginStart="8dp"
+            />
+        </LinearLayout>
     </RelativeLayout>
 </android.support.design.card.MaterialCardView>

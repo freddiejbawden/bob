@@ -21,9 +21,14 @@ import timber.log.Timber
 class ViewCartDialog(context: Context, val warehouseId: String): Dialog(context) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.dialog_view_cart)
 
         val data = getCart(context)
+        if (data.isEmpty()) {
+            setContentView(R.layout.dialog_view_cart_empty)
+            return
+        } else {
+            setContentView(R.layout.dialog_view_cart)
+        }
 
         cart.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         cart.adapter = CartAdapter(data)
@@ -37,6 +42,11 @@ class ViewCartDialog(context: Context, val warehouseId: String): Dialog(context)
                     .reduce { a, b -> a + b}
 
         total.text = "£${"%.2f".format(totalAmount)}"
+
+        clear.setOnClickListener {
+            clearCart(context)
+            dismiss()
+        }
 
         complete_order.setOnClickListener {
             val order = Order.Factory()

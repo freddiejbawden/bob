@@ -1,5 +1,6 @@
 package io.github.assis10t.bobandroid
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.CardView
 import android.support.v7.widget.LinearLayoutManager
@@ -79,14 +80,20 @@ class OrdersActivity : ActivityWithLoginMenu() {
             vh.title.text = order.warehouse!!.name
             vh.timestamp.text = order.getTimeString()
             vh.container.setOnClickListener {v ->
-                Toast.makeText(vh.container.context, "TODO: Open order details dialog", Toast.LENGTH_SHORT).show()
+                ViewOrderDialog(v.context, order).show()
             }
             vh.status.text = when(order.status) {
                 Order.Status.PENDING -> "Pending"
                 Order.Status.IN_TRANSIT -> "In transit"
-                Order.Status.COMPLETE -> "Ready to collect"
+                Order.Status.COMPLETE -> "Ready"
                 Order.Status.CANCELED -> "Canceled"
             }
+            vh.status.setTextColor(when(order.status) {
+                Order.Status.PENDING -> R.color.statusPending
+                Order.Status.IN_TRANSIT -> R.color.statusInTransit
+                Order.Status.COMPLETE -> R.color.statusReady
+                Order.Status.CANCELED -> R.color.statusCanceled
+            })
             vh.summary.text = "${order.items.size} items"
         }
 
