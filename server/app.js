@@ -20,7 +20,8 @@ app.use(
             if (whitelist.indexOf(origin) > -1) {
                 callback(null, true)
             } else {
-                callback(new Error('Not allowed by CORS.'))
+                console.log(origin, 'is not allowed by CORS. Bypassing anyway.')
+                callback(null, true)
             }
         },
         credentials: true
