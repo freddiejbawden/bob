@@ -46,7 +46,7 @@ Order {
     "warehouseId": String,
     "timestamp": String,
     "items": [Item],
-    "status": "PENDING", "IN_TRANSIT", "COMPLETE", "CANCELED",
+    "status": "PENDING", "IN_TRANSIT", "READY_TO_COLLECT", "COMPLETE", "CANCELED",
     "warehouse": Warehouse // On get requests to /api/order or /api/order/:orderId, this is also included. Not included in POST requests.
 }
 
@@ -128,6 +128,8 @@ Instruction {
 | `GET` | `/api/warehouse/:warehouseId/items/:itemId` | `Merchant` | Gets the item with the given `itemId`. |
 | `DELETE` | `/api/warehouse/:warehouseId/items/:itemId` | `Merchant` | Deletes the item with the given `itemId`. |
 | `GET` | `/api/warehouse/:warehouseId/orders` | `Merchant` | Gets all orders in the given `Warehouse`. |
+| `GET` | `/api/warehouse/:warehouseId/orders/:orderId` | `Merchant` | Get order with the given `orderId`. |
+| `POST` | `/api/warehouse/:warehouseId/orders/:orderId` | `Merchant` | Update status of the order with the given `orderId`. |
 | `GET` | `/api/warehouse/:warehouseId/robot` | `Merchant` | Gets the state of the robot(s). |
 | `GET` | `/api/robot` | `Robot` | Get details of the current Robot. |
 | `GET` | `/api/robot/:robotId` | `Merchant` | Get details about the robot with given `robotId` |
@@ -270,6 +272,28 @@ Item //With _id if updating an existing item, or without _id if creating a new o
 {
     "success": true,
     "orders": [Order]
+}
+```
+
+#### `GET /api/warehouse/:warehouseId/orders/:orderId`
+```javascript
+===== Output =====
+{
+    "success": true,
+    "order": Order
+}
+```
+
+#### `POST /api/warehouse/:warehouseId/orders/:orderId`
+```javascript
+===== Input =====
+{
+    "status": "PENDING", "IN_TRANSIT", "READY_TO_COLLECT", "COMPLETE", "CANCELED"
+}
+===== Output =====
+{
+    "success": true,
+    "order": Order
 }
 ```
 

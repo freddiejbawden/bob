@@ -104,6 +104,10 @@ const factory = db => ({
             .collection('orders')
             .find({ warehouseId })
             .toArray(),
+    setOrderStatus: (orderId, status) =>
+        db()
+            .collection('orders')
+            .updateOne({ _id: ObjectID(orderId) }, { $set: { status } }),
     addItem: ({ _id, ...item }) => {
         if (!_id) {
             item = { _id: new ObjectID(), ...item }

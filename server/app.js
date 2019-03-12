@@ -190,6 +190,53 @@ app.get(
             .catch(next)
     })
 )
+
+app.get(
+    '/api/warehouse/:warehouseId/orders/:orderId',
+    auth.merchant((req, res, next) =>
+        model
+            .getOrderById(req.params.orderId)
+            .then(order => {
+                if (order && req.params.warehouseId.equals(order.warehouseId)) {
+                    model.getWarehouseById(order.warehouseId).then(warehouse => {
+                        if (req.user._id.equals(warehouse.merchantId)) {
+                            res.json({ success: true, order: { ...order, warehouse } })
+                        } else {
+                            res.status(403).json({ success: false, error: 'You cannot view details on this order.' })
+                        }
+                    })
+                } else if (order)
+                    res.status(403).json({ success: false, error: 'You cannot view details on this order.' })
+                else res.status(404).json({ success: true, order: null })
+            })
+            .catch(next)
+    )
+)
+
+app.post(
+    '/api/warehouse/:warehouseId/orders/:orderId',
+    auth.merchant((req, res, next) =>
+        model
+            .getOrderById(req.params.orderId)
+            .then(order => {
+                if (order && req.params.warehouseId.equals(order.warehouseId)) {
+                    model.getWarehouseById(order.warehouseId).then(warehouse => {
+                        if (req.user._id.equals(warehouse.merchantId)) {
+                            model
+                                .setOrderStatus(req.params.orderId, req.body.status)
+                                .then(res.json({ success: true, order: { ...order, warehouse } }))
+                        } else {
+                            res.status(403).json({ success: false, error: 'You cannot view details on this order.' })
+                        }
+                    })
+                } else if (order)
+                    res.status(403).json({ success: false, error: 'You cannot view details on this order.' })
+                else res.status(404).json({ success: true, order: null })
+            })
+            .catch(next)
+    )
+)
+
 app.put('/api/turnon/:nOfMarkers', (req, res, next) => {
     const markers = req.params.nOfMarkers
     model
