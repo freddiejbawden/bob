@@ -23,6 +23,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import io.github.assis10t.bobandroid.pojo.Warehouse
 import kotlinx.android.synthetic.main.activity_warehouse_list.*
 
@@ -65,21 +66,32 @@ class WarehouseListActivity : ActivityWithLoginMenu(), OnMapReadyCallback {
         loading.visibility = View.GONE
     }
 
-    override fun onStart() {
-        super.onStart()
+    override fun onResume() {
+        super.onResume()
         refreshWarehouseList()
     }
 
     fun refreshWarehouseList() {
         loading.visibility = View.VISIBLE
+        warehouse_list.visibility = View.INVISIBLE
         ServerConnection().getWarehouses {err, warehouses ->
+            loading.visibility = View.GONE
+            warehouse_list.visibility = View.VISIBLE
             if (err != null) {
                 Toast.makeText(this, err.message, Toast.LENGTH_SHORT).show()
                 return@getWarehouses
             }
             val adapter = warehouse_list.adapter as WarehouseAdapter
             adapter.setItems(warehouses!!)
-            loading.visibility = View.GONE
+
+            mMap.clear()
+            warehouses.forEach { warehouse ->
+                mMap.addMarker(
+                    MarkerOptions()
+                        .position(warehouse.location!!.asLatLng())
+                        .title(warehouse.name)
+                )
+            }
         }
     }
 

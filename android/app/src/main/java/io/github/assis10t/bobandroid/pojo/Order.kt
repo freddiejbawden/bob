@@ -15,7 +15,7 @@ class Order(
     val warehouse: Warehouse? = null
 ) {
     enum class Status {
-        PENDING, IN_TRANSIT, COMPLETE, CANCELED
+        PENDING, IN_TRANSIT, READY_TO_COLLECT, COMPLETE, CANCELED
     }
 
     class Factory {

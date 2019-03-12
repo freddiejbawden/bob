@@ -5,8 +5,6 @@ import android.content.Context
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,10 +13,8 @@ import android.widget.Toast
 import io.github.assis10t.bobandroid.pojo.Item
 import io.github.assis10t.bobandroid.pojo.Order
 import kotlinx.android.synthetic.main.dialog_view_cart.*
-import org.w3c.dom.Text
-import timber.log.Timber
 
-class ViewCartDialog(context: Context, val warehouseId: String): Dialog(context) {
+class ViewCartDialog(val activity: WarehouseActivity, val warehouseId: String): Dialog(activity) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -45,6 +41,7 @@ class ViewCartDialog(context: Context, val warehouseId: String): Dialog(context)
 
         clear.setOnClickListener {
             clearCart(context)
+            activity.refreshItems()
             dismiss()
         }
 
@@ -61,6 +58,7 @@ class ViewCartDialog(context: Context, val warehouseId: String): Dialog(context)
                         return@makeOrder
                     }
                     clearCart(context)
+                    activity.refreshItems()
                     dismiss()
                 }
         }

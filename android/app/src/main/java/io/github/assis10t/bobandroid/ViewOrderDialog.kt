@@ -32,13 +32,15 @@ class ViewOrderDialog(context: Context, val order: Order): Dialog(context) {
         status.text = when(order.status) {
             Order.Status.PENDING -> "Pending"
             Order.Status.IN_TRANSIT -> "In transit"
-            Order.Status.COMPLETE -> "Ready"
+            Order.Status.READY_TO_COLLECT -> "Ready"
+            Order.Status.COMPLETE -> "Collected"
             Order.Status.CANCELED -> "Canceled"
         }
         status.setTextColor(when(order.status) {
             Order.Status.PENDING -> R.color.statusPending
             Order.Status.IN_TRANSIT -> R.color.statusInTransit
-            Order.Status.COMPLETE -> R.color.statusReady
+            Order.Status.READY_TO_COLLECT -> R.color.statusReady
+            Order.Status.COMPLETE -> R.color.statusComplete
             Order.Status.CANCELED -> R.color.statusCanceled
         })
 

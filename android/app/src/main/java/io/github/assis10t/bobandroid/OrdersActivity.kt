@@ -85,13 +85,15 @@ class OrdersActivity : ActivityWithLoginMenu() {
             vh.status.text = when(order.status) {
                 Order.Status.PENDING -> "Pending"
                 Order.Status.IN_TRANSIT -> "In transit"
-                Order.Status.COMPLETE -> "Ready"
+                Order.Status.READY_TO_COLLECT -> "Ready"
+                Order.Status.COMPLETE -> "Collected"
                 Order.Status.CANCELED -> "Canceled"
             }
             vh.status.setTextColor(when(order.status) {
                 Order.Status.PENDING -> R.color.statusPending
                 Order.Status.IN_TRANSIT -> R.color.statusInTransit
-                Order.Status.COMPLETE -> R.color.statusReady
+                Order.Status.READY_TO_COLLECT -> R.color.statusReady
+                Order.Status.COMPLETE -> R.color.statusComplete
                 Order.Status.CANCELED -> R.color.statusCanceled
             })
             vh.summary.text = "${order.items.size} items"

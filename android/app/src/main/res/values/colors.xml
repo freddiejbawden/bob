@@ -10,4 +10,5 @@
     <color name="statusInTransit">#0053FF</color>
     <color name="statusCanceled">#FF3860</color>
     <color name="statusReady">#23D160</color>
+    <color name="statusComplete">#CCC</color>
 </resources>
