@@ -15,7 +15,7 @@ import io.github.assis10t.bobandroid.pojo.Item
 import io.github.assis10t.bobandroid.pojo.Order
 import kotlinx.android.synthetic.main.dialog_view_cart.*
 
-class ViewCartDialog(context: Context, val warehouseId: String): Dialog(context) {
+class ViewCartDialog(val activity: WarehouseActivity, val warehouseId: String): Dialog(activity) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -65,8 +65,7 @@ class ViewCartDialog(context: Context, val warehouseId: String): Dialog(context)
                             return@makeOrder
                         }
                         clearCart(context)
-                        if (context is WarehouseActivity)
-                            (context as WarehouseActivity).refreshItems()
+                        activity.refreshItems()
                         submitDialog.completed()
                         Handler().postDelayed({
                             submitDialog.dismiss()

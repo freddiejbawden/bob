@@ -97,7 +97,7 @@ class WarehouseActivity : ActivityWithLoginMenu() {
             vh.title.text = item.name
             vh.price.text = item.getPriceText()
             vh.container.setOnClickListener {v ->
-                AddToCartDialog(v.context, item).show()
+                AddToCartDialog(v.context as WarehouseActivity, item).show()
             }
             if (item.image == null) {
                 Glide.with(vh.container)

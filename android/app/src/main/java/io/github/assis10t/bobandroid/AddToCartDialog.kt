@@ -13,7 +13,7 @@ import io.github.assis10t.bobandroid.pojo.Item
 import kotlinx.android.synthetic.main.dialog_add_to_cart.*
 import timber.log.Timber
 
-class AddToCartDialog(context: Context, val item: Item): Dialog(context) {
+class AddToCartDialog(val activity: WarehouseActivity, val item: Item): Dialog(activity) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.dialog_add_to_cart)
@@ -59,8 +59,7 @@ class AddToCartDialog(context: Context, val item: Item): Dialog(context) {
             )
             addToCart(context, cartItem)
             Timber.d("Cart: ${getCart(context)}")
-            if (context is WarehouseActivity)
-                (context as WarehouseActivity).refreshItems()
+            activity.refreshItems()
             dismiss()
         }
     }
