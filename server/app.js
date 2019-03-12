@@ -193,11 +193,11 @@ app.get(
 
 app.get(
     '/api/warehouse/:warehouseId/orders/:orderId',
-    auth.merchant((req, res, next) =>
+    auth.merchant((req, res, next) => {
         model
             .getOrderById(req.params.orderId)
             .then(order => {
-                if (order && req.params.warehouseId.equals(order.warehouseId)) {
+                if (order && req.params.warehouseId === order.warehouseId) {
                     model.getWarehouseById(order.warehouseId).then(warehouse => {
                         if (req.user._id.equals(warehouse.merchantId)) {
                             res.json({ success: true, order: { ...order, warehouse } })
@@ -210,7 +210,7 @@ app.get(
                 else res.status(404).json({ success: true, order: null })
             })
             .catch(next)
-    )
+    })
 )
 
 app.post(
@@ -219,7 +219,7 @@ app.post(
         model
             .getOrderById(req.params.orderId)
             .then(order => {
-                if (order && req.params.warehouseId.equals(order.warehouseId)) {
+                if (order && req.params.warehouseId === order.warehouseId) {
                     model.getWarehouseById(order.warehouseId).then(warehouse => {
                         if (req.user._id.equals(warehouse.merchantId)) {
                             model
@@ -231,7 +231,7 @@ app.post(
                     })
                 } else if (order)
                     res.status(403).json({ success: false, error: 'You cannot view details on this order.' })
-                else res.status(404).json({ success: true, order: null })
+                else res.status(404).json({ success: false, error: 'Order not found.' })
             })
             .catch(next)
     )

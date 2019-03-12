@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.Editable
@@ -36,13 +37,13 @@ class ViewOrderDialog(context: Context, val order: Order): Dialog(context) {
             Order.Status.COMPLETE -> "Collected"
             Order.Status.CANCELED -> "Canceled"
         }
-        status.setTextColor(when(order.status) {
+        status.setTextColor(ContextCompat.getColor(context, when(order.status) {
             Order.Status.PENDING -> R.color.statusPending
             Order.Status.IN_TRANSIT -> R.color.statusInTransit
             Order.Status.READY_TO_COLLECT -> R.color.statusReady
             Order.Status.COMPLETE -> R.color.statusComplete
             Order.Status.CANCELED -> R.color.statusCanceled
-        })
+        }))
 
         view_qr.visibility =
                 if (order.status == Order.Status.COMPLETE)

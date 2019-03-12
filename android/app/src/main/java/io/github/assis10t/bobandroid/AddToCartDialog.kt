@@ -59,6 +59,8 @@ class AddToCartDialog(context: Context, val item: Item): Dialog(context) {
             )
             addToCart(context, cartItem)
             Timber.d("Cart: ${getCart(context)}")
+            if (context is WarehouseActivity)
+                (context as WarehouseActivity).refreshItems()
             dismiss()
         }
     }

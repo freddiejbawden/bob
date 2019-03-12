@@ -3,6 +3,7 @@ package io.github.assis10t.bobandroid
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -14,7 +15,7 @@ import io.github.assis10t.bobandroid.pojo.Item
 import io.github.assis10t.bobandroid.pojo.Order
 import kotlinx.android.synthetic.main.dialog_view_cart.*
 
-class ViewCartDialog(val activity: WarehouseActivity, val warehouseId: String): Dialog(activity) {
+class ViewCartDialog(context: Context, val warehouseId: String): Dialog(context) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -41,7 +42,8 @@ class ViewCartDialog(val activity: WarehouseActivity, val warehouseId: String): 
 
         clear.setOnClickListener {
             clearCart(context)
-            activity.refreshItems()
+            if (context is WarehouseActivity)
+                (context as WarehouseActivity).refreshItems()
             dismiss()
         }
 
@@ -51,16 +53,27 @@ class ViewCartDialog(val activity: WarehouseActivity, val warehouseId: String): 
                 .warehouseId(warehouseId)
                 .build()
 
-            ServerConnection()
-                .makeOrder(context, order) { err ->
-                    if (err != null) {
-                        Toast.makeText(context, err.message, Toast.LENGTH_LONG).show()
-                        return@makeOrder
+            val submitDialog = SubmittingOrderDialog(context)
+            submitDialog.show()
+
+            Handler().postDelayed({
+                ServerConnection()
+                    .makeOrder(context, order) { err ->
+                        if (err != null) {
+                            Toast.makeText(context, err.message, Toast.LENGTH_LONG).show()
+                            submitDialog.dismiss()
+                            return@makeOrder
+                        }
+                        clearCart(context)
+                        if (context is WarehouseActivity)
+                            (context as WarehouseActivity).refreshItems()
+                        submitDialog.completed()
+                        Handler().postDelayed({
+                            submitDialog.dismiss()
+                            dismiss()
+                        }, 2000)
                     }
-                    clearCart(context)
-                    activity.refreshItems()
-                    dismiss()
-                }
+            }, 2000)
         }
     }
 

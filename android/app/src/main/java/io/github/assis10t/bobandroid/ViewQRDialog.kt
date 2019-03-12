@@ -12,7 +12,7 @@ class ViewQRDialog(context: Context, val order: Order): Dialog(context) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.dialog_view_qr)
 
-        instructions.text = "Show this code to the cashier at ${order.warehouse!!.name}."
+        message.text = "Show this code to the cashier at ${order.warehouse!!.name}."
 
         Glide.with(context)
             .load(generateQRCode(order._id!!))

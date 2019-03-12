@@ -2,6 +2,7 @@ package io.github.assis10t.bobandroid
 
 import android.content.Intent
 import android.os.Bundle
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.CardView
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -13,6 +14,7 @@ import android.widget.TextView
 import android.widget.Toast
 import io.github.assis10t.bobandroid.pojo.Order
 import kotlinx.android.synthetic.main.activity_orders.*
+import kotlinx.android.synthetic.main.dialog_view_order.*
 
 class OrdersActivity : ActivityWithLoginMenu() {
 
@@ -89,13 +91,14 @@ class OrdersActivity : ActivityWithLoginMenu() {
                 Order.Status.COMPLETE -> "Collected"
                 Order.Status.CANCELED -> "Canceled"
             }
-            vh.status.setTextColor(when(order.status) {
-                Order.Status.PENDING -> R.color.statusPending
-                Order.Status.IN_TRANSIT -> R.color.statusInTransit
-                Order.Status.READY_TO_COLLECT -> R.color.statusReady
-                Order.Status.COMPLETE -> R.color.statusComplete
-                Order.Status.CANCELED -> R.color.statusCanceled
-            })
+            vh.status.setTextColor(
+                ContextCompat.getColor(vh.container.context, when(order.status) {
+                    Order.Status.PENDING -> R.color.statusPending
+                    Order.Status.IN_TRANSIT -> R.color.statusInTransit
+                    Order.Status.READY_TO_COLLECT -> R.color.statusReady
+                    Order.Status.COMPLETE -> R.color.statusComplete
+                    Order.Status.CANCELED -> R.color.statusCanceled
+                }))
             vh.summary.text = "${order.items.size} items"
         }
 

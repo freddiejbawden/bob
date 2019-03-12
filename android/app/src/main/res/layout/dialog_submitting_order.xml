@@ -3,7 +3,7 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools" style="@style/Widget.MaterialComponents.CardView"
-        android:layout_width="300dp"
+        android:layout_width="216dp"
         android:layout_height="wrap_content"
         app:cardElevation="8dp">
     <RelativeLayout
@@ -14,14 +14,25 @@
                 style="@style/TextAppearance.MaterialComponents.Body2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Show this code to the cashier at Appleton Tower Superstore."
+                android:text="Submitting your order"
                 android:gravity="center"
                 android:layout_margin="8dp"/>
-        <ImageView
-                android:id="@+id/qr"
-                android:layout_width="300dp"
-                android:layout_height="300dp"
+        <FrameLayout
+                android:layout_width="150dp"
+                android:layout_height="150dp"
                 android:layout_below="@id/message"
-                android:layout_centerHorizontal="true"/>
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="8dp">
+            <ProgressBar
+                    android:id="@+id/loading"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+            <cdflynn.android.library.checkview.CheckView
+                    android:id="@+id/check"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:checkView_strokeColor="@color/colorAccent"
+                    app:checkView_strokeWidth="12dp"/>
+        </FrameLayout>
     </RelativeLayout>
 </android.support.design.card.MaterialCardView>
