@@ -41,7 +41,8 @@ module.exports = {
   ** Plugins to load before mounting the App
   */
   plugins: [
-    '@/plugins/vue-cookies.js'
+    '@/plugins/vue-cookies.js',
+    { src: '@/plugins/vue-qrcode-reader.js', ssr: false }
   ],
 
   /*
@@ -65,7 +66,7 @@ module.exports = {
   ** Build configuration
   */
   build: {
-    vendor: ['axios', 'vue-cookies'],
+    vendor: ['axios', 'vue-cookies', 'vue-qrcode-reader'],
     postcss: {
       preset: {
         features: {
