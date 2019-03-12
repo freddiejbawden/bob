@@ -13,9 +13,16 @@ app.use(bodyParser.json({ limit: '50mb' }))
 
 app.use(express.static('./public'))
 
+const whitelist = ['http://localhost:3000', 'http://sdp-10-beta.herokuapp.com', 'https://sdp-10-beta.herokuapp.com']
 app.use(
     cors({
-        origin: 'http://localhost:3000',
+        origin: (origin, callback) => {
+            if (whitelist.indexOf(origin) > -1) {
+                callback(null, true)
+            } else {
+                callback(new Error('Not allowed by CORS.'))
+            }
+        },
         credentials: true
     })
 )
