@@ -3,6 +3,7 @@ package io.github.assis10t.bobandroid
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -58,9 +59,14 @@ class AddToCartDialog(val activity: WarehouseActivity, val item: Item): Dialog(a
                 item.price
             )
             addToCart(context, cartItem)
-            Timber.d("Cart: ${getCart(context)}")
             activity.refreshItems()
-            dismiss()
+            Timber.d("Cart: ${getCart(context)}")
+            val dialog = AddedToCartDialog(context)
+            dialog.show()
+            Handler().postDelayed({
+                dialog.dismiss()
+                dismiss()
+            }, 1000)
         }
     }
 }
