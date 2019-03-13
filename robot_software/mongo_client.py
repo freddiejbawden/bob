@@ -6,7 +6,7 @@ print("Using API level v3")
 ev3_package_check = True
 try:
     import ev3dev.ev3 as ev3
-    from followLine import FollowLine
+    from robot_software.followLine import FollowLine
     print("ev3 modules imported")
 except:
     traceback.print_exc()
@@ -16,13 +16,11 @@ import requests
 print("request imported")
 import socket
 print("socket imported")
-import struct
 print("struct imported")
 import time
 print("time imported")
 import sys
 print("sys imported")
-import datetime
 print("datetime imported")
 import json
 print("json imported")

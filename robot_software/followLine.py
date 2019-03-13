@@ -1,6 +1,5 @@
 #! /usr/bin/env python3
 import ev3dev.ev3 as ev3
-import logging
 from time import sleep, time
 import control
 
@@ -9,6 +8,7 @@ class FollowLine:
     # From https://gist.github.com/CS2098/ecb3a078ed502c6a7d6e8d17dc095b48
     MOTOR_SPEED = 700
     DT = 50  # milliseconds  -  represents change in time since last sensor reading/
+
 
     MARKING_NUMBER = 1  # number of consecutive colour readings to detect marking
     MARKING_INTERVAL = 1  # time between marking checks in seconds
@@ -220,13 +220,23 @@ class FollowLine:
             time_off_line = 0
         return time_off_line
 
+    def move_toward_shelf(self):
+        self.cm.run_timed(time_sp=self.DT*50, speed_sp=-self.SIDEWAYS_SPEED)
+        sleep(self.DT*50.0/1000.0)
+        return
+
+    def move_away_from_shelf(self):
+
+        self.cm.run_timed(time_sp=1000, speed_sp=self.SIDEWAYS_SPEED)
+        sleep(1)
+        #if self.detect_marking(self.csbl.value(), self.csbl.value(), self.BLACK):
+        return
+
+    def stop_shelf_movement(self):
+        self.cm.stop(stop_action='hold')
+
     def stop(self):
         self.shut_down = True
         self.rm.stop()
         self.lm.stop()
         ev3.Sound.speak("whack").wait()
-
-
-# Main function
-if __name__ == "__main__":
-    robot = FollowLine()

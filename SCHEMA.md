@@ -132,7 +132,7 @@ Instruction {
 | `POST` | `/api/warehouse/:warehouseId/orders/:orderId` | `Merchant` | Update status of the order with the given `orderId`. |
 | `GET` | `/api/warehouse/:warehouseId/robot` | `Merchant` | Gets the state of the robot(s). |
 | `GET` | `/api/robot` | `Robot` | Get details of the current Robot. |
-| `GET` | `/api/robot/:robotId` | `Merchant` | Get details about the robot with given `robotId` |
+| `GET` | `/api/robot/:username` | `Merchant` | Get details about the robot with given `username` |
 | `POST` | `/api/robot/:robotId/sethome` | `Merchant` | Set the home location of the robot. |
 | `GET` | `/api/robotjob` | `Robot` | Gets the next job the robot needs to do. |
 | `PUT` | `/api/turnon/:n` | | Starts moving the robot. Robot stops after seeing `n` markers. |
@@ -315,7 +315,7 @@ Item //With _id if updating an existing item, or without _id if creating a new o
 }
 ```
 
-#### `GET /api/robot/:robotId`
+#### `GET /api/robot/:username`
 ```javascript
 ===== Output =====
 {
