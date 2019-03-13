@@ -92,6 +92,7 @@
                                         {'has-text-warning': order.status == 'PENDING'},
                                         {'has-text-info': order.status == 'IN_TRANSIT'},
                                         {'has-text-success': order.status == 'COMPLETE'},
+                                        {'has-text-success': order.status == 'READY_TO_COLLECT'},
                                         {'has-text-danger': order.status == 'CANCELED'},
                                     ]">
                                         <b>{{ order.status }}</b>

@@ -29,7 +29,8 @@
                         'box', 'is-full-width',
                         {'oh': !order, 'p0': !order},
                         {'element-loader': loading, 'loading': loading}
-                    ]">
+                    ]"
+                    v-if="selectedWarehouse && !completed">
                     <!-- <h3 class="has-text-centered m20-0">
                         Scan the QR code for your order.
                     </h3> -->
@@ -95,6 +96,27 @@
                     </transition>
                 </div>
 
+                <div class="box is-flex direction-column align-center" v-else-if="completed">
+                    <h3 class="has-text-centered p20-0 has-text-success">
+                        Order has been successfully collected and completed!
+                    </h3>
+                    <a 
+                        href="javascript:;" 
+                        class="button is-primary is-outlined mb20"
+                        @click="resetScan()">
+
+                        <span>Scan another order</span>
+                    </a>
+                </div>
+                <div class="box is-flex direction-column align-center" v-else>
+                    <h3 class="has-text-centered p20-0">
+                        You haven't added any warehouses.
+                    </h3>
+                    <nuxt-link to="/merchant/warehouses/create" class="button is-link mb15">
+                        <span>Add a warehouse</span>
+                    </nuxt-link>
+                </div>
+
                 <transition name="slide-top" mode="out-in">
                     <div class="is-flex justify-center align-center" v-if="order">
                         <a 
@@ -135,6 +157,7 @@ export default {
             selectedWarehouse: null,
             orders: [],
             loading: false,
+            completed: false,
             order: null,
             testOrders: [
                 {
@@ -188,6 +211,8 @@ export default {
         onDecode: function (decodedString) {
             this.loading = true
 
+            this.getOrders(this.selectedWarehouse._id)
+            
             this.orders.forEach(order => {
                 if (order._id == decodedString) {
                     setTimeout(() => {
@@ -204,10 +229,34 @@ export default {
         },
         resetScan: function () {
             this.order = null
+            this.completed = false
         },
         completeOrder: function () {
             if (this.order.status == 'READY_TO_COLLECT') {
-                // Change order status to COMPLETE 
+                this.loading = true
+            
+                axios.
+                    post(process.env.baseUrl + '/api/warehouse/' + this.selectedWarehouse._id + '/orders/' + this.order._id, {
+                        status: 'COMPLETE'
+                    }, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'username': this.$store.state.user.username,
+                        }
+                    })
+                    .then((res) => {
+                        console.log("Server response: ", res);
+    
+                    })
+                    .catch(function(error) {
+                        console.error("Error adding document: ", error);
+                    });
+                
+                setTimeout(() => {
+                    this.order = null
+                    this.completed = true
+                    this.loading = false
+                }, 1000)
             }
         },
 
