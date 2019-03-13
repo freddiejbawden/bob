@@ -6,4 +6,9 @@
     <color name="white">#FFFFFF</color>
     <color name="selectHighlight">#E0F2F1</color>
     <color name="fadedBackground">#33000000</color>
+    <color name="statusPending">#FFDD57</color>
+    <color name="statusInTransit">#0053FF</color>
+    <color name="statusCanceled">#FF3860</color>
+    <color name="statusReady">#23D160</color>
+    <color name="statusComplete">#CCC</color>
 </resources>

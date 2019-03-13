@@ -2,11 +2,11 @@
 import traceback
 #check that the robot packages are present
 print("Starting Client")
-print("Using API level v1")
+print("Using API level v3")
 ev3_package_check = True
 try:
     import ev3dev.ev3 as ev3
-    from followLineServer import FollowLine
+    from robot_software.followLine import FollowLine
     print("ev3 modules imported")
 except:
     traceback.print_exc()
@@ -16,13 +16,11 @@ import requests
 print("request imported")
 import socket
 print("socket imported")
-import struct
 print("struct imported")
 import time
 print("time imported")
 import sys
 print("sys imported")
-import datetime
 print("datetime imported")
 import json
 print("json imported")
@@ -30,6 +28,10 @@ from threading import Thread
 print("threading imported")
 from zeroconf import ServiceBrowser, Zeroconf
 print("zeroconf imported")
+from bobTranslation import extract
+print("bobTranslation imported")
+from followPath import FollowPath
+print("followPath imported")
 #remove me
 
 last_json = {}
@@ -42,17 +44,19 @@ def polling(ip_addr, port, run_robot,username):
     while running:
         try:
             headers = {'username':username}
-            r = requests.get("http://{}:{}/robotjob".format(ip_addr,port),headers=headers)
+            r = requests.get("http://{}:{}/api/robotjob".format(ip_addr,port),headers=headers)
             path = json.loads(r.text)
-            if (path["job"] == []):
+            if path["job"] == []:
                 print("No order")
             else:
                 print(path['job'])
-                #TODO: pass to robot
+                path_tuples = extract(path['job']['instruction_set'])
+                print("Path tuples: ", path_tuples)
+                robot_boy = FollowPath()
+                robot_boy.start(path_tuples)
             
         except:
-            url = "http://{}:{}/getmovement".format(ip_addr,port)
-            print("GET request: {} failed at {}".format(url,datetime.datetime.now()))
+            
             traceback.print_exc()
 
         time.sleep(5)
@@ -73,19 +77,19 @@ class MyListener:
             try:
                 base_url = "http://{}:{}".format(ip_addr,port)
                 
-                r = requests.get("http://{}:{}/ping".format(ip_addr, port))
+                r = requests.get("http://{}:{}/api/ping".format(ip_addr, port))
                 # wait for response
                 if (r.text == "pong"):
                     print("Server running on {}:{}".format(ip_addr,port))
                     username = "bob_test"
                     body = {'username':username,'type':'robot'}
-                    r = requests.post('http://{}:{}/register'.format(ip_addr,port),json=body)
+                    r = requests.post('http://{}:{}/api/register'.format(ip_addr,port),json=body)
                     if (json.loads(r.text)["success"]):
                         print('Registered bob_test')
                     else:
                         print(r.text)
                     
-                    r = requests.get('http://{}:{}/robot'.format(ip_addr,port),headers={'username':'bob_test'})
+                    r = requests.get('http://{}:{}/api/robot'.format(ip_addr,port),headers={'username':'bob_test'})
                     print(r.text)
                     if (self.run_robot):
                         ev3.Sound.tone([(1000, 250, 0),(1500, 250, 0),(2000, 250, 0)]).wait()

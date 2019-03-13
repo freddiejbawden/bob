@@ -48,6 +48,7 @@
                                         {'has-text-warning': order.status == 'PENDING'},
                                         {'has-text-info': order.status == 'IN_TRANSIT'},
                                         {'has-text-success': order.status == 'COMPLETE'},
+                                        {'has-text-success': order.status == 'READY_TO_COLLECT'},
                                         {'has-text-danger': order.status == 'CANCELED'},
                                     ]">
                                         <b>{{ order.status }}</b>
@@ -62,6 +63,15 @@
                     <h3 class="has-text-centered m30-0" v-else>
                         No orders have been placed.
                     </h3>
+                </div>
+
+                <div class="is-flex justify-center p20-0" v-if="selectedWarehouse && orders.length > 0">
+                    <nuxt-link
+                        to="/merchant/scan"
+                        class="button is-primary">
+
+                        <span>Scan an order</span>
+                    </nuxt-link>
                 </div>
             </div>
         </section>
@@ -94,7 +104,7 @@ export default {
         },
         getWarehouses () {
             axios.
-                get('http://localhost:9000/warehouse/', {
+                get(process.env.baseUrl + '/api/warehouse/', {
                     headers: {
                         'Content-Type': 'application/json'
                     }
@@ -113,7 +123,7 @@ export default {
         },
         getOrders: function (id) {
             axios.
-                get('http://localhost:9000/warehouse/' + id + '/orders', {
+                get(process.env.baseUrl + '/api/warehouse/' + id + '/orders', {
                     headers: {
                         'Content-Type': 'application/json',
                         'username': this.$store.state.user.username

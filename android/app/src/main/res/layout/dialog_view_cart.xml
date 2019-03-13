@@ -3,7 +3,7 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools" style="@style/Widget.MaterialComponents.CardView"
-        android:layout_width="300dp"
+        android:layout_width="350dp"
         android:layout_height="wrap_content"
         app:cardElevation="8dp">
     <RelativeLayout
@@ -17,6 +17,19 @@
                 android:text="Shopping Cart"
                 android:layout_margin="8dp"
         />
+        <ImageButton
+                android:id="@+id/clear"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="0dp"
+                android:layout_alignParentEnd="true"
+                android:paddingLeft="12dp"
+                android:paddingRight="12dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:src="@drawable/ic_delete_black_24dp"
+                android:contentDescription="Clear"/>
         <RelativeLayout
                 android:id="@+id/header"
                 android:layout_width="match_parent"

@@ -32,7 +32,8 @@ Change these environment variables before running the server:
 ```bash
 PORT=9000                            # Port the server will run on.
 MONGO=mongodb://localhost:27017/db   # URL of the mongo instance
-DB=fake                              # Use fake in-memory mongodb instance with pre-defined data in fake_db.json. (Overrides MONGO=...)
+DB=memory                            # Use in-memory mongodb instance (Overrides MONGO=...)
+DATA=fake                            # At startup and upon calls to GET /reset, loads the database with data from fake_db.json instead of empty data.
 ```
 
 ## Documentation

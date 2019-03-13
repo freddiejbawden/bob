@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.card.MaterialCardView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools" style="@style/Widget.MaterialComponents.CardView"
+        android:layout_width="350dp"
+        android:layout_height="wrap_content"
+        app:cardElevation="8dp">
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        <TextView
+                style="@style/TextAppearance.MaterialComponents.Headline6"
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Shopping Cart"
+                android:layout_margin="8dp"
+        />
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Your cart is empty."
+                android:layout_margin="16dp"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@id/title"
+        />
+    </RelativeLayout>
+</android.support.design.card.MaterialCardView>

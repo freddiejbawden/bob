@@ -662,12 +662,15 @@ svg image
         transition: all .3s
         opacity: 0
     &:after
-        content: ""
+        content: "Loading..."
         width: 5%
         height: 2.5rem
         position: absolute
         top: 50%
         left: 50%
+        color: $primary
+        font-weight: bold
+        text-transform: uppercase
         transform: translate(-50%, -50%)
         z-index: 10001
         // background: url('../images/svg/loader.svg') center repeat-x
@@ -1415,3 +1418,23 @@ thead
     
     &:focus
         outline: none
+
+.qrcode-stream
+    display: block !important
+.qrcode-stream__camera
+    width: 100%
+
+
+.qr-loading
+    position: absolute
+    top: 0
+    right: 0
+    bottom: 0
+    left: 0
+    display: flex
+    align-items: center
+    justify-content: center
+
+h3 
+    span, b
+        font-size: inherit

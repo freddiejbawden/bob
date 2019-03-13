@@ -91,9 +91,17 @@
                             </nuxt-link>
                         </div>
                         <div class="navbar-item" v-if="isAuth">
+                            <nuxt-link
+                                to="/merchant/scan"
+                                class="button is-primary is-outlined is-smallish">
+
+                                <span>Collect order</span>
+                            </nuxt-link>
+                        </div>
+                        <div class="navbar-item" v-if="isAuth">
                             <a 
-                                href="Javascript:;" 
-                                class="button is-primary is-outlined is-smallish"
+                                href="javascript:;" 
+                                class="navbar-link"
                                 @click="logout()">
 
                                 <span><i class="mdi mdi-logout"></i></span>
