@@ -48,6 +48,11 @@ class RobotJobListener():
                     print(path)
                     if path['job'] != []:
                         self.job_handler(path['job']['instruction_set'])
+                        headers={'username':'merchant_01'}
+                        url = 'http://{}:{}/api/warehouse/5c755f58bfcf4c592bfd00a6/orders/{}'.format(self.server_info['ip'],self.server_info['port'],path['job']['id'])
+                        update = requests.post(url,headers=headers,json={'status':'READY_TO_COLLECT'})
+                        print(update.text)
+                        print('done - notified')
                 self.retry_timeout = 1
                 sleep(5)
         except KeyboardInterrupt:
@@ -69,7 +74,7 @@ class RobotJobListener():
                 res = self.reliable_grab()
             else:
                 res = self.reliable_send_data(self.ev3_target,str(instruction))
-
+        
     def reliable_grab(self):
         try:
             global thread_manager
