@@ -122,6 +122,9 @@ class WarehouseListActivity : ActivityWithLoginMenu(), OnMapReadyCallback {
         mMap.isMyLocationEnabled = true
         val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         val location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+        if (location == null) {
+            return
+        }
         val latLng = LatLng(location.latitude, location.longitude)
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16f))
     }
