@@ -15,15 +15,20 @@ def listen():
         print('Connected by', addr)
         
         data = conn.recv(1024)
-        if data == b'grab':
+        data = data.decode("utf-8")
+        print(data)
+
+        if data[0] == 'grab':
             print('grab')
-        elif data == b'prepare':
+        elif data[0] == 'prepare':
             print('prepare_grabber')
-        elif data == b'wait_for_bump':
+        elif data[0] == 'wait_for_bump':
             print('wait for bump')
             raw_input()
             print("BUMP!")
-        
+        elif data[0] == 'lift':
+            #trigger lift 
+            print('lifting {}'.format(data[1]))
         conn.sendall(b'done')
         conn.close()
 listen()

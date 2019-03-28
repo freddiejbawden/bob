@@ -51,8 +51,11 @@ class RobotJobListener():
                         headers={'username':'merchant_01'}
                         url = 'http://{}:{}/api/warehouse/5c755f58bfcf4c592bfd00a6/orders/{}'.format(self.server_info['ip'],self.server_info['port'],path['job']['id'])
                         update = requests.post(url,headers=headers,json={'status':'READY_TO_COLLECT'})
-                        print(update.text)
-                        print('done - notified')
+                        while not(json.loads(update.text)['success']):
+                            
+                            time.sleep(5)
+                            update = requests.post(url,headers=headers,json={'status':'READY_TO_COLLECT'})
+                        print('notified')
                 self.retry_timeout = 1
                 sleep(5)
         except KeyboardInterrupt:
@@ -68,7 +71,7 @@ class RobotJobListener():
         for instruction in (instruction_set):
             command = instruction['command']
             res = None
-            if command == "lift" or command == "drop":
+            if command == "lift":
                 res = self.reliable_send_data(self.rasp_target,str(instruction))
             elif command == "grab":
                 res = self.reliable_grab()
@@ -145,5 +148,5 @@ class RobotJobListener():
 
 
 
-#rjr = RobotJobListener(('192.168.105.38',9000),('192.168.105.38',65432),('192.168.105.38',65433))
-#rjr.start_reliable_listener('robot')
+rjr = RobotJobListener(('192.168.105.38',9000),('192.168.105.38',65432),('192.168.105.38',65433))
+rjr.start_reliable_listener('robot')

@@ -1,13 +1,15 @@
 #! /usr/bin/env python3
-
+import sys
 import socket
-from followPath import FollowPath
-from bobTranslation import extract
-from followLine import FollowLine
-import ev3dev.ev3 as ev3
+if sys.argv[0] == 1:
+
+    from followPath import FollowPath
+    from bobTranslation import extract
+    from followLine import FollowLine
+    import ev3dev.ev3 as ev3
+
 import json
  # Get local machine name
-
 
 PORT = 65433 # Port to listen on (non-privileged ports are > 1023)
 
@@ -33,16 +35,18 @@ while True:
         #MoveIn()
 
         if str_instruction == 'move_in':
-
-            line_follower = FollowLine()
-            line_follower.move_toward_shelf()
+            if sys.argv[0] == 1:
+                line_follower = FollowLine()
+                line_follower.move_toward_shelf()
         elif str_instruction == 'move_out':
             print('inb')
-            line_follower = FollowLine()
-            line_follower.move_away_from_shelf()
+            if sys.argv[0] == 1:
+                line_follower = FollowLine()
+                line_follower.move_away_from_shelf()
         elif str_instruction == 'stop_shelf':
-            line_follower = FollowLine()
-            line_follower.stop()
+            if sys.argv[0] == 1:
+                line_follower = FollowLine()
+                line_follower.stop()
             #stop moving in
     
 
