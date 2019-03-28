@@ -31,8 +31,7 @@ while True:
         str_instruction = str_instruction.replace('\'', '\"')
         str_instruction = str_instruction.replace('u\"', '\"')
         print(str_instruction)
-        #TODO: fix follow path so that it can move in or make a new function to handle it.
-        #MoveIn()
+       
 
         if str_instruction == 'move_in':
             if sys.argv[0] == 1:
@@ -47,15 +46,6 @@ while True:
             if sys.argv[0] == 1:
                 line_follower = FollowLine()
                 line_follower.stop()
-            #stop moving in
-    
-
-        #else:
-        #    robot = FollowPath()
-        #    robot.start([extract(json.loads(str_instruction))])
-
-
-
         print('done')
         conn.sendall(b'done')
         conn.close()

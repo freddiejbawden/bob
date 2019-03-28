@@ -40,11 +40,12 @@ generate_drop_instruction = () => {
         command: 'drop'
     }
 }
-generate_grab_instruction = () => {
+generate_grab_instruction = (height) => {
     return {
-        command: 'grab',
-        parameters: {}
-    }
+            command: 'grab',
+            parameters: {'height':height}
+        }
+    
 }
 
 generate_lift_instruction = (start, end) => {
@@ -98,7 +99,7 @@ convert_order_to_job = (order, robot, warehouse_grid) => {
     var robot_xy = [robot_pos['x'], robot_pos['y'], robot_pos['z']]
     for (var i = 0; i < item_list.length; i++) {
         var current_item = item_list[i]['position']
-        var item_xy = [current_item['x'], current_item['y'], robot_pos['z']]
+        var item_xy = [current_item['x'], current_item['y'], current_item['z']]
 
         var path = pathfind_to_point(robot_xy, item_xy, warehouse_grid)
         if (path == [] || path == undefined) {
@@ -111,7 +112,7 @@ convert_order_to_job = (order, robot, warehouse_grid) => {
         if (robot_xy[2] != item_xy[2]) {
             job['instruction_set'].push(generate_lift_instruction(robot_xy[2], item_xy[2]))
         }
-        job['instruction_set'].push(generate_grab_instruction())
+        job['instruction_set'].push(generate_grab_instruction(item_xy[2]))
         // return home
         for (var p = path.length - 1; p > 0; p--) {
             job['instruction_set'].push(generate_movement_instruction(path[p], path[p - 1]))

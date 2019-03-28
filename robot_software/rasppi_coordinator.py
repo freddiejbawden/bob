@@ -45,14 +45,13 @@ class RobotJobListener():
                 path = json.loads(r.text)
                 print(path)
                 if path['success'] != False:
-                    print(path)
+                    
                     if path['job'] != []:
                         self.job_handler(path['job']['instruction_set'])
                         headers={'username':'merchant_01'}
                         url = 'http://{}:{}/api/warehouse/5c755f58bfcf4c592bfd00a6/orders/{}'.format(self.server_info['ip'],self.server_info['port'],path['job']['id'])
                         update = requests.post(url,headers=headers,json={'status':'READY_TO_COLLECT'})
                         while not(json.loads(update.text)['success']):
-                            
                             time.sleep(5)
                             update = requests.post(url,headers=headers,json={'status':'READY_TO_COLLECT'})
                         print('notified')
@@ -68,17 +67,18 @@ class RobotJobListener():
     def job_handler(self,instruction_set):
         # TODO, open this on a new thread
         i = 0
+        
         for instruction in (instruction_set):
+            print(instruction)
             command = instruction['command']
             res = None
-            if command == "lift":
-                res = self.reliable_send_data(self.rasp_target,str(instruction))
-            elif command == "grab":
-                res = self.reliable_grab()
+          
+            if command == "grab":
+                res = self.reliable_grab(instruction["parameters"]['height'])
             else:
                 res = self.reliable_send_data(self.ev3_target,str(instruction))
         
-    def reliable_grab(self):
+    def reliable_grab(self,height):
         try:
             global thread_manager
             thread_manager['bumped'] = False
@@ -91,7 +91,9 @@ class RobotJobListener():
             print('bump!')
             thread_manager['bumped'] = True
             #self.reliable_send_data(self.ev3_target,"stop_shelf")
+            self.reliable_send_data(self.rasp_target,"lift {}".format(height))
             self.reliable_send_data(self.rasp_target,"grab")
+            self.reliable_send_data(self.rasp_target,"lift 0")
             self.reliable_send_data(self.ev3_target,"move_out")
             return
         except KeyboardInterrupt:

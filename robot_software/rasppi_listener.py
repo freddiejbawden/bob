@@ -1,5 +1,5 @@
 import socket
-
+import json
 
 def listen():
     PORT = 65432 # Port to listen on (non-privileged ports are > 1023)
@@ -15,9 +15,8 @@ def listen():
         print('Connected by', addr)
         
         data = conn.recv(1024)
-        data = data.decode("utf-8")
-        print(data)
-
+        data = data.decode('utf-8')
+        data = data.split(' ')
         if data[0] == 'grab':
             print('grab')
         elif data[0] == 'prepare':
@@ -27,8 +26,8 @@ def listen():
             raw_input()
             print("BUMP!")
         elif data[0] == 'lift':
-            #trigger lift 
-            print('lifting {}'.format(data[1]))
+            print('lift to {}'.format(data[1]))
+        
         conn.sendall(b'done')
         conn.close()
 listen()
