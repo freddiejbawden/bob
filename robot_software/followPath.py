@@ -14,7 +14,7 @@ class FollowPath:
     def __init__(self):
         self.shut_down = False
         self.runner = None
-        self.last_direction = 'forward' # saves previous direction Bob moved in
+        self.last_direction = '' # saves previous direction Bob moved in
 
     def go(self, path):
         print(path)

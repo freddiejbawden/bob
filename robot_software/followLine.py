@@ -163,15 +163,22 @@ class FollowLine:
 
         while not self.shut_down:
             # if a colour sensor is on a blue line, correct position to be between them again
+            if direction == 'left':
+                right_speed = self.SIDEWAYS_SPEED/2.0
+                left_speed = self.SIDEWAYS_SPEED
+            else:
+                right_speed = self.SIDEWAYS_SPEED
+                left_speed = self.SIDEWAYS_SPEED / 2.0
             if self.detect_marking(self.csbl.value(), self.csbr.value(), self.BLUE):
                 # back sensors on blue line, so move forward for some time
-                self.lm.run_timed(time_sp=self.CORRECTION_TIME, speed_sp=-self.SIDEWAYS_SPEED)
-                self.rm.run_timed(time_sp=self.CORRECTION_TIME, speed_sp=-self.SIDEWAYS_SPEED)
+                self.lm.run_timed(time_sp=self.CORRECTION_TIME, speed_sp=-left_speed)
+                self.rm.run_timed(time_sp=self.CORRECTION_TIME, speed_sp=-right_speed)
                 sleep(self.CORRECTION_TIME / 1000)
             if self.detect_marking(self.csfl.value(), self.csfr.value(), self.BLUE):
                 # front sensors on blue line, so move backward for some time
-                self.lm.run_timed(time_sp=self.CORRECTION_TIME, speed_sp=self.SIDEWAYS_SPEED)
-                self.rm.run_timed(time_sp=self.CORRECTION_TIME, speed_sp=self.SIDEWAYS_SPEED)
+
+                self.lm.run_timed(time_sp=self.CORRECTION_TIME, speed_sp=left_speed)
+                self.rm.run_timed(time_sp=self.CORRECTION_TIME, speed_sp=right_speed)
                 sleep(self.CORRECTION_TIME / 1000)
 
             # colour sensor for marking detection needs to be at front or back dependng on the last direction
@@ -230,6 +237,7 @@ class FollowLine:
         self.cm.run_timed(time_sp=1000, speed_sp=self.SIDEWAYS_SPEED)
         sleep(1)
         #if self.detect_marking(self.csbl.value(), self.csbl.value(), self.BLACK):
+        # if self.detect_marking(self.csbl.value(), self.csbl.value(), self.BLACK):
         return
 
     def stop_shelf_movement(self):
