@@ -39,8 +39,13 @@ class FollowPath:
                     self.last_direction = direction
             else:
                 # not a valid direction for colour sensors
-                if direction == 'G':
+                if direction == 'in':
                     ev3.Sound.speak("Scoopdidoop").wait()
+                    line_follower.move_toward_shelf()
+                elif direction == 'out':
+                    line_follower.move_toward_shelf()
+                elif direction == 'stop':
+                    line_follower.stop_shelf_movement()
                 else:
                     ev3.Sound.speak("Wrong command given. What does", direction, "mean?").wait()
         line_follower.stop()

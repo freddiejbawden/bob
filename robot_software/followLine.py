@@ -19,7 +19,7 @@ class FollowLine:
     GREEN = 3  # green reading from colour sensor in COL-COLOR mode
 
     CORRECTION_TIME = 100  # time in millisecond Bob moves away from blue line to correct sideways movement
-    SIDEWAYS_SPEED = 800  # how fast Bob moves when moving sideways
+    SIDEWAYS_SPEED = 400  # how fast Bob moves when moving sideways
 
     # Constructor
     def __init__(self):

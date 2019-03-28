@@ -8,7 +8,7 @@ import time
 from threading import Thread
 from time import sleep
 from bobTranslation import extract
-
+from rasppi_listener import listen
 thread_manager = {'bumped':False}
 
 class RobotJobListener():
@@ -90,7 +90,7 @@ class RobotJobListener():
             self.reliable_send_data(self.rasp_target,"wait_for_bump")
             print('bump!')
             thread_manager['bumped'] = True
-            #self.reliable_send_data(self.ev3_target,"stop_shelf")
+            self.reliable_send_data(self.ev3_target,"stop_shelf")
             self.reliable_send_data(self.rasp_target,"lift {}".format(height))
             self.reliable_send_data(self.rasp_target,"grab")
             self.reliable_send_data(self.rasp_target,"lift 0")
@@ -148,7 +148,3 @@ class RobotJobListener():
             print('error')
             return -1
 
-
-
-rjr = RobotJobListener(('192.168.105.38',9000),('192.168.105.38',65432),('192.168.105.38',65433))
-rjr.start_reliable_listener('robot')

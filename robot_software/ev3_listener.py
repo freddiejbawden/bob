@@ -1,51 +1,53 @@
 #! /usr/bin/env python3
 import sys
 import socket
-if sys.argv[0] == 1:
 
-    from followPath import FollowPath
-    from bobTranslation import extract
-    from followLine import FollowLine
-    import ev3dev.ev3 as ev3
+from followPath import FollowPath
+from bobTranslation import extract
+from followLine import FollowLine
+import ev3dev.ev3 as ev3
 
 import json
  # Get local machine name
+class EV3Listener:
+    def __init__(self):
+        self.path_follower = FollowPath()
+    def get_instructions(self):
+        PORT = 65433 # Port to listen on (non-privileged ports are > 1023)
 
-PORT = 65433 # Port to listen on (non-privileged ports are > 1023)
+        s= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        HOST  = socket.gethostbyname(socket.gethostname())
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        s.bind((HOST, PORT))
+        print("Listening on {}:{}".format(HOST,PORT))
+        #ev3.Sound.tone([(1000, 250, 0),(1500, 250, 0),(2000, 250, 0)]).wait()
+        while True:
+            s.listen(2)
+            conn, addr = s.accept()
+            print('Connected by', addr)
 
-s= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-HOST  = socket.gethostbyname(socket.gethostname())
-s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-s.bind((HOST, PORT))
-print("Listening on {}:{}".format(HOST,PORT))
-#ev3.Sound.tone([(1000, 250, 0),(1500, 250, 0),(2000, 250, 0)]).wait()
-while True:
-    s.listen(2)
-    conn, addr = s.accept()
-    print('Connected by', addr)
+            data = conn.recv(1024)
+            if data:
 
-    data = conn.recv(1024)
-    if data:
-
-        str_instruction = data.decode('utf-8')
-        str_instruction = str_instruction.replace('\'', '\"')
-        str_instruction = str_instruction.replace('u\"', '\"')
-        print(str_instruction)
-       
-
-        if str_instruction == 'move_in':
-            if sys.argv[0] == 1:
-                line_follower = FollowLine()
-                line_follower.move_toward_shelf()
-        elif str_instruction == 'move_out':
-            print('inb')
-            if sys.argv[0] == 1:
-                line_follower = FollowLine()
-                line_follower.move_away_from_shelf()
-        elif str_instruction == 'stop_shelf':
-            if sys.argv[0] == 1:
-                line_follower = FollowLine()
-                line_follower.stop()
-        print('done')
-        conn.sendall(b'done')
-        conn.close()
+                str_instruction = data.decode('utf-8')
+                str_instruction = str_instruction.replace('\'', '\"')
+                str_instruction = str_instruction.replace('u\"', '\"')
+                print(str_instruction)
+        
+                if str_instruction == 'move_in':
+                    self.path_follower.go('in')
+                elif str_instruction == 'move_out':
+                   self.path_follower.go('out')
+                elif str_instruction == 'stop_shelf':
+                     self.path_follower.go('stop')
+                else:
+                    try:
+                        movement = json.loads(str_instruction)
+                       self.path_follower.go(extract(movement))
+                    except:
+                        continue
+                print('done')
+                conn.sendall(b'done')
+                conn.close()
+ev3 = EV3Listener()
+ev3.get_instructions()
