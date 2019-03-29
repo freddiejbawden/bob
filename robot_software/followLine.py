@@ -52,7 +52,7 @@ class FollowLine:
         self.start_time = 0  # when robot starts doing a command
         self.marker_counter = 0  # how many markers have been passed in current command
 
-        self.reverse = 1  # 1 if Bob is reversing, -1 if not
+        self.reverse = -1  # -1 if Bob is reversing, 1 if not
 
     def detect_marking(self, colour_left, colour_right, desired_colour):
         # print(colour_left, colour_right)
@@ -132,7 +132,7 @@ class FollowLine:
 
     # move forward
     def run_forward(self, distance, desired_colour):
-        self.reverse = -1
+        self.reverse = 1
         self.start_time = time()
         self.marker_counter = 0
         pid_controller = control.Control(self.DT)
@@ -145,7 +145,7 @@ class FollowLine:
 
     # move backward
     def run_backward(self, distance, desired_colour):
-        self.reverse = 1
+        self.reverse = -1
         self.start_time = time()
         self.marker_counter = 0
         pid_controller = control.Control(self.DT)
