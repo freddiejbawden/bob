@@ -20,7 +20,6 @@ makeWarehouse = (width, height) => {
             walkable_grid[s * 2][i] = 1
         }
     }
-    console.log(walkable_grid)
     return walkable_grid
 }
 
@@ -30,9 +29,7 @@ pathfind_to_point = (current_pos, end_pos, warehouse_grid) => {
    
     var path = finder.findPath(current_pos[0], current_pos[1], end_pos[0], end_pos[1], pf_grid)
     path = PF.Util.compressPath(path)
-    console.log(current_pos)
-    console.log(end_pos)
-    console.log(path)
+    
     return path
 }
 generate_drop_instruction = () => {
@@ -94,10 +91,12 @@ package_items_into_groups = (item_list) => {
         }
     }
     var item_groups = []
-    item_groups.push(sorted_items.large)
+    if (item_groups.length > 0) {
+        item_groups.push(sorted_items.large)
+    }
+   
     for (var i = 0; i < sorted_items.small.length; i+=2) {
         if (i + 1 < sorted_items.small.length) {
-            console.log("here")
             item_groups.push([sorted_items.small[i],sorted_items.small[i+1]])
         } else {
            if (sorted_items.tiny.length >= 1) {
@@ -118,7 +117,6 @@ package_items_into_groups = (item_list) => {
         }
         item_groups.push(to_push)
     }
-    console.log(item_groups)
     return item_groups
 }
  convert_order_to_job = (order, robot, warehouse_grid) => {
@@ -165,7 +163,6 @@ package_items_into_groups = (item_list) => {
         job['instruction_set'].push(generate_drop_instruction())
         robot_xy = [robot_home_xy[0],robot_home_xy[1],0]
     }
-    console.log(job)
     return job
 }
 module.exports.get_robot_path = (order, robot, warehouse) => {
