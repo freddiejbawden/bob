@@ -43,7 +43,7 @@ class EV3Listener:
                 else:
                     try:
                         movement = json.loads(str_instruction)
-                       self.path_follower.go(extract(movement))
+                        self.path_follower.go(extract(movement))
                     except:
                         continue
                 print('done')
