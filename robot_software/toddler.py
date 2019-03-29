@@ -56,16 +56,15 @@ class Toddler:
         global halt
         try:
             PORT = 65432  # Port to listen on (non-privileged ports are > 1023)
-
             self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             #HOST = socket.gethostbyname(socket.gethostname())
             HOST = '192.168.105.139'
             self.s.bind(('192.168.105.139', PORT))
             print("Listening on {}:{}".format(HOST, PORT))
+            
+            self.s.listen(1)
+            conn, addr = s.accept()
             while not(halt['stop']):
-                self.s.listen(1)
-                conn, addr = s.accept()
-
                 print('Connected by', addr)
 
                 data = conn.recv(1024)
@@ -85,8 +84,9 @@ class Toddler:
                     elif int(data[1]) > self.lift_pos:
                         self.lift.lift('up')
                 conn.sendall(b'done')
-                conn.close()
+            conn.close()
         except KeyboardInterrupt:
+            conn.close()
             return
 
     def control(self):

@@ -21,33 +21,31 @@ class EV3Listener:
         s.bind((HOST, PORT))
         print("Listening on {}:{}".format(HOST,PORT))
         ev3.Sound.tone([(1000, 250, 0),(1500, 250, 0),(2000, 250, 0)]).wait()
-        while True:
-            s.listen(2)
-            conn, addr = s.accept()
-            print('Connected by', addr)
-
-            data = conn.recv(1024)
-            if data:
-
-                str_instruction = data.decode('utf-8')
-                str_instruction = str_instruction.replace('\'', '\"')
-                str_instruction = str_instruction.replace('u\"', '\"')
-                print(str_instruction)
-        
-                if str_instruction == 'move_in' or str_instruction == 'in':
-                    self.path_follower.go('in')
-                elif str_instruction == 'move_out'or str_instruction == 'in':
-                   self.path_follower.go('out')
-                elif str_instruction == 'stop_shelf':
-                     self.path_follower.go('stop')
-                else:
-                    
-                    movement = json.loads(str_instruction)
-                    print(type(extract(movement)))
-                    self.path_follower.go([extract(movement)])
-                    
-                print('done')
-                conn.sendall(b'done')
-                conn.close()
+        s.listen(2)
+        conn, addr = s.accept()
+        print('Connected by', addr)
+        try:
+            while True:
+                data = conn.recv(1024)
+                if data:
+                    str_instruction = data.decode('utf-8')
+                    str_instruction = str_instruction.replace('\'', '\"')
+                    str_instruction = str_instruction.replace('u\"', '\"')
+                    print(str_instruction)
+            
+                    if str_instruction == 'move_in' or str_instruction == 'in':
+                        self.path_follower.go('in')
+                    elif str_instruction == 'move_out'or str_instruction == 'in':
+                    self.path_follower.go('out')
+                    elif str_instruction == 'stop_shelf':
+                        self.path_follower.go('stop')
+                    else:
+                        movement = json.loads(str_instruction)
+                        print(type(extract(movement)))
+                        self.path_follower.go([extract(movement)])
+                    print('done')
+                    conn.sendall(b'done')
+        except KeyboardInterrupt:
+            conn.close()
 ev3 = EV3Listener()
 ev3.get_instructions()

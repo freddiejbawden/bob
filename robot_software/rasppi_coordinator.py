@@ -21,6 +21,10 @@ class RobotJobListener():
         self.socket_listener = None
         self.retry_timeout = 1
         self.max_timeout = 16
+        self.rasp_pi_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.rasp_pi_socket.connect((rasp_info[0], rasp_info[1]))
+        self.ev3_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.ev3_socket.connect((ev3_info[0], ev3_info[1]))
     def start_reliable_listener(self,username):
         try:
             while True:
@@ -67,7 +71,6 @@ class RobotJobListener():
     def job_handler(self,instruction_set):
         # TODO, open this on a new thread
         i = 0
-        
         for instruction in (instruction_set):
             print(instruction)
             command = instruction['command']
@@ -122,29 +125,23 @@ class RobotJobListener():
             return -1
 
     def open_and_send(self, target,payload):
-        HOST = None
-        PORT = None
-        if target == self.rasp_target:
-            HOST = self.rasp_info['ip']
-            PORT = self.rasp_info['port']
-
-        elif target == self.ev3_target:
-            HOST = self.ev3_info['ip']
-            PORT = self.ev3_info['port']
-        print('connecting to {}:{}'.format(HOST,PORT))
-        #convert instruction to payload
         try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.connect((HOST, PORT))
-            s.sendall(str.encode(payload))
-            print("sent, waiting")
-            instruction_ack = s.recv(1024)
-            while instruction_ack != b'done':
-                    instruction_ack = s.recv(1024)
-            print('done')
-            s.close()
+            if target == self.rasp_target:
+                self.rasp_pi_socket.sendall(str.encode(payload))
+                instruction_ack =  self.rasp_pi_socket.recv(1024)
+                while instruction_ack != b'done':
+                        instruction_ack =  self.rasp_pi_socket.recv(1024)
+                print('done')
+            
+            elif target == self.ev3_target:
+                self.ev3_socket.sendall(str.encode(payload))        
+                print("sent, waiting")
+                instruction_ack =  self.ev3_socket.recv(1024)
+                while instruction_ack != b'done':
+                        instruction_ack =  self.ev3_socket.recv(1024)
+                print('done')
             return 0
         except socket.error:
-            print('error')
+            print('Error sending to {}'.format(target))
             return -1
 
