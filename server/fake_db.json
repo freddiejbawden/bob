@@ -100,7 +100,7 @@
             "unit": "kg",
             "price": 1.35,
             "warehouseId": "5c755f58bfcf4c592bfd00a6",
-            "size":"small"
+            "size":"tiny"
         },
         {
             "_id": "5c7565f7a29bee5b5b8a5428",
