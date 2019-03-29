@@ -120,6 +120,7 @@ package_items_into_groups = (item_list) => {
     return item_groups
 }
  convert_order_to_job = (order, robot, warehouse_grid) => {
+    console.log(warehouse_grid)
     if (order == undefined) {
         return {}
     }

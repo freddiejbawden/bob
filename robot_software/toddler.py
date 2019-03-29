@@ -8,6 +8,7 @@ from threading import Thread
 from iotools import IOTools
 from grabber import Grabber
 from rasppi_coordinator import RobotJobListener
+from rasppi_listener import listen
 
 class Logger(object):
     def __init__(self, onRobot):
@@ -27,7 +28,7 @@ class Logger(object):
     def flush(self):
         pass
 
-halt = {'sop':False}
+halt = {'stop':False}
 
 class Toddler:
 
@@ -43,22 +44,26 @@ class Toddler:
         self.mc.stopMotors()
         self.sc = IO.servo_control
         self.grabber = Grabber(self.mc, self.MOTOR_PORT, self.sc)
+        self.lift = Lift()
+        self.lift_pos = 0
+        self.s = None
         #self.mc.setMotor(self.MOTOR_PORT, 100)
         #time.sleep(3)
         #self.mc.stopMotors()
-
+    def kill_socket(self):
+        s.close()
     def listen(self):
         global halt
         try:
             PORT = 65432  # Port to listen on (non-privileged ports are > 1023)
 
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             #HOST = socket.gethostbyname(socket.gethostname())
             HOST = '192.168.105.139'
-            s.bind(('192.168.105.139', PORT))
+            self.s.bind(('192.168.105.139', PORT))
             print("Listening on {}:{}".format(HOST, PORT))
-            while not(halt['sop']):
-                s.listen(1)
+            while not(halt['stop']):
+                self.s.listen(1)
                 conn, addr = s.accept()
 
                 print('Connected by', addr)
@@ -75,7 +80,10 @@ class Toddler:
                         print("Wait for bump")
                     print("bump")
                 elif data[0] == 'lift':
-                    print('lift to {}'.format(data[1]))
+                    if int(data[1]) < self.lift_pos:
+                        self.lift.lift('down')
+                    elif int(data[1]) > self.lift_pos:
+                        self.lift.lift('up')
                 conn.sendall(b'done')
                 conn.close()
         except KeyboardInterrupt:
@@ -93,7 +101,7 @@ class Toddler:
             # start pinging the server
             # server, rasppi, ev3
         except KeyboardInterrupt:
-            halt['sop'] = True
+            halt['stop'] = True
             return
 
     def vision(self):
@@ -107,5 +115,8 @@ if __name__ == '__main__':
     onRobot = bool(sys.argv.count('-rss'))
     sys.stdout = Logger(onRobot)
     sys.stderr = sys.stdout
-    t = Toddler(onRobot)
-    t.control()
+    try:
+        t = Toddler(onRobot)
+        t.control()
+    except KeyboardInterrupt:
+        t.kill_socket()

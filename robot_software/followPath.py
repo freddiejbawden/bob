@@ -37,7 +37,10 @@ class FollowPath:
                     line_follower.set_cs_modes(direction)
                     line_follower.run_sideways(distance, direction, self.last_direction)
                     self.last_direction = direction
+                else:
+                    print("oh no")
             else:
+                print("here")
                 # not a valid direction for colour sensors
                 if direction == 'in':
                     ev3.Sound.speak("Scoopdidoop").wait()

@@ -6,7 +6,7 @@ import control
 
 class FollowLine:
     # From https://gist.github.com/CS2098/ecb3a078ed502c6a7d6e8d17dc095b48
-    MOTOR_SPEED = 700
+    MOTOR_SPEED = 1000
     DT = 50  # milliseconds  -  represents change in time since last sensor reading/
 
 
@@ -19,7 +19,7 @@ class FollowLine:
     GREEN = 3  # green reading from colour sensor in COL-COLOR mode
 
     CORRECTION_TIME = 100  # time in millisecond Bob moves away from blue line to correct sideways movement
-    SIDEWAYS_SPEED = 600   # how fast Bob moves when moving sideways
+    SIDEWAYS_SPEED = 1000   # how fast Bob moves when moving sideways
 
     # Constructor
     def __init__(self):

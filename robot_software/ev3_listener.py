@@ -20,7 +20,7 @@ class EV3Listener:
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         s.bind((HOST, PORT))
         print("Listening on {}:{}".format(HOST,PORT))
-        #ev3.Sound.tone([(1000, 250, 0),(1500, 250, 0),(2000, 250, 0)]).wait()
+        ev3.Sound.tone([(1000, 250, 0),(1500, 250, 0),(2000, 250, 0)]).wait()
         while True:
             s.listen(2)
             conn, addr = s.accept()
@@ -34,18 +34,18 @@ class EV3Listener:
                 str_instruction = str_instruction.replace('u\"', '\"')
                 print(str_instruction)
         
-                if str_instruction == 'move_in':
+                if str_instruction == 'move_in' or str_instruction == 'in':
                     self.path_follower.go('in')
-                elif str_instruction == 'move_out':
+                elif str_instruction == 'move_out'or str_instruction == 'in':
                    self.path_follower.go('out')
                 elif str_instruction == 'stop_shelf':
                      self.path_follower.go('stop')
                 else:
-                    try:
-                        movement = json.loads(str_instruction)
-                        self.path_follower.go(extract(movement))
-                    except:
-                        continue
+                    
+                    movement = json.loads(str_instruction)
+                    print(type(extract(movement)))
+                    self.path_follower.go([extract(movement)])
+                    
                 print('done')
                 conn.sendall(b'done')
                 conn.close()
