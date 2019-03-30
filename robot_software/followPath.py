@@ -23,7 +23,7 @@ class FollowPath:
             if isinstance(p,tuple):
                 direction, distance = p
                 if line_follower.set_cs_modes(direction):
-                    
+
                     # modes set successfully
                     # direction move in forwards axis or side axis
                     if direction == 'forward':
@@ -31,7 +31,7 @@ class FollowPath:
                     elif direction == 'backward':
                         line_follower.run_backward(distance, self.GREEN)
                     elif direction == 'left' or direction == 'right':
-                        if self.last_direction == 'forward': # Bob has to move forward to blue line
+                        if self.last_direction == 'forward':  # Bob has to move forward to blue line
                             line_follower.set_cs_modes('forward')
                             line_follower.run_forward(1, self.BLUE)
                         if self.last_direction == 'backward':  # Bob has to move backward to blue line
@@ -41,7 +41,8 @@ class FollowPath:
                         line_follower.run_sideways(distance, direction, self.last_direction)
                         self.last_direction = direction
                     else:
-                        print("oh no")
+                        print("invalid direction")
+                self.last_direction = direction
             else:
                 print("here")
                 # not a valid direction for colour sensors

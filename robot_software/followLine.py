@@ -183,12 +183,12 @@ class FollowLine:
 
             # colour sensor for marking detection needs to be at front or back dependng on the last direction
             if last_direction == 'forward':
-                cs_left = self.csbr
-                cs_right = self.csbl
-            else:
-                # if last direction is backward, left, or right
                 cs_left = self.csfr
                 cs_right = self.csfl
+            else:
+                # if last direction is backward, left, or right
+                cs_left = self.csbr
+                cs_right = self.csbl
 
             # move sideways for a bit while counting black markings
             if direction == 'left':
@@ -233,12 +233,11 @@ class FollowLine:
         return
 
     def move_away_from_shelf(self):
-
-        self.cm.run_timed(time_sp=1000, speed_sp=self.SIDEWAYS_SPEED)
-        sleep(1)
-        #if self.detect_marking(self.csbl.value(), self.csbl.value(), self.BLACK):
-        # if self.detect_marking(self.csbl.value(), self.csbl.value(), self.BLACK):
-        return
+        # move out until black is seen
+        self.cm.run_timed(time_sp=self.DT, speed_sp=self.SIDEWAYS_SPEED)
+        sleep(self.DT / 1000)
+        if self.detect_marking(self.csbl, self.csbl, self.BLACK):
+            return
 
     def stop_shelf_movement(self):
         self.cm.stop(stop_action='hold')

@@ -20,13 +20,15 @@ class Lift:
             self.mc.setMotor(self.mc_id_a, -self.MC_SPEED)
             self.mc.setMotor(self.mc_id_b, -self.MC_SPEED)
             time.sleep(self.LIFT_TIME)
-            self.mc.stopMotors()
+            self.mc.stopMotor(self.mc_id_a)
+            self.mc.stopMotor(self.mc_id_b)
             time.sleep(1)
         elif direction == 'down':
             self.mc.setMotor(self.mc_id_a, self.MC_SPEED)
             self.mc.setMotor(self.mc_id_b, self.MC_SPEED)
             time.sleep(self.LIFT_TIME/2.0)
-            self.mc.stopMotors()
+            self.mc.stopMotor(self.mc_id_a)
+            self.mc.stopMotor(self.mc_id_b)
             time.sleep(1)
 
 
