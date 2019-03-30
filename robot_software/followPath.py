@@ -19,39 +19,42 @@ class FollowPath:
     def go(self, path):
         print(path)
         line_follower = FollowLine()
-        for direction, distance in path:
-            if line_follower.set_cs_modes(direction):
-                # modes set successfully
-                # direction move in forwards axis or side axis
-                if direction == 'forward':
-                    line_follower.run_forward(distance, self.GREEN)
-                elif direction == 'backward':
-                    line_follower.run_backward(distance, self.GREEN)
-                elif direction == 'left' or direction == 'right':
-                    if self.last_direction == 'forward':  # Bob has to move forward to blue line
-                        line_follower.set_cs_modes('forward')
-                        line_follower.run_forward(1, self.BLUE)
-                    if self.last_direction == 'backward':  # Bob has to move backward to blue line
-                        line_follower.set_cs_modes('backward')
-                        line_follower.run_backward(1, self.BLUE)
-                    line_follower.set_cs_modes(direction)
-                    line_follower.run_sideways(distance, direction, self.last_direction)
-                    self.last_direction = direction
-                else:
-                    print("invalid direction")
+        for p in path:
+            if isinstance(p,tuple):
+                direction, distance = p
+                if line_follower.set_cs_modes(direction):
+
+                    # modes set successfully
+                    # direction move in forwards axis or side axis
+                    if direction == 'forward':
+                        line_follower.run_forward(distance, self.GREEN)
+                    elif direction == 'backward':
+                        line_follower.run_backward(distance, self.GREEN)
+                    elif direction == 'left' or direction == 'right':
+                        if self.last_direction == 'forward':  # Bob has to move forward to blue line
+                            line_follower.set_cs_modes('forward')
+                            line_follower.run_forward(1, self.BLUE)
+                        if self.last_direction == 'backward':  # Bob has to move backward to blue line
+                            line_follower.set_cs_modes('backward')
+                            line_follower.run_backward(1, self.BLUE)
+                        line_follower.set_cs_modes(direction)
+                        line_follower.run_sideways(distance, direction, self.last_direction)
+                        self.last_direction = direction
+                    else:
+                        print("invalid direction")
                 self.last_direction = direction
             else:
                 print("here")
                 # not a valid direction for colour sensors
-                if direction == 'in':
-                    ev3.Sound.speak("Scoopdidoop").wait()
+                if p == 'in':
+                    #ev3.Sound.speak("Scoopdidoop").wait()
                     line_follower.move_toward_shelf()
-                elif direction == 'out':
+                elif p == 'out':
                     line_follower.move_away_from_shelf()
-                elif direction == 'stop':
+                elif p == 'stop':
                     line_follower.stop_shelf_movement()
                 else:
-                    ev3.Sound.speak("Wrong command given. What does", direction, "mean?").wait()
+                    print("Wrong command given. What does", p, "mean?")
         line_follower.stop()
 
 
@@ -60,6 +63,7 @@ class FollowPath:
         self.shut_down = False
         print(path)
         if len(path) == 0:
-            ev3.Sound.speak("No instructions given").wait()
+            print('no instructions!')
+            #ev3.Sound.speak("No instructions given").wait()
         else:
             self.go(path)

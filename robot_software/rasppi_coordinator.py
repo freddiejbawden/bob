@@ -21,15 +21,17 @@ class RobotJobListener():
         self.socket_listener = None
         self.retry_timeout = 1
         self.max_timeout = 16
-        self.rasp_pi_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.rasp_pi_socket.connect((rasp_info[0], rasp_info[1]))
         self.ev3_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.ev3_socket.connect((ev3_info[0], ev3_info[1]))
+        print("Ev3 socket connected")
+        self.rasp_pi_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.rasp_pi_socket.connect((rasp_info[0], rasp_info[1]))
+        print("Rasp Pi socket connected")
+        
     def start_reliable_listener(self,username):
         try:
             while True:
                 res = self.listen_to_server(username)
-                print("RES {}".format(res))
                 if res == -2:
                     break
                 elif res == -1:
@@ -38,8 +40,13 @@ class RobotJobListener():
                     print("Failed to connect, retrying in {} seconds".format(self.retry_timeout))
                     time.sleep(self.retry_timeout)
         except KeyboardInterrupt:
+            
             print("STOP!!!!!")
             return
+        finally:
+            self.ev3_socket.sendall(str.encode("FIN"))
+            self.ev3_socket.close()
+            self.rasp_pi_socket.close()
     def listen_to_server(self,username):
         try:
             while True:
@@ -58,7 +65,6 @@ class RobotJobListener():
                         while not(json.loads(update.text)['success']):
                             time.sleep(5)
                             update = requests.post(url,headers=headers,json={'status':'READY_TO_COLLECT'})
-                        print('notified')
                 self.retry_timeout = 1
                 sleep(5)
         except KeyboardInterrupt:
@@ -84,20 +90,23 @@ class RobotJobListener():
     def reliable_grab(self,height):
         try:
             global thread_manager
-            thread_manager['bumped'] = False
+            self.reliable_send_data(self.rasp_target,"lift {}".format(height))
             self.reliable_send_data(self.rasp_target,"prepare")
+            thread_manager['bumped'] = False
             move_in_thread = Thread(target = self.move_until_bump)
             move_in_thread.daemon = True
             move_in_thread.start()
-
+            
             self.reliable_send_data(self.rasp_target,"wait_for_bump")
             print('bump!')
             thread_manager['bumped'] = True
+            
             self.reliable_send_data(self.ev3_target,"stop_shelf")
-            self.reliable_send_data(self.rasp_target,"lift {}".format(height))
+            
             self.reliable_send_data(self.rasp_target,"grab")
-            self.reliable_send_data(self.rasp_target,"lift 0")
             self.reliable_send_data(self.ev3_target,"move_out")
+            self.reliable_send_data(self.rasp_target,"lift 0")
+
             return
         except KeyboardInterrupt:
             thread_manager['bumped'] = True
@@ -120,6 +129,7 @@ class RobotJobListener():
                         self.retry_timeout = self.retry_timeout * 2
                     time.sleep(self.retry_timeout)
                 else:
+                    time.sleep(1)
                     return 0
         except KeyboardInterrupt:
             return -1
@@ -135,7 +145,7 @@ class RobotJobListener():
             
             elif target == self.ev3_target:
                 self.ev3_socket.sendall(str.encode(payload))        
-                print("sent, waiting")
+                print("sent to ev3")
                 instruction_ack =  self.ev3_socket.recv(1024)
                 while instruction_ack != b'done':
                         instruction_ack =  self.ev3_socket.recv(1024)

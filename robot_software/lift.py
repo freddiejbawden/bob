@@ -5,14 +5,13 @@ import sys
 
 class Lift:
     MC_SPEED = 100
-    LIFT_TIME = 5
+    LIFT_TIME = 14
     # use ports 2 and 3
     mc_id_a = 2
     mc_id_b = 3
 
-    def __init__(self, onRobot):
-        IO = IOTools(True)
-        self.mc = IO.motor_control
+    def __init__(self,onRobot, mc):
+        self.mc = mc
         self.mc.stopMotors()
 
     def lift(self, direction):
