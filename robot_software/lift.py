@@ -10,9 +10,8 @@ class Lift:
     mc_id_a = 2
     mc_id_b = 3
 
-    def __init__(self, onRobot):
-        IO = IOTools(True)
-        self.mc = IO.motor_control
+    def __init__(self,onRobot, mc):
+        self.mc = mc
         self.mc.stopMotors()
 
     def lift(self, direction):

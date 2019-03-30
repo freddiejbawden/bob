@@ -7,6 +7,7 @@ import socket
 from threading import Thread
 from iotools import IOTools
 from grabber import Grabber
+from lift import Lift
 from rasppi_coordinator import RobotJobListener
 from rasppi_listener import listen
 
@@ -43,8 +44,11 @@ class Toddler:
         self.mc = IO.motor_control
         self.mc.stopMotors()
         self.sc = IO.servo_control
+        self.sc.engage()
         self.grabber = Grabber(self.mc, self.MOTOR_PORT, self.sc)
-        self.lift = Lift()
+        self.grabber.cycle_grabber()
+        self.lift = Lift(onRobot,self.mc)
+     
         self.lift_pos = 0
         self.s = None
         #self.mc.setMotor(self.MOTOR_PORT, 100)
@@ -63,26 +67,32 @@ class Toddler:
             print("Listening on {}:{}".format(HOST, PORT))
             
             self.s.listen(1)
-            conn, addr = s.accept()
+            conn, addr = self.s.accept()
             while not(halt['stop']):
-                print('Connected by', addr)
-
+        
                 data = conn.recv(1024)
                 data = data.decode('utf-8')
                 data = data.split(' ')
-                if data == 'grab':
+                print("Listen: " + data[0])
+                if data[0] == 'grab':
                     self.grabber.grab()
-                elif data == 'prepare':
+                elif data[0] == 'prepare':
                     self.grabber.prepare_grabber()
-                elif data == 'wait_for_bump':
-                    while(self.getInputs()[0] == 0 or self.getInputs()[1] == 0):
-                        print("Wait for bump")
+                elif data[0] == 'wait_for_bump':
+                    inp = self.getInputs()
+                    while(inp[0] == 0 or inp[1] == 0):
+                       print(inp)
                     print("bump")
                 elif data[0] == 'lift':
                     if int(data[1]) < self.lift_pos:
+                        print('down')
                         self.lift.lift('down')
                     elif int(data[1]) > self.lift_pos:
+                        print('up')
                         self.lift.lift('up')
+                    self.lift_pos = int(data[1])
+                    time.sleep(0.5)
+                print("Listen done")
                 conn.sendall(b'done')
             conn.close()
         except KeyboardInterrupt:
@@ -91,19 +101,22 @@ class Toddler:
 
     def control(self):
         global halt
+        
         try:
             thread = Thread(target=self.listen)
             thread.daemon = True
             thread.start()
-
-            rjr = RobotJobListener(('192.168.105.38',9000),('192.168.105.139',65432),('192.168.105.94',65433))
+            print("here")
+            rjr = RobotJobListener(('192.168.105.38',9000),('192.168.105.139',65432),('192.168.105.38',65433))
             rjr.start_reliable_listener('robot')
             # start pinging the server
             # server, rasppi, ev3
         except KeyboardInterrupt:
             halt['stop'] = True
+            self.sc.disengage()
             return
-
+        
+         
     def vision(self):
         # image = self.camera.getFrame()
         # self.camera.imshow('Camera', image)
@@ -119,4 +132,5 @@ if __name__ == '__main__':
         t = Toddler(onRobot)
         t.control()
     except KeyboardInterrupt:
+        
         t.kill_socket()

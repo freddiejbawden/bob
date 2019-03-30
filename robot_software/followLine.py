@@ -247,4 +247,4 @@ class FollowLine:
         self.shut_down = True
         self.rm.stop()
         self.lm.stop()
-        ev3.Sound.speak("whack").wait()
+        #ev3.Sound.speak("whack").wait()
