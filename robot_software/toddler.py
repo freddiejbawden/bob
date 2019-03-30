@@ -48,6 +48,7 @@ class Toddler:
         self.grabber = Grabber(self.mc, self.MOTOR_PORT, self.sc)
         self.grabber.cycle_grabber()
         self.lift = Lift(onRobot,self.mc)
+      
         #self.lift.lift('down')
         self.lift_pos = 0
         self.s = None
