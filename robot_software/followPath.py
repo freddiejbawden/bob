@@ -51,6 +51,7 @@ class FollowPath:
                     #ev3.Sound.speak("Scoopdidoop").wait()
                     line_follower.move_toward_shelf()
                 elif p == 'out':
+                    line_follower.set_cs_modes('left')
                     line_follower.move_away_from_shelf()
                 elif p == 'stop':
                     line_follower.stop_shelf_movement()

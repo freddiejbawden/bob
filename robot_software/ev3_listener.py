@@ -6,7 +6,7 @@ from followPath import FollowPath
 from bobTranslation import extract
 from followLine import FollowLine
 import ev3dev.ev3 as ev3
-
+import time
 import json
  # Get local machine name
 class EV3Listener:
@@ -20,7 +20,7 @@ class EV3Listener:
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         s.bind((HOST, PORT))
         print("Listening on {}:{}".format(HOST,PORT))
-        ev3.Sound.tone([(1000, 250, 0),(1500, 250, 0),(2000, 250, 0)]).wait()
+        #ev3.Sound.tone([(1000, 250, 0),(1500, 250, 0),(2000, 250, 0)]).wait()
         s.listen(2)
         conn, addr = s.accept()
         print('Connected by', addr)
@@ -32,20 +32,24 @@ class EV3Listener:
                     str_instruction = str_instruction.replace('\'', '\"')
                     str_instruction = str_instruction.replace('u\"', '\"')
                     print(str_instruction)
-            
-                    if str_instruction == 'move_in' or str_instruction == 'in':
-                        self.path_follower.go('in')
+                    if str_instruction == 'FIN':
+                        return
+                    elif str_instruction == 'move_in' or str_instruction == 'in':
+                        self.path_follower.go(['in'])
                     elif str_instruction == 'move_out'or str_instruction == 'in':
-                    self.path_follower.go('out')
+                        self.path_follower.go(['out'])
                     elif str_instruction == 'stop_shelf':
-                        self.path_follower.go('stop')
+                        self.path_follower.go(['stop'])
                     else:
                         movement = json.loads(str_instruction)
-                        print(type(extract(movement)))
                         self.path_follower.go([extract(movement)])
                     print('done')
                     conn.sendall(b'done')
         except KeyboardInterrupt:
+            print("Interrupted! Closing")
+            conn.close()
+        finally:
+            print("Ended. Closing")
             conn.close()
 ev3 = EV3Listener()
 ev3.get_instructions()

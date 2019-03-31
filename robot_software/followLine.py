@@ -53,7 +53,7 @@ class FollowLine:
         self.marker_counter = 0  # how many markers have been passed in current command
 
         self.reverse = -1  # -1 if Bob is reversing, 1 if not
-
+        self.moving_out_over_black_count = 0
     def detect_marking(self, colour_left, colour_right, desired_colour):
         # print(colour_left, colour_right)
         if colour_right == desired_colour and colour_left == desired_colour:
@@ -171,24 +171,24 @@ class FollowLine:
                 left_speed = self.SIDEWAYS_SPEED / 2.0
             if self.detect_marking(self.csbl.value(), self.csbr.value(), self.BLUE):
                 # back sensors on blue line, so move forward for some time
-                self.lm.run_timed(time_sp=self.CORRECTION_TIME, speed_sp=-left_speed)
-                self.rm.run_timed(time_sp=self.CORRECTION_TIME, speed_sp=-right_speed)
+                self.lm.run_timed(time_sp=self.CORRECTION_TIME, speed_sp=left_speed)
+                self.rm.run_timed(time_sp=self.CORRECTION_TIME, speed_sp=right_speed)
                 sleep(self.CORRECTION_TIME / 1000)
             if self.detect_marking(self.csfl.value(), self.csfr.value(), self.BLUE):
                 # front sensors on blue line, so move backward for some time
 
-                self.lm.run_timed(time_sp=self.CORRECTION_TIME, speed_sp=left_speed)
-                self.rm.run_timed(time_sp=self.CORRECTION_TIME, speed_sp=right_speed)
+                self.lm.run_timed(time_sp=self.CORRECTION_TIME, speed_sp=-left_speed)
+                self.rm.run_timed(time_sp=self.CORRECTION_TIME, speed_sp=-right_speed)
                 sleep(self.CORRECTION_TIME / 1000)
 
             # colour sensor for marking detection needs to be at front or back dependng on the last direction
             if last_direction == 'forward':
-                cs_left = self.csfr
-                cs_right = self.csfl
-            else:
-                # if last direction is backward, left, or right
                 cs_left = self.csbr
                 cs_right = self.csbl
+            else:
+                # if last direction is backward, left, or right
+                cs_left = self.csfr
+                cs_right = self.csfl
 
             # move sideways for a bit while counting black markings
             if direction == 'left':
@@ -234,13 +234,16 @@ class FollowLine:
 
     def move_away_from_shelf(self):
         # move out until black is seen
-        self.cm.run_timed(time_sp=self.DT, speed_sp=self.SIDEWAYS_SPEED)
-        sleep(self.DT / 1000)
-        if self.detect_marking(self.csbl, self.csbl, self.BLACK):
+        print('moving back')
+        
+        self.cm.run_timed(time_sp=300, speed_sp=self.SIDEWAYS_SPEED)
+        sleep(0.3)
+        if self.detect_marking(self.csbr, self.csbr, self.BLACK):
+            print("BLACK!")
             return
 
     def stop_shelf_movement(self):
-        self.cm.stop(stop_action='hold')
+        self.cm.stop(stop_action='brake')
 
     def stop(self):
         self.shut_down = True
