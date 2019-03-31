@@ -84,9 +84,10 @@ class RobotJobListener():
           
             if command == "grab":
                 res = self.reliable_grab(instruction["parameters"]['height'])
+            elif command == "drop":
+                res = self.reliable_send_data(self.rasp_target, str("drop"))
             else:
                 res = self.reliable_send_data(self.ev3_target,str(instruction))
-        
     def reliable_grab(self,height):
         try:
             global thread_manager
@@ -99,10 +100,8 @@ class RobotJobListener():
             
             self.reliable_send_data(self.rasp_target,"wait_for_bump")
             print('bump!')
-            thread_manager['bumped'] = True
-            
             self.reliable_send_data(self.ev3_target,"stop_shelf")
-            
+            thread_manager['bumped'] = True    
             self.reliable_send_data(self.rasp_target,"grab")
             self.reliable_send_data(self.ev3_target,"move_out")
             self.reliable_send_data(self.rasp_target,"lift 0")

@@ -44,8 +44,6 @@ class EV3Listener:
                         movement = json.loads(str_instruction)
                         self.path_follower.go([extract(movement)])
                     print('done')
-                    
-                   
                     conn.sendall(b'done')
         except KeyboardInterrupt:
             print("Interrupted! Closing")

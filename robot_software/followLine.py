@@ -243,7 +243,7 @@ class FollowLine:
             return
 
     def stop_shelf_movement(self):
-        self.cm.stop(stop_action='hold')
+        self.cm.stop(stop_action='brake')
 
     def stop(self):
         self.shut_down = True
