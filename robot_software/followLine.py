@@ -53,7 +53,7 @@ class FollowLine:
         self.marker_counter = 0  # how many markers have been passed in current command
 
         self.reverse = -1  # -1 if Bob is reversing, 1 if not
-
+        self.moving_out_over_black_count = 0
     def detect_marking(self, colour_left, colour_right, desired_colour):
         # print(colour_left, colour_right)
         if colour_right == desired_colour and colour_left == desired_colour:
@@ -235,11 +235,12 @@ class FollowLine:
     def move_away_from_shelf(self):
         # move out until black is seen
         print('moving back')
-        while not self.shut_down:
-            self.cm.run_timed(time_sp=self.DT, speed_sp=self.SIDEWAYS_SPEED)
-            sleep(self.DT / 1000)
-            if self.detect_marking(self.csbr, self.csbr, self.BLACK):
-                return
+        
+        self.cm.run_timed(time_sp=300, speed_sp=self.SIDEWAYS_SPEED)
+        sleep(0.3)
+        if self.detect_marking(self.csbr, self.csbr, self.BLACK):
+            print("BLACK!")
+            return
 
     def stop_shelf_movement(self):
         self.cm.stop(stop_action='hold')

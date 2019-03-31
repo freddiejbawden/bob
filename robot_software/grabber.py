@@ -17,16 +17,11 @@ class Grabber():
         self.sc.engage()
         self.sc.setPosition(self.RETRACT_ANGLE)
         time.sleep(self.SERVO_TIME)
-        self.prepare_grabber()
 
     def prepare_grabber(self):
         print("preparing")
         self.sc.setPosition(30)
         time.sleep(self.SERVO_TIME)
-    def cycle_grabber(self):
-        
-        self.sc.setPosition(30)
-        self.sc.setPosition(180)
     def grab(self):
         print('grabbing')
         self.mc.setMotor(self.mc_id, self.MC_SPEED)
@@ -34,7 +29,7 @@ class Grabber():
         self.mc.stopMotors()
         time.sleep(1)
 
-        self.sc.setPosition(120)
+        self.sc.setPosition(180)
 
         time.sleep(self.SERVO_TIME)
         self.mc.setMotor(self.mc_id, -self.MC_SPEED)

@@ -5,7 +5,7 @@ import sys
 
 class Lift:
     MC_SPEED = 100
-    LIFT_TIME = 10
+    LIFT_TIME = 14
     # use ports 2 and 3
     mc_id_a = 2
     mc_id_b = 3
