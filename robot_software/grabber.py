@@ -23,22 +23,23 @@ class Grabber():
         print("preparing")
         self.sc.setPosition(30)
         time.sleep(self.SERVO_TIME)
+
     def cycle_grabber(self):
-        
         self.sc.setPosition(30)
         self.sc.setPosition(180)
-    def grab(self):
+
+    def grab(self, inputs):
         print('grabbing')
-        self.mc.setMotor(self.mc_id, self.MC_SPEED)
-        time.sleep(self.OUTWARD_SCOOP_TIME)
+        while inputs()[3] == 0:
+            self.mc.setMotor(self.mc_id, self.MC_SPEED)
         self.mc.stopMotors()
         time.sleep(1)
 
         self.sc.setPosition(120)
 
         time.sleep(self.SERVO_TIME)
-        self.mc.setMotor(self.mc_id, -self.MC_SPEED)
-        time.sleep(self.OUTWARD_SCOOP_TIME+0.07)
+        while inputs()[2] == 0:
+            self.mc.setMotor(self.mc_id, -self.MC_SPEED)
         self.mc.stopMotors()
 
-        #self.sc.disengage()
+        # self.sc.disengage()
