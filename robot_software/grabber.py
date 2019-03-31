@@ -3,7 +3,7 @@ import time
 
 class Grabber():
     RETRACT_ANGLE = 180
-    PREPARE_ANGLE = 30
+    PREPARE_ANGLE = 35
     GRAB_ANGLE = 180
 
     MC_SPEED = -100  # speed for the outward and inward scoop
@@ -20,8 +20,14 @@ class Grabber():
 
     def prepare_grabber(self):
         print("preparing")
-        self.sc.setPosition(30)
+        self.sc.setPosition(self.PREPARE_ANGLE)
         time.sleep(self.SERVO_TIME)
+
+    def retract_grabber(self):
+        print("retracting")
+        self.sc.setPosition(self.RETRACT_ANGLE)
+        time.sleep(self.SERVO_TIME)
+
     def grab(self):
         print('grabbing')
         self.mc.setMotor(self.mc_id, self.MC_SPEED)
@@ -29,7 +35,7 @@ class Grabber():
         self.mc.stopMotors()
         time.sleep(1)
 
-        self.sc.setPosition(180)
+        self.sc.setPosition(self.GRAB_ANGLE)
 
         time.sleep(self.SERVO_TIME)
         self.mc.setMotor(self.mc_id, -self.MC_SPEED)
