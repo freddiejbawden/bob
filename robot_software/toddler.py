@@ -52,7 +52,6 @@ class Toddler:
         self.sc = IO.servo_control
         self.sc.engage()
         self.grabber = Grabber(self.mc, self.MOTOR_PORT, self.sc)
-
         self.lift = Lift(onRobot, self.mc)
 
         self.lift_pos = 0
@@ -83,7 +82,7 @@ class Toddler:
                 data = data.split(' ')
                 print("Listen: " + data[0])
                 if data[0] == 'grab':
-                    self.grabber.grab(self.getInputs)
+                    self.grabber.grab(self)
                 elif data[0] == 'prepare':
                     self.grabber.prepare_grabber()
                 elif data[0] == 'wait_for_bump':

@@ -32,9 +32,13 @@ class Grabber():
         self.sc.setPosition(self.RETRACT_ANGLE)
         time.sleep(self.SERVO_TIME)
 
-    def grab(self, inputs):
+    def grab(self, inputer):
         print('grabbing')
-        while inputs()[3] == 0:
+        inp = inputer.getInputs()
+        print(inp)
+        while inp[3] == 0:
+            print(inp)
+            inp = inputer.getInputs()
             self.mc.setMotor(self.mc_id, self.MC_SPEED)
         self.mc.stopMotors()
         time.sleep(1)
@@ -42,7 +46,9 @@ class Grabber():
         self.sc.setPosition(self.GRAB_ANGLE)
 
         time.sleep(self.SERVO_TIME)
-        while inputs()[2] == 0:
+        while inp[2] == 0:
+            print(inp)
+            inp = inputer.getInputs()
             self.mc.setMotor(self.mc_id, -self.MC_SPEED)
         self.mc.stopMotors()
 
