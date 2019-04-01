@@ -24,24 +24,33 @@ class Grabber():
         self.sc.setPosition(self.PREPARE_ANGLE)
         time.sleep(self.SERVO_TIME)
 
+    def cycle_grabber(self):
+        self.sc.setPosition(30)
+        self.sc.setPosition(180)
+
     def retract_grabber(self):
         print("retracting")
         self.sc.setPosition(self.RETRACT_ANGLE)
         time.sleep(self.SERVO_TIME)
 
-    def grab(self):
+    def grab(self, inputer):
         print('grabbing')
-        self.prepare_grabber()
-        self.mc.setMotor(self.mc_id, self.MC_SPEED)
-        time.sleep(self.OUTWARD_SCOOP_TIME)
+        inp = inputer.getInputs()
+        print(inp)
+        while inp[3] == 0:
+            print(inp)
+            inp = inputer.getInputs()
+            self.mc.setMotor(self.mc_id, self.MC_SPEED)
         self.mc.stopMotors()
         time.sleep(1)
 
         self.sc.setPosition(self.GRAB_ANGLE)
 
         time.sleep(self.SERVO_TIME)
-        self.mc.setMotor(self.mc_id, -self.MC_SPEED)
-        time.sleep(self.OUTWARD_SCOOP_TIME+0.07)
+        while inp[2] == 0:
+            print(inp)
+            inp = inputer.getInputs()
+            self.mc.setMotor(self.mc_id, -self.MC_SPEED)
         self.mc.stopMotors()
 
-        #self.sc.disengage()
+        # self.sc.disengage()

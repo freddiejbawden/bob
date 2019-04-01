@@ -84,7 +84,7 @@ class Toddler:
                 data = data.split(' ')
                 print("Listen: " + data[0])
                 if data[0] == 'grab':
-                    self.grabber.grab()
+                    self.grabber.grab(self)
                 elif data[0] == 'prepare':
                     self.grabber.prepare_grabber()
                 elif data[0] == 'wait_for_bump':
