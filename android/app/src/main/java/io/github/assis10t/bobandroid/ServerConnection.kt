@@ -252,6 +252,7 @@ class ServerConnection {
 
     val logout = { context: Context, onLogoutComplete: ((error: Exception?) -> Unit)? ->
         setCurrentUsername(context, null)
+        Timber.d("Logged out.")
         onLogoutComplete?.invoke(null)
     }
 
@@ -271,6 +272,23 @@ class ServerConnection {
         }
     }
     val register = registerFactory(httpClient, Gson())
+
+    val deleteMyDataFactory = { http: OkHttpClient, gson: Gson ->
+        { context: Context, onDeleteMyData: (error: Exception?) -> Unit ->
+            connect { server ->
+                getRequestFactory(http, gson)("$server/api/reset") { error, str ->
+                    if (error != null) {
+                        onDeleteMyData(error)
+                    } else {
+                        logout(context) {_ ->
+                            onDeleteMyData(null)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    val deleteMyData = deleteMyDataFactory(httpClient, Gson())
 
     fun addAuthListener(listener: (loggedIn: Boolean) -> Unit) {
         authListeners.add(listener)

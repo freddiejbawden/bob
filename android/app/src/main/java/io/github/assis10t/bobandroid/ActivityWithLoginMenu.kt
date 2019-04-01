@@ -1,13 +1,16 @@
 package io.github.assis10t.bobandroid
 
 import android.annotation.SuppressLint
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.os.PersistableBundle
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import org.jetbrains.anko.toast
 import timber.log.Timber
 
 @SuppressLint("Registered")
@@ -75,6 +78,28 @@ open class ActivityWithLoginMenu: AppCompatActivity() {
             }
             R.id.orders -> {
                 startActivity(Intent(this, OrdersActivity::class.java))
+                true
+            }
+            R.id.deleteMyData -> {
+                AlertDialog.Builder(this)
+                    .setTitle("Confirm Data Deletion")
+                    .setMessage("Are you sure you want to delete ALL of your data? This action cannot be undone.")
+                    .setPositiveButton("Delete") { dialogInterface, whichButton ->
+                        ServerConnection().deleteMyData(this) { error ->
+                            Timber.d(error, "DeleteMyData result")
+                            if (error != null) {
+                                toast("A problem occured while deleting your data.")
+                                return@deleteMyData
+                            }
+                            toast("Your data has been deleted. Thank you for using Bob!")
+                            if (this !is WarehouseListActivity) {
+                                startActivity(Intent(this, WarehouseListActivity::class.java))
+                                finish()
+                            }
+                        }
+                    }
+                    .setNegativeButton("Cancel", null)
+                    .show()
                 true
             }
             else -> super.onOptionsItemSelected(item)
