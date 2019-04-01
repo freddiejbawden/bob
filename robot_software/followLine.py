@@ -10,8 +10,8 @@ class FollowLine:
     DT = 50  # milliseconds  -  represents change in time since last sensor reading/
 
 
-    MARKING_NUMBER = 1  # number of consecutive colour readings to detect marking
-    MARKING_INTERVAL = 1  # time between marking checks in seconds
+    MARKING_NUMBER = 2  # number of consecutive colour readings to detect marking
+    MARKING_INTERVAL = 1.3  # time between marking checks in seconds
     reverse = False
 
     BLACK = 1  # black reading from colour sensor in COL-COLOR mode

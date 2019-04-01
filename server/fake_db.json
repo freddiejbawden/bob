@@ -146,5 +146,5 @@
     ],
     "bob_movement": [{ "_id": "5c73f048ffb612103e1288a8", "moving": false, "markers": 1 }],
     "orders": [],
-    "robot": [{ "_id": "5c73e2de3b80de0d5a4e19d2","username":"robot", "home_x": 3, "home_y":1, "location": { "x": 3, "y": 1, "z": 0 } }]
+    "robot": [{ "_id": "5c73e2de3b80de0d5a4e19d2","username":"robot", "home_x": 4, "home_y":0, "location": { "x": 4, "y": 0, "z": 0 } }]
 }
