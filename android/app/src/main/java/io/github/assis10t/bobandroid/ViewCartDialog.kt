@@ -48,32 +48,41 @@ class ViewCartDialog(val activity: WarehouseActivity, val warehouseId: String): 
         }
 
         complete_order.setOnClickListener {
-            val order = Order.Factory()
-                .items(data)
-                .warehouseId(warehouseId)
-                .build()
-
-            val submitDialog = SubmittingOrderDialog(context)
-            submitDialog.show()
-
-            Handler().postDelayed({
-                ServerConnection()
-                    .makeOrder(context, order) { err ->
-                        if (err != null) {
-                            Toast.makeText(context, err.message, Toast.LENGTH_LONG).show()
-                            submitDialog.dismiss()
-                            return@makeOrder
-                        }
-                        clearCart(context)
-                        activity.refreshItems()
-                        submitDialog.completed()
-                        Handler().postDelayed({
-                            submitDialog.dismiss()
-                            dismiss()
-                        }, 2000)
-                    }
-            }, 2000)
+            if (!ServerConnection().isLoggedIn(context)) {
+                LoginDialog(context).show()
+            } else {
+                submitOrder(data)
+            }
         }
+    }
+
+    private fun submitOrder(data: List<Item>) {
+        val order = Order.Factory()
+            .items(data)
+            .warehouseId(warehouseId)
+            .build()
+
+        val submitDialog = SubmittingOrderDialog(context)
+        submitDialog.show()
+
+        Handler().postDelayed({
+            ServerConnection()
+                .makeOrder(context, order) { err ->
+                    if (err != null) {
+                        Toast.makeText(context, err.message, Toast.LENGTH_LONG).show()
+                        submitDialog.dismiss()
+                        return@makeOrder
+                    }
+                    clearCart(context)
+                    activity.refreshItems()
+                    submitDialog.completed()
+                    Handler().postDelayed({
+                        submitDialog.dismiss()
+                        dismiss()
+                    }, 2000)
+                }
+        }, 2000)
+
     }
 
     class CartAdapter(val items: List<Item>): RecyclerView.Adapter<CartAdapter.ViewHolder>() {

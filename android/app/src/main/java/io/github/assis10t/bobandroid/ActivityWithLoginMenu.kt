@@ -1,12 +1,32 @@
 package io.github.assis10t.bobandroid
 
+import android.annotation.SuppressLint
 import android.content.Intent
+import android.os.Bundle
+import android.os.PersistableBundle
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import timber.log.Timber
 
+@SuppressLint("Registered")
 open class ActivityWithLoginMenu: AppCompatActivity() {
+
+    private val authListener = { isLoggedIn: Boolean ->
+        Timber.d("Is logged in? $isLoggedIn")
+        invalidateOptionsMenu()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        ServerConnection().addAuthListener(authListener)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        ServerConnection().removeAuthListener(authListener)
+    }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         if (ServerConnection().isLoggedIn(this)) {
@@ -39,7 +59,7 @@ open class ActivityWithLoginMenu: AppCompatActivity() {
         // Handle item selection
         return when (item?.itemId) {
             R.id.login -> {
-                startActivity(Intent(this, LoginActivity::class.java))
+                LoginDialog(this) { invalidateOptionsMenu() }.show()
                 true
             }
             R.id.logout -> {
