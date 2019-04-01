@@ -101,9 +101,13 @@ class RobotJobListener():
             self.reliable_send_data(self.rasp_target,"wait_for_bump")
             print('bump!')
             self.reliable_send_data(self.ev3_target,"stop_shelf")
-            thread_manager['bumped'] = True    
-            self.reliable_send_data(self.rasp_target,"grab")
+            thread_manager['bumped'] = True
+            if int(height) >= 1:
+                self.reliable_send_data(self.rasp_target, "upper_grab")
+            else:
+                self.reliable_send_data(self.rasp_target,"grab")
             self.reliable_send_data(self.ev3_target,"move_out")
+            self.reliable_send_data(self.rasp_target, "retract")
             self.reliable_send_data(self.rasp_target,"lift 0")
 
             return

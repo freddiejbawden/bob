@@ -4,7 +4,7 @@ import time
 class Grabber():
     RETRACT_ANGLE = 180
     PREPARE_ANGLE = 35
-    UPPER_GRAB = 65
+    UPPER_GRAB_ANGLE = 110
     GRAB_ANGLE = 180
 
     MC_SPEED = -100  # speed for the outward and inward scoop
@@ -45,6 +45,26 @@ class Grabber():
         time.sleep(1)
 
         self.sc.setPosition(self.GRAB_ANGLE)
+
+        time.sleep(self.SERVO_TIME)
+        while inp[2] == 0:
+            print(inp)
+            inp = inputer.getInputs()
+            self.mc.setMotor(self.mc_id, -self.MC_SPEED)
+        self.mc.stopMotors()
+
+    def upper_grab(self, inputer):
+        print('grabbing but higher')
+        inp = inputer.getInputs()
+        print(inp)
+        while inp[3] == 0:
+            print(inp)
+            inp = inputer.getInputs()
+            self.mc.setMotor(self.mc_id, self.MC_SPEED)
+        self.mc.stopMotors()
+        time.sleep(1)
+
+        self.sc.setPosition(self.UPPER_GRAB_ANGLE)
 
         time.sleep(self.SERVO_TIME)
         while inp[2] == 0:

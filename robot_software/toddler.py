@@ -85,8 +85,12 @@ class Toddler:
                 print("Listen: " + data[0])
                 if data[0] == 'grab':
                     self.grabber.grab(self)
+                elif data[0] == 'upper_grab':
+                    self.grabber.upper_grab(self)
                 elif data[0] == 'prepare':
                     self.grabber.prepare_grabber()
+                elif data[0] == 'retract':
+                    self.grabber.retract_grabber()
                 elif data[0] == 'wait_for_bump':
                     inp = self.getInputs()
                     while inp[self.BUMP_SENSOR_SHELF_1] == 0 or inp[self.BUMP_SENSOR_SHELF_2] == 0:
