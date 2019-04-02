@@ -117,6 +117,7 @@
                                 <td>Position</td>
                                 <td>Quantity</td>
                                 <td>Unit</td>
+                                <td>Size</td>
                                 <td>Price</td>
                                 <td>Edit items</td>
                                 <td>Delete items</td>
@@ -139,7 +140,10 @@
                                     {{ item.quantity }}
                                 </td>
                                 <td>
-                                    {{ item.unit }}
+                                    {{ item.unit ? item.unit : '-' }}
+                                </td>
+                                <td>
+                                    {{ item.size }}
                                 </td>
                                 <td>
                                     {{ item.price }} GBP

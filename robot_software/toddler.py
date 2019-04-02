@@ -9,7 +9,6 @@ from iotools import IOTools
 from grabber import Grabber
 from rasppi_coordinator import RobotJobListener
 
-
 class Logger(object):
     def __init__(self, onRobot):
         self.useTerminal = not onRobot
@@ -65,14 +64,18 @@ class Toddler:
                 print('Connected by', addr)
 
                 data = conn.recv(1024)
-                if data == b'grab':
+                data = data.decode('utf-8')
+                data = data.split(' ')
+                if data == 'grab':
                     self.grabber.grab()
-                elif data == b'prepare':
+                elif data == 'prepare':
                     self.grabber.prepare_grabber()
-                elif data == b'wait_for_bump':
+                elif data == 'wait_for_bump':
                     while(self.getInputs()[0] == 0 or self.getInputs()[1] == 0):
                         print("Wait for bump")
                     print("bump")
+                elif data[0] == 'lift':
+                    print('lift to {}'.format(data[1]))
                 conn.sendall(b'done')
                 conn.close()
         except KeyboardInterrupt:

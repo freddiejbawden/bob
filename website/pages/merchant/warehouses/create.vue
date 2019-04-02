@@ -38,7 +38,7 @@
                             <div class="field">
                                 <label class="label">Warehouse schema:</label>
                                 <p class="help is-size-8">
-                                    Enter the dimensions of the warehouse. X and Y values are the amount of rows and columns that the warehouse phisically has for the robot.
+                                    Enter the dimensions of the warehouse. X and Y values are the amount of rows and columns that the warehouse physically has for the robot.
                                 </p>
                                 <div class="control columns">
                                     <div class="column is-6">

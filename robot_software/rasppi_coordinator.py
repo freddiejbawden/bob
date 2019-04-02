@@ -8,7 +8,7 @@ import time
 from threading import Thread
 from time import sleep
 from bobTranslation import extract
-
+from rasppi_listener import listen
 thread_manager = {'bumped':False}
 
 class RobotJobListener():
@@ -45,14 +45,16 @@ class RobotJobListener():
                 path = json.loads(r.text)
                 print(path)
                 if path['success'] != False:
-                    print(path)
+                    
                     if path['job'] != []:
                         self.job_handler(path['job']['instruction_set'])
                         headers={'username':'merchant_01'}
                         url = 'http://{}:{}/api/warehouse/5c755f58bfcf4c592bfd00a6/orders/{}'.format(self.server_info['ip'],self.server_info['port'],path['job']['id'])
                         update = requests.post(url,headers=headers,json={'status':'READY_TO_COLLECT'})
-                        print(update.text)
-                        print('done - notified')
+                        while not(json.loads(update.text)['success']):
+                            time.sleep(5)
+                            update = requests.post(url,headers=headers,json={'status':'READY_TO_COLLECT'})
+                        print('notified')
                 self.retry_timeout = 1
                 sleep(5)
         except KeyboardInterrupt:
@@ -65,17 +67,18 @@ class RobotJobListener():
     def job_handler(self,instruction_set):
         # TODO, open this on a new thread
         i = 0
+        
         for instruction in (instruction_set):
+            print(instruction)
             command = instruction['command']
             res = None
-            if command == "lift" or command == "drop":
-                res = self.reliable_send_data(self.rasp_target,str(instruction))
-            elif command == "grab":
-                res = self.reliable_grab()
+          
+            if command == "grab":
+                res = self.reliable_grab(instruction["parameters"]['height'])
             else:
                 res = self.reliable_send_data(self.ev3_target,str(instruction))
         
-    def reliable_grab(self):
+    def reliable_grab(self,height):
         try:
             global thread_manager
             thread_manager['bumped'] = False
@@ -87,8 +90,10 @@ class RobotJobListener():
             self.reliable_send_data(self.rasp_target,"wait_for_bump")
             print('bump!')
             thread_manager['bumped'] = True
-            #self.reliable_send_data(self.ev3_target,"stop_shelf")
+            self.reliable_send_data(self.ev3_target,"stop_shelf")
+            self.reliable_send_data(self.rasp_target,"lift {}".format(height))
             self.reliable_send_data(self.rasp_target,"grab")
+            self.reliable_send_data(self.rasp_target,"lift 0")
             self.reliable_send_data(self.ev3_target,"move_out")
             return
         except KeyboardInterrupt:
@@ -143,7 +148,3 @@ class RobotJobListener():
             print('error')
             return -1
 
-
-
-#rjr = RobotJobListener(('192.168.105.38',9000),('192.168.105.38',65432),('192.168.105.38',65433))
-#rjr.start_reliable_listener('robot')

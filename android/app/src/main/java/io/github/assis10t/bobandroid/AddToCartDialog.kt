@@ -56,7 +56,8 @@ class AddToCartDialog(val activity: WarehouseActivity, val item: Item): Dialog(a
                 item.position,
                 Integer.parseInt(quantity.text.toString()).toDouble(),
                 item.unit,
-                item.price
+                item.price,
+                item.size
             )
             addToCart(context, cartItem)
             activity.refreshItems()

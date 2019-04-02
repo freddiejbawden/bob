@@ -84,6 +84,24 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="field">
+                                <div class="control">
+                                    <label class="label">Size:</label>
+                                    <p class="help is-size-8">
+                                        <i>Tiny</i> - 3 of these can fit in the robots basket, <i>Small</i> - 2 can fit, <i>Large</i> - 1 can fit.
+                                    </p>
+                                    <select 
+                                        name="size" 
+                                        id="size" 
+                                        class="input"
+                                        v-model="item.size">
+                                        
+                                        <option value="tiny">Tiny</option>
+                                        <option value="small">Small</option>
+                                        <option value="large">Large</option>
+                                    </select>
+                                </div>
+                            </div>
                             <div class="field" v-if="warehouse.dimensions">
                                 <div class="control">
                                     <label class="label">Price:</label>

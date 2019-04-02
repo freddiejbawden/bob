@@ -30,6 +30,9 @@
                             </div>
                             <div class="field" v-if="warehouse.dimensions">
                                 <label class="label">Position:</label>
+                                <p class="help is-size-8">
+                                    X and Y specify the row and column respectively and Z specifies which shelf the product will be on.
+                                </p>
                                 <div class="control columns">
                                     <div class="column is-4">
                                         <select 
@@ -84,7 +87,25 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="field" v-if="warehouse.dimensions">
+                            <div class="field">
+                                <div class="control">
+                                    <label class="label">Size:</label>
+                                    <p class="help is-size-8">
+                                        <i>Tiny</i> - 3 of these can fit in the robots basket, <i>Small</i> - 2 can fit, <i>Large</i> - 1 can fit.
+                                    </p>
+                                    <select 
+                                        name="size" 
+                                        id="size" 
+                                        class="input"
+                                        v-model="size">
+                                        
+                                        <option value="tiny">Tiny</option>
+                                        <option value="small">Small</option>
+                                        <option value="large">Large</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="field">
                                 <div class="control">
                                     <label class="label">Price:</label>
                                     <input class="input" type="number" placeholder="Enter item price" v-model.number="price">
@@ -134,6 +155,7 @@ export default {
             },
             quantity: null,
             unit: null,
+            size: 'tiny',
             price: null
         }
     },
@@ -177,6 +199,7 @@ export default {
                         position: this.position,
                         quantity: this.quantity,
                         unit: this.unit,
+                        size: this.size,
                         price: this.price,
                     }, {
                         headers: {
