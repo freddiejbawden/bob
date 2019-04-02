@@ -45,7 +45,7 @@ class FollowPath:
                         print("invalid direction")
                 self.last_direction = direction
             else:
-                print("here")
+                print(p)
                 # not a valid direction for colour sensors
                 if p == 'in':
                     #ev3.Sound.speak("Scoopdidoop").wait()
@@ -53,8 +53,12 @@ class FollowPath:
                 elif p == 'out':
                     line_follower.set_cs_modes('left')
                     line_follower.move_away_from_shelf()
+                elif p == 'move_out_upper':
+                    line_follower.move_away_from_shelf_upper()
                 elif p == 'stop':
                     line_follower.stop_shelf_movement()
+                elif p == 'prep_for_upper':
+                    line_follower.prep_for_upper()
                 else:
                     print("Wrong command given. What does", p, "mean?")
         line_follower.stop()

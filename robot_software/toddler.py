@@ -52,9 +52,10 @@ class Toddler:
         self.sc = IO.servo_control
         self.sc.engage()
         self.grabber = Grabber(self.mc, self.MOTOR_PORT, self.sc)
-        
+        #self.grabber.prepare_grabber()
         self.lift = Lift(onRobot, self.mc)
-        self.grabber.grab(self)
+       
+        
         
         self.lift_pos = 0
         self.s = None
@@ -99,10 +100,10 @@ class Toddler:
                 elif data[0] == 'lift':
                     if int(data[1]) < self.lift_pos:
                         print('down')
-                        #self.lift.lift('down')
+                        self.lift.lift('down')
                     elif int(data[1]) > self.lift_pos:
                         print('up')
-                        #self.lift.lift('up')
+                        self.lift.lift('up')
                     self.lift_pos = int(data[1])
                     time.sleep(0.5)
                 elif data[0] == 'drop':

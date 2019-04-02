@@ -40,6 +40,10 @@ class EV3Listener:
                         self.path_follower.go(['out'])
                     elif str_instruction == 'stop_shelf':
                         self.path_follower.go(['stop'])
+                    elif str_instruction == 'move_out_upper':
+                        self.path_follower.go(['move_out_upper'])
+                    elif str_instruction == 'prep_for_upper':
+                        self.path_follower.go(['prep_for_upper'])
                     else:
                         movement = json.loads(str_instruction)
                         self.path_follower.go([extract(movement)])

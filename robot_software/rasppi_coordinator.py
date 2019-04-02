@@ -90,7 +90,10 @@ class RobotJobListener():
                 res = self.reliable_send_data(self.ev3_target,str(instruction))
     def reliable_grab(self,height):
         try:
+            print(height)
             global thread_manager
+            if (int(height) >= 1):
+                self.reliable_send_data(self.ev3_target, "prep_for_upper")
             self.reliable_send_data(self.rasp_target,"lift {}".format(height))
             self.reliable_send_data(self.rasp_target,"prepare")
             thread_manager['bumped'] = False
@@ -104,9 +107,11 @@ class RobotJobListener():
             thread_manager['bumped'] = True
             if int(height) >= 1:
                 self.reliable_send_data(self.rasp_target, "upper_grab")
+                self.reliable_send_data(self.ev3_target,"move_out_upper")
             else:
                 self.reliable_send_data(self.rasp_target,"grab")
-            self.reliable_send_data(self.ev3_target,"move_out")
+                self.reliable_send_data(self.ev3_target,"move_out")
+            
             self.reliable_send_data(self.rasp_target, "retract")
             self.reliable_send_data(self.rasp_target,"lift 0")
 

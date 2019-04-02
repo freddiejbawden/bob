@@ -3,7 +3,7 @@ import time
 
 class Grabber():
     RETRACT_ANGLE = 180
-    PREPARE_ANGLE = 35
+    PREPARE_ANGLE = 50
     UPPER_GRAB_ANGLE = 110
     GRAB_ANGLE = 180
 
@@ -16,7 +16,7 @@ class Grabber():
         self.mc = mc
         self.sc = sc
         self.sc.engage()
-        self.sc.setPosition(self.PREPARE_ANGLE)
+        self.sc.setPosition(self.RETRACT_ANGLE)
         time.sleep(self.SERVO_TIME)
 
     def prepare_grabber(self):
@@ -34,24 +34,28 @@ class Grabber():
         time.sleep(self.SERVO_TIME)
 
     def grab(self, inputer):
-        print('grabbing')
-        inp = inputer.getInputs()
-        print(inp)
-        while inp[3] == 0:
-            print(inp)
+        try:
+            print('grabbing')
             inp = inputer.getInputs()
-            self.mc.setMotor(self.mc_id, self.MC_SPEED)
-        self.mc.stopMotors()
-        time.sleep(1)
-
-        self.sc.setPosition(self.GRAB_ANGLE)
-
-        time.sleep(self.SERVO_TIME)
-        while inp[2] == 0:
             print(inp)
-            inp = inputer.getInputs()
-            self.mc.setMotor(self.mc_id, -self.MC_SPEED)
-        self.mc.stopMotors()
+            while inp[3] == 0:
+                print(inp)
+                inp = inputer.getInputs()
+                self.mc.setMotor(self.mc_id, self.MC_SPEED)
+            self.mc.stopMotors()
+            time.sleep(1)
+
+            self.sc.setPosition(self.GRAB_ANGLE)
+
+            time.sleep(self.SERVO_TIME)
+            while inp[2] == 0:
+                self.sc.setPosition(self.GRAB_ANGLE)
+                print(inp)
+                inp = inputer.getInputs()
+                self.mc.setMotor(self.mc_id, -self.MC_SPEED)
+            self.mc.stopMotors()
+        except KeyboardInterrupt:
+            self.mc.stopMotors()
 
     def upper_grab(self, inputer):
         print('grabbing but higher')
