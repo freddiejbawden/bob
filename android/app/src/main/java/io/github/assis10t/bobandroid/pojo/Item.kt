@@ -10,7 +10,8 @@ class Item (
     val position: Position? = null,
     val quantity: Double? = null,
     val unit: String? = null,
-    val price: Double = 0.0
+    val price: Double = 0.0,
+    val size: String? = null
 ) {
     companion object {
         fun fromString(str: String) = Gson().fromJson(str, Item::class.java)

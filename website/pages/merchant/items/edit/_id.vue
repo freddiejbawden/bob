@@ -84,6 +84,24 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="field">
+                                <div class="control">
+                                    <label class="label">Size:</label>
+                                    <p class="help is-size-8">
+                                        <i>Tiny</i> - 3 of these can fit in the robots basket, <i>Small</i> - 2 can fit, <i>Large</i> - 1 can fit.
+                                    </p>
+                                    <select 
+                                        name="size" 
+                                        id="size" 
+                                        class="input"
+                                        v-model="item.size">
+                                        
+                                        <option value="tiny">Tiny</option>
+                                        <option value="small">Small</option>
+                                        <option value="large">Large</option>
+                                    </select>
+                                </div>
+                            </div>
                             <div class="field" v-if="warehouse.dimensions">
                                 <div class="control">
                                     <label class="label">Price:</label>
@@ -133,7 +151,7 @@ export default {
     methods: {
         getWarehouse () {
             axios.
-                get('http://localhost:9000/warehouse/' + this.warehouseId, {
+                get(process.env.baseUrl + '/api/warehouse/' + this.warehouseId, {
                     headers: {
                         'Content-Type': 'application/json'
                     }
@@ -149,7 +167,7 @@ export default {
         },
         getItem () {
             axios.
-                get('http://localhost:9000/warehouse/' + this.warehouseId + '/items/' + this.itemId, {
+                get(process.env.baseUrl + '/api/warehouse/' + this.warehouseId + '/items/' + this.itemId, {
                     headers: {
                         'Content-Type': 'application/json',
                         'username': this.$store.state.user.username,
@@ -180,7 +198,7 @@ export default {
         },
         updateItem () {
             axios.
-                post('http://localhost:9000/warehouse/' + this.warehouseId + '/items', this.item, {
+                post(process.env.baseUrl + '/api/warehouse/' + this.warehouseId + '/items', this.item, {
                     headers: {
                         'Content-Type': 'application/json',
                         'username': this.$store.state.user.username,

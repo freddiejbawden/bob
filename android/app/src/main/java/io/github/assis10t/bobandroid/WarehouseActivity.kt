@@ -1,5 +1,6 @@
 package io.github.assis10t.bobandroid
 
+import android.app.Activity
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -7,7 +8,10 @@ import android.support.v7.widget.CardView
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.*
+import android.widget.ImageView
 import android.widget.TextView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import io.github.assis10t.bobandroid.pojo.Item
 import io.github.assis10t.bobandroid.pojo.Order
 import io.github.assis10t.bobandroid.pojo.Warehouse
@@ -32,10 +36,10 @@ class WarehouseActivity : ActivityWithLoginMenu() {
         supportActionBar?.setHomeButtonEnabled(true)
         supportActionBar?.title = warehouseName
 
-        container.isEnabled = false
+        container.setOnRefreshListener { refreshItems() }
         item_list.layoutManager = GridLayoutManager(this, 2)
         item_list.adapter = ItemAdapter()
-//        (item_list.adapter as ItemAdapter).updateItems(listOf(
+//        (item_list.adapter as ItemAdapter).updateOrders(listOf(
 //            Item("some_id2", "some_id", "My Item", "my_img", null, null, null, 1.25)
 //        )) //TODO: Remove this.
         view_cart.setOnClickListener {
@@ -93,7 +97,17 @@ class WarehouseActivity : ActivityWithLoginMenu() {
             vh.title.text = item.name
             vh.price.text = item.getPriceText()
             vh.container.setOnClickListener {v ->
-                AddToCartDialog(v.context, item).show()
+                AddToCartDialog(v.context as WarehouseActivity, item).show()
+            }
+            if (item.image == null) {
+                Glide.with(vh.container)
+                    .clear(vh.image)
+                vh.image.setImageDrawable(null)
+            } else {
+                Glide.with(vh.container)
+                    .load(base64ToByteArray(item.image))
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .into(vh.image)
             }
         }
 
@@ -106,6 +120,7 @@ class WarehouseActivity : ActivityWithLoginMenu() {
             val title: TextView = view.findViewById(R.id.title)
             val price: TextView = view.findViewById(R.id.price)
             val container: CardView = view.findViewById(R.id.container)
+            val image: ImageView = view.findViewById(R.id.image)
         }
     }
 }

@@ -4,4 +4,8 @@
             android:id="@+id/zeroconf_bypass"
             android:title="Zeroconf Bypass"
             app:showAsAction="never"/>
+    <item
+            android:id="@+id/cloud"
+            android:title="Use cloud server"
+            app:showAsAction="never"/>
 </menu>

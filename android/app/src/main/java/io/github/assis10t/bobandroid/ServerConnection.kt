@@ -16,7 +16,7 @@ import javax.jmdns.JmDNS
 import javax.jmdns.ServiceEvent
 import javax.jmdns.ServiceListener
 
-// Using API level v2
+// Using API level v3
 
 class ServerConnection {
     companion object {
@@ -25,6 +25,7 @@ class ServerConnection {
         val httpClient: OkHttpClient = OkHttpClient()
 
         val onConnectedListeners: MutableList<(serverAddress: String) -> Unit> = mutableListOf()
+        private val authListeners: MutableList<(loggedIn: Boolean) -> Unit> = mutableListOf()
 
         fun initialize() {
             doAsync {
@@ -61,7 +62,7 @@ class ServerConnection {
 
         fun zeroconfBypass(address: String) {
             Timber.d("Bypassed zeroconf: $address")
-            serverAddress = "http://$address:9000"
+            serverAddress = address
             onConnectedListeners.forEach { it(serverAddress!!) }
             onConnectedListeners.clear()
         }
@@ -136,7 +137,7 @@ class ServerConnection {
     val getWarehousesFactory = { http: OkHttpClient, gson: Gson ->
         { onGetWarehouses: (error: Exception?, warehouses: List<Warehouse>?) -> Unit ->
             connect { server ->
-                getRequestFactory(http, gson)("$server/warehouse") { error, str ->
+                getRequestFactory(http, gson)("$server/api/warehouse") { error, str ->
                     if (error != null) {
                         onGetWarehouses(error, null)
                     } else {
@@ -152,11 +153,16 @@ class ServerConnection {
     val getWarehouseFactory = { http: OkHttpClient, gson: Gson ->
         { warehouseId: String, onGetWarehouse: (error: Exception?, warehouse: Warehouse?) -> Unit ->
             connect { server ->
-                getRequestFactory(http, gson)("$server/warehouse/$warehouseId") { error, str ->
+                getRequestFactory(http, gson)("$server/api/warehouse/$warehouseId") { error, str ->
                     if (error != null) {
                         onGetWarehouse(error, null)
                     } else {
                         val response = gson.fromJson(str!!, GetWarehouseResponse::class.java)
+                        val warehouse = response.warehouse
+                        if (warehouse != null) {
+                            // Remove items that are out of stock.
+                            warehouse.items = warehouse.items.filter { it.quantity != null && it.quantity > 0 }
+                        }
                         onGetWarehouse(null, response.warehouse)
                     }
                 }
@@ -173,7 +179,7 @@ class ServerConnection {
                     onGetOrders(Exception("This operation requires authentication."), null)
                     return@connect
                 }
-                getRequestWithAuthFactory(http, gson)("$server/order", getCurrentUsername(context)!!) { error, str ->
+                getRequestWithAuthFactory(http, gson)("$server/api/order", getCurrentUsername(context)!!) { error, str ->
                     if (error != null) {
                         onGetOrders(error, null)
                     } else {
@@ -194,7 +200,7 @@ class ServerConnection {
                     onOrderComplete?.invoke(Exception("This operation requires authentication."))
                     return@connect
                 }
-                postRequestWithAuthFactory(http, gson)("$server/order", getCurrentUsername(context)!!, order) { error, str ->
+                postRequestWithAuthFactory(http, gson)("$server/api/order", getCurrentUsername(context)!!, order) { error, str ->
                     onOrderComplete?.invoke(error)
                 }
             }
@@ -208,26 +214,29 @@ class ServerConnection {
         context.getSharedPreferences("bob", Context.MODE_PRIVATE).getString("username", null)
     }
 
+    @SuppressLint("ApplySharedPref")
     private val setCurrentUsername = { context: Context, username: String? ->
         if (username == null) {
             context
                 .getSharedPreferences("bob", Context.MODE_PRIVATE)
                 .edit()
                 .remove("username")
-                .apply()
+                .commit()
+            authListeners.forEach { it(false) }
         } else {
             context
                 .getSharedPreferences("bob", Context.MODE_PRIVATE)
                 .edit()
                 .putString("username", username)
-                .apply()
+                .commit()
+            authListeners.forEach { it(true) }
         }
     }
 
     val loginFactory = { http: OkHttpClient, gson: Gson ->
         { context: Context, username: String, onLoginComplete: ((error: Exception?, user: User?) -> Unit)? ->
             connect { server ->
-                postRequestFactory(http, gson)("$server/login", LoginRequest(username)) { error, str ->
+                postRequestFactory(http, gson)("$server/api/login", LoginRequest(username)) { error, str ->
                     if (error != null) {
                         onLoginComplete?.invoke(error, null)
                     } else {
@@ -243,13 +252,14 @@ class ServerConnection {
 
     val logout = { context: Context, onLogoutComplete: ((error: Exception?) -> Unit)? ->
         setCurrentUsername(context, null)
+        Timber.d("Logged out.")
         onLogoutComplete?.invoke(null)
     }
 
     val registerFactory = { http: OkHttpClient, gson: Gson ->
         { context: Context, username: String, onRegisterComplete: ((error: Exception?, user: User?) -> Unit)? ->
             connect { server ->
-                postRequestFactory(http, gson)("$server/register", RegisterRequest(username)) { error, str ->
+                postRequestFactory(http, gson)("$server/api/register", RegisterRequest(username)) { error, str ->
                     if (error != null) {
                         onRegisterComplete?.invoke(error, null)
                     } else {
@@ -262,4 +272,29 @@ class ServerConnection {
         }
     }
     val register = registerFactory(httpClient, Gson())
+
+    val deleteMyDataFactory = { http: OkHttpClient, gson: Gson ->
+        { context: Context, onDeleteMyData: (error: Exception?) -> Unit ->
+            connect { server ->
+                getRequestFactory(http, gson)("$server/api/reset") { error, str ->
+                    if (error != null) {
+                        onDeleteMyData(error)
+                    } else {
+                        logout(context) {_ ->
+                            onDeleteMyData(null)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    val deleteMyData = deleteMyDataFactory(httpClient, Gson())
+
+    fun addAuthListener(listener: (loggedIn: Boolean) -> Unit) {
+        authListeners.add(listener)
+    }
+
+    fun removeAuthListener(listener: (loggedIn: Boolean) -> Unit) {
+        authListeners.remove(listener)
+    }
 }

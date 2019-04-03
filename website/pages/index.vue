@@ -31,6 +31,9 @@ export default {
         user: function () {
             return this.$store.state.user
         }
+    },
+    mounted: function () {
+        console.log('TEST is', process.env.baseUrl)
     }
 };
 </script>

@@ -43,6 +43,7 @@
                                 <td>Quantity</td>
                                 <td>Unit</td>
                                 <td>Price</td>
+                                <td>Size</td>
                                 <td>Edit items</td>
                                 <td>Delete items</td>
                             </tr>
@@ -64,7 +65,10 @@
                                     {{ item.quantity }}
                                 </td>
                                 <td>
-                                    {{ item.unit }}
+                                    {{ item.unit ? item.unit : '-' }}
+                                </td>
+                                <td>
+                                    {{ item.size }}
                                 </td>
                                 <td>
                                     {{ item.price }} GBP
@@ -123,7 +127,7 @@ export default {
         },
         getWarehouses () {
             axios.
-                get('http://localhost:9000/warehouse/', {
+                get(process.env.baseUrl + '/api/warehouse/', {
                     headers: {
                         'Content-Type': 'application/json'
                     }
@@ -146,7 +150,7 @@ export default {
         },
         getItems: function (id) {
             axios.
-                get('http://localhost:9000/warehouse/' + id, {
+                get(process.env.baseUrl + '/api/warehouse/' + id, {
                     headers: {
                         'Content-Type': 'application/json'
                     }
@@ -163,7 +167,7 @@ export default {
         deleteItem: function (warehouseId, itemId, i) {
             axios.
                 delete(
-                    'http://localhost:9000/warehouse/' + warehouseId + '/items/' + itemId, {
+                    process.env.baseUrl + '/api/warehouse/' + warehouseId + '/items/' + itemId, {
                     headers: {
                         'Content-Type': 'application/json',
                         'username': this.$store.state.user.username,

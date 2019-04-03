@@ -92,6 +92,7 @@
                                         {'has-text-warning': order.status == 'PENDING'},
                                         {'has-text-info': order.status == 'IN_TRANSIT'},
                                         {'has-text-success': order.status == 'COMPLETE'},
+                                        {'has-text-success': order.status == 'READY_TO_COLLECT'},
                                         {'has-text-danger': order.status == 'CANCELED'},
                                     ]">
                                         <b>{{ order.status }}</b>
@@ -116,6 +117,7 @@
                                 <td>Position</td>
                                 <td>Quantity</td>
                                 <td>Unit</td>
+                                <td>Size</td>
                                 <td>Price</td>
                                 <td>Edit items</td>
                                 <td>Delete items</td>
@@ -138,7 +140,10 @@
                                     {{ item.quantity }}
                                 </td>
                                 <td>
-                                    {{ item.unit }}
+                                    {{ item.unit ? item.unit : '-' }}
+                                </td>
+                                <td>
+                                    {{ item.size }}
                                 </td>
                                 <td>
                                     {{ item.price }} GBP
@@ -195,7 +200,7 @@ export default {
     methods: {
         getWarehouse () {
             axios.
-                get('http://localhost:9000/warehouse/' + this.warehouseId, {
+                get(process.env.baseUrl + '/api/warehouse/' + this.warehouseId, {
                     headers: {
                         'Content-Type': 'application/json'
                     }
@@ -211,7 +216,7 @@ export default {
                 });
 
             axios.
-                get('http://localhost:9000/warehouse/' + this.warehouseId + '/orders', {
+                get(process.env.baseUrl + '/api/warehouse/' + this.warehouseId + '/orders', {
                     headers: {
                         'Content-Type': 'application/json',
                         'username': this.$store.state.user.username,
@@ -229,7 +234,7 @@ export default {
         deleteItem: function (warehouseId, itemId, i) {
             axios.
                 delete(
-                    'http://localhost:9000/warehouse/' + warehouseId + '/items/' + itemId, {
+                    process.env.baseUrl + '/api/warehouse/' + warehouseId + '/items/' + itemId, {
                     headers: {
                         'Content-Type': 'application/json',
                         'username': this.$store.state.user.username,
@@ -248,7 +253,7 @@ export default {
     mounted: function () {
         this.getWarehouse()
         console.log(this.warehouse)
-        console.log(this.items)
+        console.log(process.env.baseUrl)
     }
 };
 </script>
