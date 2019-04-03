@@ -16,8 +16,8 @@ class Control:
 
     def calculate_torque(self, lval, rval):
         error = lval - rval
-        print('lval', lval)
-        print('rval', rval)
+        #print('lval', lval)
+        #print('rval', rval)
         #print("PID error: ", error)
         self.integral += (error * self.dt)
         derivative = (error - self.previous_error) / self.dt

@@ -6,7 +6,7 @@ from followPath import FollowPath
 from bobTranslation import extract
 from followLine import FollowLine
 import ev3dev.ev3 as ev3
-
+import time
 import json
  # Get local machine name
 class EV3Listener:
@@ -21,33 +21,45 @@ class EV3Listener:
         s.bind((HOST, PORT))
         print("Listening on {}:{}".format(HOST,PORT))
         #ev3.Sound.tone([(1000, 250, 0),(1500, 250, 0),(2000, 250, 0)]).wait()
-        while True:
-            s.listen(2)
-            conn, addr = s.accept()
-            print('Connected by', addr)
-
-            data = conn.recv(1024)
-            if data:
-
-                str_instruction = data.decode('utf-8')
-                str_instruction = str_instruction.replace('\'', '\"')
-                str_instruction = str_instruction.replace('u\"', '\"')
-                print(str_instruction)
-        
-                if str_instruction == 'move_in':
-                    self.path_follower.go('in')
-                elif str_instruction == 'move_out':
-                   self.path_follower.go('out')
-                elif str_instruction == 'stop_shelf':
-                     self.path_follower.go('stop')
-                else:
-                    try:
+        s.listen(2)
+        conn, addr = s.accept()
+        print('Connected by', addr)
+        try:
+            while True:
+                data = conn.recv(1024)
+                if data:
+                    str_instruction = data.decode('utf-8')
+                    str_instruction = str_instruction.replace('\'', '\"')
+                    str_instruction = str_instruction.replace('u\"', '\"')
+                    print(str_instruction)
+                    if str_instruction == 'FIN':
+                        return
+                    elif str_instruction == 'move_in' or str_instruction == 'in':
+                        self.path_follower.go(['in'])
+                    elif str_instruction == 'move_out'or str_instruction == 'in':
+                        self.path_follower.go(['out'])
+                    elif str_instruction == 'stop_shelf':
+                        self.path_follower.go(['stop'])
+                    elif str_instruction == 'move_out_upper':
+                        self.path_follower.go(['move_out_upper'])
+                    elif str_instruction == 'prep_for_upper':
+                        self.path_follower.go(['prep_for_upper'])
+                    elif str_instruction == 'move_forward_a_little':
+                        self.path_follower.go(['move_forward_a_little'])
+                    elif str_instruction == 'move_back_a_little':
+                        self.path_follower.go(['move_back_a_little'])
+                    elif str_instruction == 'reset':
+                        self.path_follower.go(['reset'])
+                    else:
                         movement = json.loads(str_instruction)
-                        self.path_follower.go(extract(movement))
-                    except:
-                        continue
-                print('done')
-                conn.sendall(b'done')
-                conn.close()
+                        self.path_follower.go([extract(movement)])
+                    print('done')
+                    conn.sendall(b'done')
+        except KeyboardInterrupt:
+            print("Interrupted! Closing")
+            conn.close()
+        finally:
+            print("Ended. Closing")
+            conn.close()
 ev3 = EV3Listener()
 ev3.get_instructions()
