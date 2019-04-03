@@ -6,12 +6,12 @@ import control
 
 class FollowLine:
     # From https://gist.github.com/CS2098/ecb3a078ed502c6a7d6e8d17dc095b48
-    MOTOR_SPEED = 700
+    MOTOR_SPEED = 1000
     DT = 50  # milliseconds  -  represents change in time since last sensor reading/
 
 
     MARKING_NUMBER = 1  # number of consecutive colour readings to detect marking
-    MARKING_INTERVAL = 1  # time between marking checks in seconds
+    MARKING_INTERVAL = 1.6  # time between marking checks in seconds
     reverse = False
 
     BLACK = 1  # black reading from colour sensor in COL-COLOR mode
@@ -19,7 +19,8 @@ class FollowLine:
     GREEN = 3  # green reading from colour sensor in COL-COLOR mode
 
     CORRECTION_TIME = 100  # time in millisecond Bob moves away from blue line to correct sideways movement
-    SIDEWAYS_SPEED = 600   # how fast Bob moves when moving sideways
+    SIDEWAYS_SPEED = 1000   # how fast Bob moves when moving sideways
+    YEET_SPEED = 900  # how fast Bob moves when yeeting forward or backward
 
     # Constructor
     def __init__(self):
@@ -52,8 +53,8 @@ class FollowLine:
         self.start_time = 0  # when robot starts doing a command
         self.marker_counter = 0  # how many markers have been passed in current command
 
-        self.reverse = 1  # 1 if Bob is reversing, -1 if not
-
+        self.reverse = -1  # -1 if Bob is reversing, 1 if not
+        self.moving_out_over_black_count = 0
     def detect_marking(self, colour_left, colour_right, desired_colour):
         # print(colour_left, colour_right)
         if colour_right == desired_colour and colour_left == desired_colour:
@@ -120,8 +121,8 @@ class FollowLine:
         # Set the speed of the motors
         speed_left = self.limit_speed(self.MOTOR_SPEED + torque)
         speed_right = self.limit_speed(self.MOTOR_SPEED - torque)
-        print('Speed left:', speed_left)
-        print('Speed right:', speed_right)
+        #print('Speed left:', speed_left)
+        #print('Speed right:', speed_right)
 
         # run motors
         motor_left.run_timed(time_sp=self.DT, speed_sp=speed_left * self.reverse)
@@ -132,7 +133,7 @@ class FollowLine:
 
     # move forward
     def run_forward(self, distance, desired_colour):
-        self.reverse = -1
+        self.reverse = 1
         self.start_time = time()
         self.marker_counter = 0
         pid_controller = control.Control(self.DT)
@@ -145,7 +146,7 @@ class FollowLine:
 
     # move backward
     def run_backward(self, distance, desired_colour):
-        self.reverse = 1
+        self.reverse = -1
         self.start_time = time()
         self.marker_counter = 0
         pid_controller = control.Control(self.DT)
@@ -163,25 +164,25 @@ class FollowLine:
 
         while not self.shut_down:
             # if a colour sensor is on a blue line, correct position to be between them again
-            if direction == 'left':
-                right_speed = self.SIDEWAYS_SPEED/2.0
-                left_speed = self.SIDEWAYS_SPEED
-            else:
-                right_speed = self.SIDEWAYS_SPEED
-                left_speed = self.SIDEWAYS_SPEED / 2.0
+            #if direction == 'left':
+             #   right_speed = self.SIDEWAYS_SPEED/2.0
+              #  left_speed = self.SIDEWAYS_SPEED
+            #else:
+             #   right_speed = self.SIDEWAYS_SPEED
+             #   left_speed = self.SIDEWAYS_SPEED / 2.0
             if self.detect_marking(self.csbl.value(), self.csbr.value(), self.BLUE):
                 # back sensors on blue line, so move forward for some time
-                self.lm.run_timed(time_sp=self.CORRECTION_TIME, speed_sp=-left_speed)
-                self.rm.run_timed(time_sp=self.CORRECTION_TIME, speed_sp=-right_speed)
+                self.lm.run_timed(time_sp=self.CORRECTION_TIME, speed_sp=self.SIDEWAYS_SPEED)
+                self.rm.run_timed(time_sp=self.CORRECTION_TIME, speed_sp=self.SIDEWAYS_SPEED)
                 sleep(self.CORRECTION_TIME / 1000)
             if self.detect_marking(self.csfl.value(), self.csfr.value(), self.BLUE):
                 # front sensors on blue line, so move backward for some time
 
-                self.lm.run_timed(time_sp=self.CORRECTION_TIME, speed_sp=left_speed)
-                self.rm.run_timed(time_sp=self.CORRECTION_TIME, speed_sp=right_speed)
+                self.lm.run_timed(time_sp=self.CORRECTION_TIME, speed_sp=-self.SIDEWAYS_SPEED)
+                self.rm.run_timed(time_sp=self.CORRECTION_TIME, speed_sp=-self.SIDEWAYS_SPEED)
                 sleep(self.CORRECTION_TIME / 1000)
 
-            # colour sensor for marking detection needs to be at front or back dependng on the last direction
+            # colour sensor for marking detection needs to be at front or back depending on the last direction
             if last_direction == 'forward':
                 cs_left = self.csbr
                 cs_right = self.csbl
@@ -194,11 +195,11 @@ class FollowLine:
             if direction == 'left':
                 self.cm.run_timed(time_sp=self.DT, speed_sp=self.SIDEWAYS_SPEED)
                 sleep(self.DT / 1000)
-                self.count_markings(cs_left, cs_left, self.BLACK)
+                self.count_markings(cs_left, cs_left, self.GREEN)
             if direction == 'right':
                 self.cm.run_timed(time_sp=self.DT, speed_sp=-self.SIDEWAYS_SPEED)
                 sleep(self.DT / 1000)
-                self.count_markings(cs_right, cs_right, self.BLACK)
+                self.count_markings(cs_right, cs_right, self.GREEN)
 
             if self.marker_counter >= distance:
                 return
@@ -233,18 +234,47 @@ class FollowLine:
         return
 
     def move_away_from_shelf(self):
+        # move out until black is seen
+        print('move back: lower')
+        self.cm.run_timed(time_sp=300, speed_sp=self.SIDEWAYS_SPEED)
+        sleep(0.3)
+        if self.detect_marking(self.csbr, self.csbr, self.BLACK):
+            print("BLACK!")
+            return
+    def move_away_from_shelf_upper(self):
+        # move out until black is seen
+        print('move back: upper')
+        self.cm.run_timed(time_sp=600, speed_sp=self.SIDEWAYS_SPEED)
+        sleep(0.6)
 
-        self.cm.run_timed(time_sp=1000, speed_sp=self.SIDEWAYS_SPEED)
-        sleep(1)
-        #if self.detect_marking(self.csbl.value(), self.csbl.value(), self.BLACK):
-        # if self.detect_marking(self.csbl.value(), self.csbl.value(), self.BLACK):
-        return
-
+    def prep_for_upper(self):
+        # move out until black is seen
+        print('prep for upper')
+        self.cm.run_timed(time_sp=400, speed_sp=self.SIDEWAYS_SPEED)
+        sleep(0.4)
+    def reset_from_move(self):
+        print('reset')
+        self.cm.run_timed(time_sp=350, speed_sp=-self.SIDEWAYS_SPEED)
+        sleep(0.4)
     def stop_shelf_movement(self):
-        self.cm.stop(stop_action='hold')
+        self.cm.stop(stop_action='brake')
+
+    def move_forward_for_a_little_bit(self):
+        # move forward for a while
+        print('moving forward for some time')
+        self.lm.run_timed(time_sp=1000, speed_sp=self.YEET_SPEED)
+        self.rm.run_timed(time_sp=1000, speed_sp=self.YEET_SPEED)
+        sleep(1)
+
+    def move_backward_for_a_little_bit(self):
+        # move forward for a while
+        print('moving forward for some time')
+        self.lm.run_timed(time_sp=1000, speed_sp=-self.YEET_SPEED)
+        self.rm.run_timed(time_sp=1000, speed_sp=-self.YEET_SPEED)
+        sleep(1)
 
     def stop(self):
         self.shut_down = True
         self.rm.stop()
         self.lm.stop()
-        ev3.Sound.speak("whack").wait()
+        #ev3.Sound.speak("Whack").wait()

@@ -91,9 +91,12 @@ package_items_into_groups = (item_list) => {
         }
     }
     var item_groups = []
-    if (item_groups.length > 0) {
-        item_groups.push(sorted_items.large)
+  
+    for (var i = 0; i < sorted_items.large.length;i++) {
+        item_groups.push([sorted_items.large[i]])
     }
+       
+    
    
     for (var i = 0; i < sorted_items.small.length; i+=2) {
         if (i + 1 < sorted_items.small.length) {
@@ -134,6 +137,7 @@ package_items_into_groups = (item_list) => {
     var robot_xy = [robot_pos['x'], robot_pos['y'], robot_pos['z']]
     const robot_home_xy = [robot['home_x'],robot['home_y']]
     // collect item groups
+    console.log(item_groups)
     for (var i = 0; i < item_groups.length; i++) {
         var current_group = item_groups[i]
         var path = []

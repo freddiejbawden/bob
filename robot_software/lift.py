@@ -5,14 +5,13 @@ import sys
 
 class Lift:
     MC_SPEED = 100
-    LIFT_TIME = 5
+    LIFT_TIME = 13
     # use ports 2 and 3
     mc_id_a = 2
     mc_id_b = 3
 
-    def __init__(self, onRobot):
-        IO = IOTools(True)
-        self.mc = IO.motor_control
+    def __init__(self,onRobot, mc):
+        self.mc = mc
         self.mc.stopMotors()
 
     def lift(self, direction):
@@ -21,13 +20,15 @@ class Lift:
             self.mc.setMotor(self.mc_id_a, -self.MC_SPEED)
             self.mc.setMotor(self.mc_id_b, -self.MC_SPEED)
             time.sleep(self.LIFT_TIME)
-            self.mc.stopMotors()
+            self.mc.stopMotor(self.mc_id_a)
+            self.mc.stopMotor(self.mc_id_b)
             time.sleep(1)
         elif direction == 'down':
             self.mc.setMotor(self.mc_id_a, self.MC_SPEED)
             self.mc.setMotor(self.mc_id_b, self.MC_SPEED)
             time.sleep(self.LIFT_TIME/2.0)
-            self.mc.stopMotors()
+            self.mc.stopMotor(self.mc_id_a)
+            self.mc.stopMotor(self.mc_id_b)
             time.sleep(1)
 
 
