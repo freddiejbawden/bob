@@ -52,7 +52,7 @@ class AddToCartDialog(val activity: WarehouseActivity, val item: Item): Dialog(a
                 item._id,
                 item.warehouseId,
                 item.name,
-                item.image,
+                null,
                 item.position,
                 Integer.parseInt(quantity.text.toString()).toDouble(),
                 item.unit,
