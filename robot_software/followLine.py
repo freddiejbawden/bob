@@ -135,7 +135,11 @@ class FollowLine:
     # move forward
     def run_forward(self, distance, desired_colour):
         self.reverse = 1
-        self.start_time = time()
+        if desired_colour == self.BLUE:
+            # distance between lines is shorter
+            self.start_time = time() - int(self.MARKING_INTERVAL*(3/4))
+        else:
+            self.start_time = time()
         self.marker_counter = 0
         pid_controller = control.Control(self.DT)
 
@@ -148,7 +152,11 @@ class FollowLine:
     # move backward
     def run_backward(self, distance, desired_colour):
         self.reverse = -1
-        self.start_time = time()
+        if desired_colour == self.BLUE:
+            # distance between lines is shorter
+            self.start_time = time() - int(self.MARKING_INTERVAL*(3/4))
+        else:
+            self.start_time = time()
         self.marker_counter = 0
         pid_controller = control.Control(self.DT)
 
