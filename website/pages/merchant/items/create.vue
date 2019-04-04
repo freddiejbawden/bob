@@ -16,7 +16,7 @@
                     <div class="box p30 pl50 pr50">
                         <form action="">
                             <div class="field">
-                                <label class="label">Item name:</label>
+                                <label class="label">* Item name:</label>
                                 <div class="control">
                                     <input class="input" type="text" placeholder="Enter item name" v-model="name">
                                 </div>
@@ -43,7 +43,7 @@
                                             <option 
                                                 :value="n - 1"
                                                 v-for="n in (warehouse.dimensions.x + 1)">
-                                                {{ n - 1 }}
+                                                {{ n }}
                                             </option>
                                         </select>
                                     </div>
@@ -56,7 +56,7 @@
                                             <option 
                                                 :value="n - 1"
                                                 v-for="n in (warehouse.dimensions.y + 1)">
-                                                {{ n - 1 }}
+                                                {{ n }}
                                             </option>
                                         </select>
                                     </div>
@@ -69,7 +69,7 @@
                                             <option 
                                                 :value="n - 1"
                                                 v-for="n in warehouse.dimensions.z.length">
-                                                {{ n - 1 }}
+                                                {{ n }} 
                                             </option>
                                         </select>
                                     </div>
@@ -78,12 +78,15 @@
                             <div class="field" v-if="warehouse.dimensions">
                                 <div class="control columns">
                                     <div class="column is-6">
-                                        <label class="label">Quantity:</label>
+                                        <label class="label">* Quantity:</label>
                                         <input class="input" type="number" placeholder="Enter item quantity" v-model.number="quantity">
                                     </div>
                                     <div class="column is-6">
                                         <label class="label">Unit:</label>
                                         <input class="input" type="text" placeholder="Enter measerment unit" v-model="unit">
+                                        <p class="help is-size-8 mb0">
+                                            <i>kg</i>, <i>lbs</i>, <i>litres</i>, etc... or blank.
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -107,7 +110,7 @@
                             </div>
                             <div class="field">
                                 <div class="control">
-                                    <label class="label">Price:</label>
+                                    <label class="label">* Price (in GBP):</label>
                                     <input class="input" type="number" placeholder="Enter item price" v-model.number="price">
                                 </div>
                             </div>
@@ -146,17 +149,17 @@ export default {
             warehouseId: this.$nuxt._route.params.id,
             warehouse: {},
 
-            name: null,
+            name: "",
             image: null,
             position: {
                 x: 0,
                 y: 0,
                 z: 0,
             },
-            quantity: null,
+            quantity: "",
             unit: null,
             size: 'tiny',
-            price: null
+            price: ""
         }
     },
     methods: {
@@ -222,7 +225,7 @@ export default {
     },
     computed: {
         can_submit: function () {
-            return this.name && this.quantity && this.price
+            return this.name.toString().length > 0 && this.quantity.toString().length > 0 && this.price.toString().length > 0
         }
     },
     mounted: function () {

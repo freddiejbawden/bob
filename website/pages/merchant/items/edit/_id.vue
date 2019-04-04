@@ -3,7 +3,7 @@
         <section class="section pt60 pt30t pb0">
             <div class="container has-text-centered">
                 <h1 class="is-inline-block is-relative mb25">
-                    Add item
+                    Edit item
                 </h1>
             </div>
         </section>

@@ -16,8 +16,8 @@ module.exports = {
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
-      { rel: 'stylesheet', type: 'text/css', href: '//cdn.materialdesignicons.com/2.0.46/css/materialdesignicons.min.css' },
-      { rel: 'stylesheet', type: 'text/css', href: 'https://fonts.googleapis.com/css?family=Raleway&Open+Sans' }
+      // { rel: 'stylesheet', type: 'text/css', href: '//cdn.materialdesignicons.com/2.0.46/css/materialdesignicons.min.css' },
+      // { rel: 'stylesheet', type: 'text/css', href: 'https://fonts.googleapis.com/css?family=Raleway&Open+Sans' }
     ]
   },
 
@@ -34,7 +34,8 @@ module.exports = {
   ** Global CSS
   */
   css: [
-    '@/assets/sass/style.sass'
+    '@/assets/sass/style.sass',
+    '@/node_modules/@mdi/font/css/materialdesignicons.min.css',
   ],
 
   /*

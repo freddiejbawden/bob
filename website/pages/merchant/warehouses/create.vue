@@ -12,7 +12,7 @@
                     <div class="box p30 pl50 pr50">
                         <form action="">
                             <div class="field">
-                                <label class="label">Warehouse name:</label>
+                                <label class="label">* Warehouse name:</label>
                                 <div class="control">
                                     <input class="input" type="text" placeholder="Enter your warehouse name" v-model="name">
                                 </div>
@@ -42,22 +42,33 @@
                                 </p>
                                 <div class="control columns">
                                     <div class="column is-6">
-                                        <input class="input" type="number" placeholder="Enter X dim" v-model.number="dimensions.x">
+                                        <input class="input" type="number" placeholder="* Enter X dim" v-model.number="dimensions.x">
                                     </div>
                                     <div class="column is-6">
-                                        <input class="input" type="number" placeholder="Enter Y dim" v-model.number="dimensions.y">
+                                        <input class="input" type="number" placeholder="* Enter Y dim" v-model.number="dimensions.y">
                                     </div>
                                 </div>
                                 <p class="help is-size-8">
                                     The Z values are the amount of shelfs and their respected heights from the robot's perspective. (Include bottom shelf as 0.0)
                                 </p>
-                                <input 
-                                    type="number" 
-                                    class="input half-width mb10" 
+                                <div
                                     v-for="(shelf, i) in dimensions.z"
                                     :key="'shelf-' + i"
-                                    :placeholder="'Enter shelf N' + (i + 1) + ' height'"
-                                    v-model.number="dimensions.z[i]">
+                                    class="is-flex align-center mb10">
+
+                                    <input 
+                                        type="number" 
+                                        class="input half-width" 
+                                        :placeholder="'Enter shelf N' + (i + 1) + ' height'"
+                                        v-model.number="dimensions.z[i]">
+                                    <a 
+                                        href="javascript:;" 
+                                        class="is-inline-block has-text-danger ml10" 
+                                        @click="deleteShelf(i)">
+                                       
+                                        <i class="mdi mdi-minus-circle is-size-4"></i>
+                                    </a>
+                                </div>
 
                                 <a href="javascript:;" class="button is-link is-outlined is-smallish mt15" @click="addShelf()">
                                     <span>Add a shelf</span>
@@ -95,15 +106,15 @@ export default {
     },
     data: function () {
         return {
-            name: null,
+            name: "",
             image: null,
             location: {
-                latitude: null,
-                longitude: null
+                latitude: "",
+                longitude: ""
             },
             dimensions: {
-                x: null,
-                y: null,
+                x: "",
+                y: "",
                 z: [
                     0.0
                 ]
@@ -113,6 +124,9 @@ export default {
     methods: {
         addShelf: function () {
             this.dimensions.z.push(this.dimensions.z[this.dimensions.z.length - 1])
+        },
+        deleteShelf: function (i) {
+            this.dimensions.z.splice(i, 1)
         },
         uploadFile: function (event) {
             let file = event.target.files[0]
@@ -158,7 +172,7 @@ export default {
     },
     computed: {
         can_submit: function () {
-            return this.name && this.location.latitude && this.location.longitude && this.dimensions.x && this.dimensions.y
+            return this.name.toString().length > 0 && this.dimensions.x.toString().length > 0 && this.dimensions.y.toString().length > 0
         }
     }
 };
