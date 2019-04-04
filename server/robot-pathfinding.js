@@ -17,7 +17,7 @@ makeWarehouse = (width, height) => {
     // add shelves
     for (var s = 0; s < number_of_shelves; s++) {
         for (var i = 1; i < width - 1; i++) {
-            walkable_grid[s * 2][i] = 1
+            walkable_grid[s * 2 + 1][i] = 1
         }
     }
     return walkable_grid
@@ -26,7 +26,9 @@ makeWarehouse = (width, height) => {
 pathfind_to_point = (current_pos, end_pos, warehouse_grid) => {
     var pf_grid = new PF.Grid(warehouse_grid)
     var finder = new PF.AStarFinder()
-
+    console.log(warehouse_grid)
+    console.log(current_pos)
+    console.log(end_pos)
     var path = finder.findPath(current_pos[0], current_pos[1], end_pos[0], end_pos[1], pf_grid)
     path = PF.Util.compressPath(path)
 
@@ -59,19 +61,19 @@ generate_movement_instruction = (start, end) => {
         var num_blocks = end[0] - start[0]
         var direction = ''
         if (num_blocks < 0) {
-            direction = 'forward'
+            direction = 'backward'
             num_blocks = num_blocks * -1
         } else {
-            direction = 'backward'
+            direction = 'forward'
         }
     } else {
         var num_blocks = end[1] - start[1]
         var direction = ''
         if (num_blocks < 0) {
-            direction = 'right'
+            direction = 'left'
             num_blocks = num_blocks * -1
         } else {
-            direction = 'left'
+            direction = 'right'
         }
     }
     return {
@@ -95,8 +97,10 @@ package_items_into_groups = item_list => {
     for (var i = 0; i < sorted_items.large.length; i++) {
         item_groups.push([sorted_items.large[i]])
     }
-
+    console.log(sorted_items)
+    
     for (var i = 0; i < sorted_items.small.length; i += 2) {
+        
         if (i + 1 < sorted_items.small.length) {
             item_groups.push([sorted_items.small[i], sorted_items.small[i + 1]])
         } else {
@@ -105,7 +109,7 @@ package_items_into_groups = item_list => {
             } else {
                 item_groups.push([sorted_items.small[i]])
             }
-        }
+        } 
     }
     for (var i = 0; i < sorted_items.tiny.length; i += 3) {
         to_push = [sorted_items.tiny[i]]
@@ -120,6 +124,7 @@ package_items_into_groups = item_list => {
     return item_groups
 }
 convert_order_to_job = (order, robot, warehouse_grid) => {
+    console.log(warehouse_grid)
     if (order == undefined) {
         return {}
     }
@@ -132,6 +137,7 @@ convert_order_to_job = (order, robot, warehouse_grid) => {
         instruction_set: []
     }
     var robot_xy = [robot_pos['x'], robot_pos['y'], robot_pos['z']]
+    console.log(robot_xy)
     const robot_home_xy = [robot['home_x'], robot['home_y']]
     // collect item groups
     console.log(item_groups)
@@ -146,6 +152,7 @@ convert_order_to_job = (order, robot, warehouse_grid) => {
             if (path == [] || path == undefined) {
                 return {}
             }
+            console.log(path)
             //go to position and grab
             for (var p = 1; p < path.length; p++) {
                 job['instruction_set'].push(generate_movement_instruction(path[p - 1], path[p]))

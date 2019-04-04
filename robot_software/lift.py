@@ -5,7 +5,6 @@ import sys
 
 class Lift:
     MC_SPEED = 100
-    LIFT_TIME = 13
     # use ports 2 and 3
     mc_id_a = 2
     mc_id_b = 3
@@ -16,20 +15,26 @@ class Lift:
 
     def lift(self, direction):
         print('lifting {}'.format(direction))
-        if direction == 'up':
-            self.mc.setMotor(self.mc_id_a, -self.MC_SPEED)
-            self.mc.setMotor(self.mc_id_b, -self.MC_SPEED)
-            time.sleep(self.LIFT_TIME)
-            self.mc.stopMotor(self.mc_id_a)
-            self.mc.stopMotor(self.mc_id_b)
-            time.sleep(1)
-        elif direction == 'down':
-            self.mc.setMotor(self.mc_id_a, self.MC_SPEED)
-            self.mc.setMotor(self.mc_id_b, self.MC_SPEED)
-            time.sleep(self.LIFT_TIME/2.0)
-            self.mc.stopMotor(self.mc_id_a)
-            self.mc.stopMotor(self.mc_id_b)
-            time.sleep(1)
+        try:
+            if direction == 'up':
+                self.mc.setMotor(self.mc_id_a, -self.MC_SPEED)
+                self.mc.setMotor(self.mc_id_b, -self.MC_SPEED)
+                raw_input()
+                #time.sleep(10)
+                self.mc.stopMotor(self.mc_id_a)
+                self.mc.stopMotor(self.mc_id_b)
+                time.sleep(1)
+            elif direction == 'down':
+                self.mc.setMotor(self.mc_id_a, self.MC_SPEED)
+                self.mc.setMotor(self.mc_id_b, self.MC_SPEED)
+                raw_input()
+                #time.sleep(8)
+                self.mc.stopMotor(self.mc_id_a)
+                self.mc.stopMotor(self.mc_id_b)
+                time.sleep(1)
+        except KeyboardInterrupt:
+                self.mc.stopMotor(self.mc_id_a)
+                self.mc.stopMotor(self.mc_id_b)
 
 
 if __name__ == "__main__":
