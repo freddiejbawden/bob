@@ -130,9 +130,17 @@ const factory = db => ({
             .deleteOne({ _id: ObjectID(item._id) }),
     createUser: (username, type) => {
         const user = { _id: new ObjectID(), username, type }
-        return db()
-            .collection('users')
-            .insertOne(user)
+        return factory(db)
+            .authUser(username)
+            .then(user => {
+                if (user) throw new Error('User already exists.')
+                return true
+            })
+            .then(() =>
+                db()
+                    .collection('users')
+                    .insertOne(user)
+            )
             .then(() => user)
     },
     authUser: username =>
@@ -151,7 +159,7 @@ const factory = db => ({
         return new Promise((res, rej) => {
             db()
                 .collection('robot')
-                .find({ 'username': robot_username })
+                .find({ username: robot_username })
                 .toArray((err, robot) => {
                     console.log(robot)
                     console.log(err)
@@ -188,7 +196,7 @@ const factory = db => ({
         new Promise((res, rej) => {
             db()
                 .collection('robot')
-                .findOne({ 'username': robot_id })
+                .findOne({ username: robot_id })
                 .then((robot, err) => {
                     if (err) {
                         rej(err)
@@ -226,7 +234,7 @@ const factory = db => ({
                                                                 db()
                                                                     .collection('robot')
                                                                     .updateOne(
-                                                                        { 'username': robot_id },
+                                                                        { username: robot_id },
                                                                         { $set: { status: 'ON_JOB' } }
                                                                     )
                                                                     .then(() => res(robot_job))
