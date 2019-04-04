@@ -85,6 +85,7 @@ class RobotJobListener():
             res = None
            
             if command == "grab":
+                print("grab")
                 res = self.reliable_grab(instruction["parameters"]['height'], approach_vector)
             elif command == "drop":
                 res = self.reliable_send_data(self.rasp_target, str("drop"))
@@ -155,7 +156,7 @@ class RobotJobListener():
                 self.reliable_send_data(self.rasp_target, "upper_grab")
                 self.reliable_send_data(self.ev3_target,"move_out_upper")
                 self.reliable_send_data(self.rasp_target, "retract")
-                self.reliable_send_data(self.ev3_target,"reset")
+                
             else:
                 self.reliable_send_data(self.rasp_target,"grab")
                 self.reliable_send_data(self.rasp_target, "retract")
@@ -169,8 +170,11 @@ class RobotJobListener():
                 thread_manager['bumped'] = True
                 return
 
-            status = centre_detection()
-            self.reliable_send_data(self.ev3_target,"move_out")
+            
+            if height >= 1:
+                self.reliable_send_data(self.ev3_target,"reset")
+            else:
+                self.reliable_send_data(self.ev3_target,"move_out")
 
             self.reliable_send_data(self.rasp_target,"lift 0")
 
