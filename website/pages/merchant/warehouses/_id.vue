@@ -134,7 +134,7 @@
                                 <td>
                                     X: <i>{{ item.position ? item.position.x : 'not set' }},</i>
                                     Y: <i>{{ item.position ? item.position.y : 'not set' }}</i> <br>
-                                    Shelf: <i>{{ item.position ? item.position.z : 'not set' }} </i><br>
+                                    Shelf: <i>{{ item.position ? item.position.z + 1 : 'not set' }} </i><br>
                                 </td>
                                 <td>
                                     {{ item.quantity }}

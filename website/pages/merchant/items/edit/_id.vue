@@ -40,7 +40,7 @@
                                             <option 
                                                 :value="n - 1"
                                                 v-for="n in (warehouse.dimensions.x + 1)">
-                                                {{ n - 1 }}
+                                                {{ n }}
                                             </option>
                                         </select>
                                     </div>
@@ -53,7 +53,7 @@
                                             <option 
                                                 :value="n - 1"
                                                 v-for="n in (warehouse.dimensions.y + 1)">
-                                                {{ n - 1 }}
+                                                {{ n }}
                                             </option>
                                         </select>
                                     </div>
@@ -64,9 +64,9 @@
                                             class="input"
                                             v-model.number="item.position.z">
                                             <option 
-                                                :value="n - 1"
-                                                v-for="n in warehouse.dimensions.z.length">
-                                                {{ n - 1 }}
+                                                :value="i"
+                                                v-for="(height, i) in warehouse.dimensions.z">
+                                                {{ i + 1 }}: {{ height }}m
                                             </option>
                                         </select>
                                     </div>
@@ -104,7 +104,7 @@
                             </div>
                             <div class="field" v-if="warehouse.dimensions">
                                 <div class="control">
-                                    <label class="label">Price:</label>
+                                    <label class="label">Price (in GBP):</label>
                                     <input class="input" type="number" placeholder="Enter item price" v-model.number="item.price">
                                 </div>
                             </div>

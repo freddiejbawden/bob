@@ -67,9 +67,9 @@
                                             class="input"
                                             v-model.number="position.z">
                                             <option 
-                                                :value="n - 1"
-                                                v-for="n in warehouse.dimensions.z.length">
-                                                {{ n }} 
+                                                :value="i"
+                                                v-for="(height, i) in warehouse.dimensions.z">
+                                                {{ i + 1 }}: {{ height }}m
                                             </option>
                                         </select>
                                     </div>
@@ -83,7 +83,7 @@
                                     </div>
                                     <div class="column is-6">
                                         <label class="label">Unit:</label>
-                                        <input class="input" type="text" placeholder="Enter measerment unit" v-model="unit">
+                                        <input class="input" type="text" placeholder="Enter measurment unit" v-model="unit">
                                         <p class="help is-size-8 mb0">
                                             <i>kg</i>, <i>lbs</i>, <i>litres</i>, etc... or blank.
                                         </p>
