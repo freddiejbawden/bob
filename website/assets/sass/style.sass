@@ -943,6 +943,18 @@ main
 .hero-slide
     min-height: 40rem
 
+h1 span
+    color: $primary
+    font-size: inherit
+    font-weight: inherit
+
+
+h2 span,
+h3 span,
+h4 span
+    font-size: inherit
+    font-weight: inherit
+
 .partners-carousel
     .partner-slide
         height: 100%
@@ -982,6 +994,7 @@ footer
 
     .footer-content
         position: absolute
+        top: 0
         right: 0
         bottom: 0
         left: 0
@@ -989,18 +1002,13 @@ footer
         color: #fff
         font-family: $family-secondary
 
-        @include tablet
-            position: relative
+        .footer-logo
+            width: 100%
+            display: flex
+            justify-content: center
 
-            .footer-logo
-                width: 100%
-                display: flex
-                justify-content: center
-                padding-top: 2rem
-            .footer-nav
-                width: 33%
-            .footer-credits
-                text-align: center
+            svg
+                width: 50%
 
         .level
             margin: 1rem 2.5rem 0 2.5rem

@@ -17,12 +17,8 @@
                     url: '/bob-app'
                 },
                 {
-                    name: 'About',
+                    name: 'About the Team',
                     url: '/about'
-                },
-                {
-                    name: 'Contact us',
-                    url: '/contacts'
                 },
             ]"
         >
