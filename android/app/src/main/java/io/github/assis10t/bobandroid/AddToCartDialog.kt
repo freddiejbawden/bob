@@ -2,14 +2,19 @@ package io.github.assis10t.bobandroid
 
 import android.app.Dialog
 import android.content.Context
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.widget.TextView
+import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.cesarferreira.pluralize.pluralize
+import com.cesarferreira.pluralize.singularize
+import com.cesarferreira.pluralize.utils.Plurality
 import io.github.assis10t.bobandroid.pojo.Item
 import kotlinx.android.synthetic.main.dialog_add_to_cart.*
 import timber.log.Timber
@@ -22,6 +27,14 @@ class AddToCartDialog(val activity: WarehouseActivity, val item: Item): Dialog(a
         title.text = item.name
         price.text = item.getPriceText()
         total.text = "£${"%.2f".format(item.price)}"
+
+        val unitText =
+            if (item.quantity!!.toInt() == 1)
+                (item.unit?:"item").singularize()
+            else
+                (item.unit?:"item").pluralize()
+
+        unit.text = "${item.quantity.toInt()} $unitText"
 
         if (item.image == null) {
             image.visibility = View.GONE
@@ -39,10 +52,17 @@ class AddToCartDialog(val activity: WarehouseActivity, val item: Item): Dialog(a
                 val amountSelected = s.toString().toIntOrNull()
                 if (amountSelected != null) {
                     total.text = "£${"%.2f".format(amountSelected * item.price)}"
-                    add_to_cart.isEnabled = (item.quantity == null || amountSelected <= item.quantity) && amountSelected > 0
+                    if (amountSelected <= item.quantity && amountSelected > 0) {
+                        add_to_cart.isEnabled = true
+                        unit.setTextColor(Color.parseColor("#89000000"))
+                    } else {
+                        add_to_cart.isEnabled = false
+                        unit.setTextColor(Color.parseColor("#89FF0000"))
+                    }
                 } else {
                     total.text = ""
                     add_to_cart.isEnabled = false
+                    unit.setTextColor(Color.parseColor("#89000000"))
                 }
             }
         })
@@ -59,7 +79,11 @@ class AddToCartDialog(val activity: WarehouseActivity, val item: Item): Dialog(a
                 item.price,
                 item.size
             )
-            addToCart(context, cartItem)
+            val success = addToCart(context, cartItem)
+            if (!success) {
+                Toast.makeText(context, "Couldn't add item to cart.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
             activity.refreshItems()
             Timber.d("Cart: ${getCart(context)}")
             val dialog = AddedToCartDialog(context)

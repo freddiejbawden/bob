@@ -64,12 +64,23 @@
                         android:textAlignment="center"/>
                 <TextView
                         style="@style/TextAppearance.MaterialComponents.Caption"
+                        android:id="@+id/out_of"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="out of "
+                        android:layout_toEndOf="@id/quantity"
+                        android:layout_alignBaseline="@id/quantity"
+                />
+                <TextView
+                        style="@style/TextAppearance.MaterialComponents.Caption"
                         android:id="@+id/unit"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="items"
-                        android:layout_toEndOf="@id/quantity"
-                        android:layout_alignBaseline="@id/quantity"/>
+                        android:text="50 items"
+                        android:layout_toEndOf="@id/out_of"
+                        android:layout_alignBaseline="@id/quantity"
+                        android:textColor="#89000000"
+                />
             </RelativeLayout>
             <RelativeLayout
                     android:layout_width="wrap_content"

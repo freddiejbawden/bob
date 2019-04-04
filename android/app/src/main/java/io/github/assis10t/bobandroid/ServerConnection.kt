@@ -151,7 +151,7 @@ class ServerConnection {
     val getWarehouses = getWarehousesFactory(httpClient, Gson())
 
     val getWarehouseFactory = { http: OkHttpClient, gson: Gson ->
-        { warehouseId: String, onGetWarehouse: (error: Exception?, warehouse: Warehouse?) -> Unit ->
+        { context: Context, warehouseId: String, onGetWarehouse: (error: Exception?, warehouse: Warehouse?) -> Unit ->
             connect { server ->
                 getRequestFactory(http, gson)("$server/api/warehouse/$warehouseId") { error, str ->
                     if (error != null) {
@@ -160,8 +160,26 @@ class ServerConnection {
                         val response = gson.fromJson(str!!, GetWarehouseResponse::class.java)
                         val warehouse = response.warehouse
                         if (warehouse != null) {
-                            // Remove items that are out of stock.
-                            warehouse.items = warehouse.items.filter { it.quantity != null && it.quantity > 0 }
+                            // Reduce stock by what's already in the cart & remove items out of stock.
+                            val cartItems = getCart(context).items
+                            warehouse.items = warehouse.items
+                                .map { item ->
+                                    if (item.quantity == null)
+                                        return@map item
+                                    else
+                                        return@map Item(
+                                            item._id,
+                                            item.warehouseId,
+                                            item.name,
+                                            item.image,
+                                            item.position,
+                                            item.quantity - (cartItems[item._id]?.quantity ?: 0.0),
+                                            item.unit,
+                                            item.price,
+                                            item.size
+                                        )
+                                }
+                                .filter { item -> item.quantity != null && item.quantity > 0 }
                         }
                         onGetWarehouse(null, response.warehouse)
                     }

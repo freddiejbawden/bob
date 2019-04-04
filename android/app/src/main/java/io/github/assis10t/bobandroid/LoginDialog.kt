@@ -9,14 +9,17 @@ import android.widget.Toast
 import kotlinx.android.synthetic.main.dialog_login.*
 import org.jetbrains.anko.toast
 
-class LoginDialog(context: Context, val onResult: ((loggedIn: Boolean) -> Unit)? = null) : Dialog(context) {
+class LoginDialog(context: Context, private val onResult: ((loggedIn: Boolean) -> Unit)? = null) : Dialog(context) {
+
+    private var shouldTriggerOnResult = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.dialog_login)
 
         setOnDismissListener {
-            onResult?.invoke(ServerConnection().isLoggedIn(context))
+            if (shouldTriggerOnResult)
+                onResult?.invoke(ServerConnection().isLoggedIn(context))
         }
 
         login_button.setOnClickListener {
@@ -25,7 +28,7 @@ class LoginDialog(context: Context, val onResult: ((loggedIn: Boolean) -> Unit)?
                 username.text.toString()
             ) { err, user ->
                 if (err != null) {
-                    Toast.makeText(context, "An error occured while logging in.", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, err.message, Toast.LENGTH_LONG).show()
                 } else {
                     dismiss()
                 }
@@ -33,16 +36,9 @@ class LoginDialog(context: Context, val onResult: ((loggedIn: Boolean) -> Unit)?
         }
 
         register_button.setOnClickListener {
-            ServerConnection().register(
-                context,
-                username.text.toString()
-            ) { err, user ->
-                if (err != null) {
-                    Toast.makeText(context, "An error occured while registering.", Toast.LENGTH_LONG).show()
-                } else {
-                    dismiss()
-                }
-            }
+            RegisterDialog(context, onResult).show()
+            shouldTriggerOnResult = false
+            dismiss()
         }
     }
 }

@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
 import android.os.Handler
+import android.support.design.widget.Snackbar
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -19,7 +20,7 @@ class ViewCartDialog(val activity: WarehouseActivity, val warehouseId: String): 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val data = getCart(context)
+        val data = getCart(context).items.values.toList()
         if (data.isEmpty()) {
             setContentView(R.layout.dialog_view_cart_empty)
             return
@@ -42,8 +43,14 @@ class ViewCartDialog(val activity: WarehouseActivity, val warehouseId: String): 
 
         clear.setOnClickListener {
             clearCart(context)
-            if (context is WarehouseActivity)
-                (context as WarehouseActivity).refreshItems()
+            activity.refreshItems()
+            Snackbar.make(snackbarView(activity), "Cleared your shopping cart", Snackbar.LENGTH_LONG)
+                .setAction("Undo") {
+                    data.forEach { addToCart(activity, it) }
+                    ViewCartDialog(activity, warehouseId).show()
+                    activity.refreshItems()
+                }
+                .show()
             dismiss()
         }
 
@@ -96,7 +103,7 @@ class ViewCartDialog(val activity: WarehouseActivity, val warehouseId: String): 
         override fun onBindViewHolder(vh: ViewHolder, pos: Int) {
             val item = items[pos]
             vh.name.text = item.name
-            vh.quantity.text = "${item.quantity}"
+            vh.quantity.text = "${item.quantity?.toInt()}"
             vh.price.text =
                 if (item.unit == null)
                     "£${"%.2f".format(item.price)}"

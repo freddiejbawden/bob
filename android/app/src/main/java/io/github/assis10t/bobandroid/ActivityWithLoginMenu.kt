@@ -5,10 +5,12 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.os.PersistableBundle
+import android.support.design.widget.Snackbar
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import org.jetbrains.anko.toast
 import timber.log.Timber
@@ -16,9 +18,15 @@ import timber.log.Timber
 @SuppressLint("Registered")
 open class ActivityWithLoginMenu: AppCompatActivity() {
 
-    private val authListener = { isLoggedIn: Boolean ->
+    private val authListener: (Boolean) -> Unit = { isLoggedIn: Boolean ->
         Timber.d("Is logged in? $isLoggedIn")
         invalidateOptionsMenu()
+        val username = ServerConnection().getCurrentUsername(this)
+        if (username != null) {
+            Snackbar.make(snackbarView(this), "Welcome, $username!", Snackbar.LENGTH_SHORT).show()
+        } else {
+            Snackbar.make(snackbarView(this), "Logged out successfully.", Snackbar.LENGTH_LONG).show()
+        }
     }
 
     override fun onStart() {
@@ -72,7 +80,6 @@ open class ActivityWithLoginMenu: AppCompatActivity() {
                         Toast.makeText(this, err.message, Toast.LENGTH_SHORT).show()
                         return@logout
                     }
-                    Toast.makeText(this, "Logged out successfully.", Toast.LENGTH_SHORT).show()
                 }
                 true
             }
