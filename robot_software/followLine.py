@@ -11,12 +11,13 @@ class FollowLine:
 
 
     MARKING_NUMBER = 1  # number of consecutive colour readings to detect marking
-    MARKING_INTERVAL = 1.6  # time between marking checks in seconds
+    MARKING_INTERVAL = 4  # time between marking checks in seconds
     reverse = False
 
     BLACK = 1  # black reading from colour sensor in COL-COLOR mode
     BLUE = 2  # blue reading from colour sensor in COL-COLOR mode
     GREEN = 3  # green reading from colour sensor in COL-COLOR mode
+    RED = 5  # red reading from colour sensor in COL-COLOR mode
 
     CORRECTION_TIME = 100  # time in millisecond Bob moves away from blue line to correct sideways movement
     SIDEWAYS_SPEED = 1000   # how fast Bob moves when moving sideways
@@ -59,7 +60,7 @@ class FollowLine:
         # print(colour_left, colour_right)
         if colour_right == desired_colour and colour_left == desired_colour:
             self.consecutive_colours += 1
-            print("CONSECUTIVE COLOURS: ", self.consecutive_colours)
+            print("COLOUR DETECTED: ", desired_colour)
             if self.consecutive_colours >= self.MARKING_NUMBER:
                 self.consecutive_colours = 0
                 return True
@@ -195,11 +196,11 @@ class FollowLine:
             if direction == 'left':
                 self.cm.run_timed(time_sp=self.DT, speed_sp=self.SIDEWAYS_SPEED)
                 sleep(self.DT / 1000)
-                self.count_markings(cs_left, cs_left, self.GREEN)
+                self.count_markings(cs_left, cs_left, self.RED)
             if direction == 'right':
                 self.cm.run_timed(time_sp=self.DT, speed_sp=-self.SIDEWAYS_SPEED)
                 sleep(self.DT / 1000)
-                self.count_markings(cs_right, cs_right, self.GREEN)
+                self.count_markings(cs_right, cs_right, self.RED)
 
             if self.marker_counter >= distance:
                 return

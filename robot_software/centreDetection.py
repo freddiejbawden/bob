@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 
 def centre_detection():
+    print('before')
     cap = cv2.VideoCapture(0)
     cap_width = int(cap.get(3))
     cap_height = int(cap.get(4))
@@ -10,6 +11,10 @@ def centre_detection():
 
     # Capture frame-by-frame
     ret, frame = cap.read()
+    print('after')
+    cv2.imshow('frame', frame)
+    cv2.waitKey(5000)
+
     edges = cv2.Canny(frame,100,200)
 
 
@@ -19,8 +24,7 @@ def centre_detection():
     mask_copy = mask.copy()
 
 
-    #cv2.imshow('frame', frame)
-    #cv2.waitKey(1)
+
     #cv2.imshow('edges', edges)
     #cv2.waitKey(1)
     #cv2.imshow('mask', mask)
@@ -59,9 +63,10 @@ def centre_detection():
         print('below threshold')
         return('empty')
 
-#if __name__ == "__main__":
-#    for i in range(5000):
-#        print(centre_detection())
+if __name__ == "__main__":
+    for i in range(5000):
+        print('yeet', i)
+        centre_detection()
 
 
 
