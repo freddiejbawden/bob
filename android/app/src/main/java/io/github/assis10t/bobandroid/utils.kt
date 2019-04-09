@@ -1,15 +1,20 @@
 package io.github.assis10t.bobandroid
 
+import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.util.TypedValue
 import android.provider.SyncStateContract.Helpers.update
 import android.util.Base64
+import android.view.View
+import com.google.gson.Gson
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.MultiFormatWriter
 import com.journeyapps.barcodescanner.BarcodeEncoder
+import io.github.assis10t.bobandroid.pojo.Cart
 import io.github.assis10t.bobandroid.pojo.Item
+import kotlinx.android.synthetic.main.dialog_add_to_cart.*
 import timber.log.Timber
 import java.security.NoSuchAlgorithmException
 import java.text.SimpleDateFormat
@@ -19,32 +24,6 @@ import java.util.*
 
 fun dp(context: Context, dp: Float) =
     TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, context.resources.displayMetrics)
-
-//From: http://www.kospol.gr/204/create-md5-hashes-in-android/
-fun md5(s: String): String {
-    try {
-        // Create MD5 Hash
-        val digest = java.security.MessageDigest
-            .getInstance("MD5")
-        digest.update(s.toByteArray())
-        val messageDigest = digest.digest()
-
-        // Create Hex String
-        val hexString = StringBuffer()
-        for (i in messageDigest.indices) {
-            var h = Integer.toHexString(0xFF and messageDigest[i].toInt())
-            while (h.length < 2)
-                h = "0$h"
-            hexString.append(h)
-        }
-        return hexString.toString()
-
-    } catch (e: NoSuchAlgorithmException) {
-        e.printStackTrace()
-    }
-
-    return ""
-}
 
 fun getCurrentTimeString(): String {
     val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.UK)
@@ -56,20 +35,41 @@ fun parseISODate(str: String): Date {
     return sdf.parse(str)
 }
 
-fun addToCart(context: Context, i: Item) {
+fun addToCart(context: Context, item: Item): Boolean {
+    if (item._id == null || item.quantity == null) {
+        return false
+    }
     val preferences = context.getSharedPreferences("bob", Context.MODE_PRIVATE)
-    val cart = context.getSharedPreferences("bob", Context.MODE_PRIVATE).getStringSet("cart", setOf()).toMutableSet()
-    cart.add(i.toString())
+    val cart = getCart(context)
+
+    val cartItem = cart.items[item._id]
+    val newCartItem = Item(
+        item._id,
+        item.warehouseId,
+        item.name,
+        null,
+        item.position,
+        (cartItem?.quantity ?: 0.0) + item.quantity,
+        item.unit,
+        item.price,
+        item.size
+    )
+    cart.items[item._id] = newCartItem
+
     preferences.edit()
-        .putStringSet("cart", cart)
+        .putString("cart", Gson().toJson(cart))
         .commit()
+    return true
 }
 
-fun getCart(context: Context) = context
-    .getSharedPreferences("bob", Context.MODE_PRIVATE)
-    .getStringSet("cart", setOf())
-    .toList()
-    .map { Item.fromString(it) }
+fun getCart(context: Context): Cart =
+    Gson().fromJson(
+        context
+            .getSharedPreferences("bob", Context.MODE_PRIVATE)
+            .getString("cart", Gson().toJson(Cart())),
+        Cart::class.java
+    )
+
 
 fun clearCart(context: Context) {
     val preferences = context.getSharedPreferences("bob", Context.MODE_PRIVATE)
@@ -87,3 +87,7 @@ fun generateQRCode(str: String): Bitmap {
     val bitMatrix = MultiFormatWriter().encode(str, BarcodeFormat.QR_CODE, 300, 300)
     return BarcodeEncoder().createBitmap(bitMatrix)
 }
+
+fun snackbarView(activity: Activity): View
+        = activity.findViewById(R.id.view_cart)
+        ?: activity.findViewById(android.R.id.content)

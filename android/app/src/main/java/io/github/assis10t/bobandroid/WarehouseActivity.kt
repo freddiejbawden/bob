@@ -55,7 +55,7 @@ class WarehouseActivity : ActivityWithLoginMenu() {
 
     fun refreshItems() {
         container.isRefreshing = true
-        ServerConnection().getWarehouse(warehouseId) { err, warehouse ->
+        ServerConnection().getWarehouse(this, warehouseId) { err, warehouse ->
             container.isRefreshing = false
             if (err != null) {
                 Timber.e("getWarehouse failed. $err")

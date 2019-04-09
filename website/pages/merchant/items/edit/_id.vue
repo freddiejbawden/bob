@@ -3,7 +3,7 @@
         <section class="section pt60 pt30t pb0">
             <div class="container has-text-centered">
                 <h1 class="is-inline-block is-relative mb25">
-                    Add item
+                    Edit item
                 </h1>
             </div>
         </section>
@@ -40,7 +40,7 @@
                                             <option 
                                                 :value="n - 1"
                                                 v-for="n in (warehouse.dimensions.x + 1)">
-                                                {{ n - 1 }}
+                                                {{ n }}
                                             </option>
                                         </select>
                                     </div>
@@ -53,7 +53,7 @@
                                             <option 
                                                 :value="n - 1"
                                                 v-for="n in (warehouse.dimensions.y + 1)">
-                                                {{ n - 1 }}
+                                                {{ n }}
                                             </option>
                                         </select>
                                     </div>
@@ -64,9 +64,9 @@
                                             class="input"
                                             v-model.number="item.position.z">
                                             <option 
-                                                :value="n - 1"
-                                                v-for="n in warehouse.dimensions.z.length">
-                                                {{ n - 1 }}
+                                                :value="i"
+                                                v-for="(height, i) in warehouse.dimensions.z">
+                                                {{ i + 1 }}: {{ height }}m
                                             </option>
                                         </select>
                                     </div>
@@ -84,9 +84,27 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="field">
+                                <div class="control">
+                                    <label class="label">Size:</label>
+                                    <p class="help is-size-8">
+                                        <i>Tiny</i> - 3 of these can fit in the robots basket, <i>Small</i> - 2 can fit, <i>Large</i> - 1 can fit.
+                                    </p>
+                                    <select 
+                                        name="size" 
+                                        id="size" 
+                                        class="input"
+                                        v-model="item.size">
+                                        
+                                        <option value="tiny">Tiny</option>
+                                        <option value="small">Small</option>
+                                        <option value="large">Large</option>
+                                    </select>
+                                </div>
+                            </div>
                             <div class="field" v-if="warehouse.dimensions">
                                 <div class="control">
-                                    <label class="label">Price:</label>
+                                    <label class="label">Price (in GBP):</label>
                                     <input class="input" type="number" placeholder="Enter item price" v-model.number="item.price">
                                 </div>
                             </div>

@@ -42,6 +42,7 @@
                                 <td>Position</td>
                                 <td>Quantity</td>
                                 <td>Unit</td>
+                                <td>Size</td>
                                 <td>Price</td>
                                 <td>Edit items</td>
                                 <td>Delete items</td>
@@ -58,13 +59,16 @@
                                 <td>
                                     X: <i>{{ item.position ? item.position.x : 'not set' }},</i>
                                     Y: <i>{{ item.position ? item.position.y : 'not set' }}</i> <br>
-                                    Shelf: <i>{{ item.position ? item.position.z : 'not set' }} </i><br>
+                                    Shelf: <i>{{ item.position ? item.position.z + 1 : 'not set' }} </i><br>
                                 </td>
                                 <td>
                                     {{ item.quantity }}
                                 </td>
                                 <td>
-                                    {{ item.unit }}
+                                    {{ item.unit ? item.unit : '-' }}
+                                </td>
+                                <td>
+                                    {{ item.size }}
                                 </td>
                                 <td>
                                     {{ item.price }} GBP

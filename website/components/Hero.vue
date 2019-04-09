@@ -34,7 +34,7 @@
                             width="120%" 
                             height="100%"
                             x="-10%"
-                            xlink:href="~/assets/images/hero.png" 
+                            xlink:href="~/assets/images/bob-hero.jpg" 
                             v-for="(slide, i) in slides" 
                             :key="'img' + i"></image>
                         <rect x="0" y="0" width="100%" height="100%" fill="#646464" fill-opacity="0.15"></rect>
@@ -63,15 +63,14 @@
                         lines: 5,
                         text: slide.title
                     }"></h1> -->
-                    <h1 class="mt0">
-                        {{ slide.title }}
+                    <h1 class="mt0" v-html="slide.title">
                     </h1>
                     <p>
                         {{ slide.short_description }}
                     </p>
-                    <a :href="slide.path" class="button is-primary mt30">
+                    <nuxt-link :to="slide.path" class="button is-primary mt30">
                         <span>Learn more</span>
-                    </a>
+                    </nuxt-link>
                     <!-- <p v-if="!is_carousel" class="has-text-grey is-size-6 mt30">
                         Or scroll down to learn more <i class="mdi mdi-chevron-down"></i>
                     </p> -->

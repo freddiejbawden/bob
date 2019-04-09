@@ -16,7 +16,7 @@
                     <div class="box p30 pl50 pr50">
                         <form action="">
                             <div class="field">
-                                <label class="label">Item name:</label>
+                                <label class="label">* Item name:</label>
                                 <div class="control">
                                     <input class="input" type="text" placeholder="Enter item name" v-model="name">
                                 </div>
@@ -30,6 +30,9 @@
                             </div>
                             <div class="field" v-if="warehouse.dimensions">
                                 <label class="label">Position:</label>
+                                <p class="help is-size-8">
+                                    X and Y specify the row and column respectively and Z specifies which shelf the product will be on.
+                                </p>
                                 <div class="control columns">
                                     <div class="column is-4">
                                         <select 
@@ -40,7 +43,7 @@
                                             <option 
                                                 :value="n - 1"
                                                 v-for="n in (warehouse.dimensions.x + 1)">
-                                                {{ n - 1 }}
+                                                {{ n }}
                                             </option>
                                         </select>
                                     </div>
@@ -53,7 +56,7 @@
                                             <option 
                                                 :value="n - 1"
                                                 v-for="n in (warehouse.dimensions.y + 1)">
-                                                {{ n - 1 }}
+                                                {{ n }}
                                             </option>
                                         </select>
                                     </div>
@@ -64,9 +67,9 @@
                                             class="input"
                                             v-model.number="position.z">
                                             <option 
-                                                :value="n - 1"
-                                                v-for="n in warehouse.dimensions.z.length">
-                                                {{ n - 1 }}
+                                                :value="i"
+                                                v-for="(height, i) in warehouse.dimensions.z">
+                                                {{ i + 1 }}: {{ height }}m
                                             </option>
                                         </select>
                                     </div>
@@ -75,18 +78,39 @@
                             <div class="field" v-if="warehouse.dimensions">
                                 <div class="control columns">
                                     <div class="column is-6">
-                                        <label class="label">Quantity:</label>
+                                        <label class="label">* Quantity:</label>
                                         <input class="input" type="number" placeholder="Enter item quantity" v-model.number="quantity">
                                     </div>
                                     <div class="column is-6">
                                         <label class="label">Unit:</label>
-                                        <input class="input" type="text" placeholder="Enter measerment unit" v-model="unit">
+                                        <input class="input" type="text" placeholder="Enter measurment unit" v-model="unit">
+                                        <p class="help is-size-8 mb0">
+                                            <i>kg</i>, <i>lbs</i>, <i>litres</i>, etc... or blank.
+                                        </p>
                                     </div>
                                 </div>
                             </div>
-                            <div class="field" v-if="warehouse.dimensions">
+                            <div class="field">
                                 <div class="control">
-                                    <label class="label">Price:</label>
+                                    <label class="label">Size:</label>
+                                    <p class="help is-size-8">
+                                        <i>Tiny</i> - 3 of these can fit in the robots basket, <i>Small</i> - 2 can fit, <i>Large</i> - 1 can fit.
+                                    </p>
+                                    <select 
+                                        name="size" 
+                                        id="size" 
+                                        class="input"
+                                        v-model="size">
+                                        
+                                        <option value="tiny">Tiny</option>
+                                        <option value="small">Small</option>
+                                        <option value="large">Large</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="control">
+                                    <label class="label">* Price (in GBP):</label>
                                     <input class="input" type="number" placeholder="Enter item price" v-model.number="price">
                                 </div>
                             </div>
@@ -125,16 +149,17 @@ export default {
             warehouseId: this.$nuxt._route.params.id,
             warehouse: {},
 
-            name: null,
+            name: "",
             image: null,
             position: {
                 x: 0,
                 y: 0,
                 z: 0,
             },
-            quantity: null,
+            quantity: "",
             unit: null,
-            price: null
+            size: 'tiny',
+            price: ""
         }
     },
     methods: {
@@ -177,6 +202,7 @@ export default {
                         position: this.position,
                         quantity: this.quantity,
                         unit: this.unit,
+                        size: this.size,
                         price: this.price,
                     }, {
                         headers: {
@@ -199,7 +225,7 @@ export default {
     },
     computed: {
         can_submit: function () {
-            return this.name && this.quantity && this.price
+            return this.name.toString().length > 0 && this.quantity.toString().length > 0 && this.price.toString().length > 0
         }
     },
     mounted: function () {

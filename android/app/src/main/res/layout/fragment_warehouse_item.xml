@@ -15,6 +15,10 @@
             android:src="@drawable/banana"
             android:scaleType="center"
     />
+    <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/gradient_price_overlay" />
     <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -35,9 +39,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="£5.99"
-                android:layout_gravity="end|bottom"
+                android:layout_gravity="end|top"
                 android:textColor="@color/white"
-                android:layout_margin="8dp"
+                android:padding="8dp"
         />
     </FrameLayout>
 </android.support.v7.widget.CardView>

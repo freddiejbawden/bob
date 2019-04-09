@@ -104,7 +104,7 @@ app.post(
 )
 app.get('/api/warehouse/:warehouseId', (req, res, next) => {
     model
-        .getWarehouseById(req.params.warehouseId)
+        .getWarehouseWithItemsById(req.params.warehouseId)
         .then(warehouse => res.status(warehouse ? 200 : 404).json({ success: true, warehouse }))
         .catch(next)
 })

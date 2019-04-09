@@ -33,9 +33,9 @@ db.init()
             await db.dropDatabase()
             if (FAKE_DATA) {
                 await utils.loadDBwithData(db, fakeData)
-                res.send('Deleted all data and reloaded with fake data.')
+                res.json({ success: true, message: 'Deleted all data and reloaded with fake data.' })
             } else {
-                res.send('Deleted all data.')
+                res.json({ success: true, message: 'Deleted all data.' })
             }
         })
 

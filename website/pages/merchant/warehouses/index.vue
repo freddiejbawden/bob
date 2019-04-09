@@ -21,7 +21,7 @@
                                 <td>Location</td>
                                 <td>Dimensions</td>
                                 <td>Shelves count</td>
-                                <td>Items count</td>
+                                <!-- <td>Items count</td> -->
                                 <td>View warehouse</td>
                                 <td>Edit warehouse</td>
                                 <td>Delete warehouse</td>
@@ -33,8 +33,13 @@
                                     <b>{{ warehouse.name }}</b>
                                 </td>
                                 <td>
-                                    {{ warehouse.location ? warehouse.location.latitude : 'not set' }}, 
-                                    {{ warehouse.location ? warehouse.location.longitude : 'not set' }} 
+                                    <a :href="'https://www.google.com/maps/search/?api=1&query=' + warehouse.location.latitude + ',' + warehouse.location.longitude" target="_blank" v-if="warehouse.location">
+                                        {{ warehouse.location.latitude }}, 
+                                        {{ warehouse.location.longitude }} 
+                                    </a>
+                                    <span v-else>
+                                        not set
+                                    </span>
                                 </td>
                                 <td>
                                     X: {{ warehouse.dimensions ? warehouse.dimensions.x : 'not set' }}, 
@@ -43,9 +48,9 @@
                                 <td>
                                     {{ warehouse.dimensions ? warehouse.dimensions.z.length : 0 }}
                                 </td>
-                                <td>
+                                <!-- <td>
                                     {{ warehouse.items ? warehouse.items.length : 0 }}
-                                </td>
+                                </td> -->
                                 <td>
                                     <nuxt-link :to="'/merchant/warehouses/' + warehouse._id" class="has-text-info">
                                         <i class="mdi mdi-eye"></i>

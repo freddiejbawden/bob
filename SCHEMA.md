@@ -31,7 +31,8 @@ Item {
     "position": Position,
     "quantity": Double,
     "unit": String (or null if there is no unit),
-    "price": Double // In GBP
+    "price": Double, // In GBP
+    "size": "tiny", "small", "large" // Tiny - 3 of these can fit in bob, Small - 2 can fit, Large - 1 can fit
 }
 
 Position {

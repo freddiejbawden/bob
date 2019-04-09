@@ -10,6 +10,30 @@
             <div class="container">
                 <div class="box">
                     <div class="columns">
+                        <div class="column is-6 is-flex justify-center direction-column p40">
+                            <h3>The Bob App</h3>
+                            <p>
+                                The Bob app is central to the customers experience. 
+                            </p>
+                            <p>
+                                From the app they will be able order the food they want, and choose when they want to collect it. 
+                            </p>
+                            <p>
+                                They will also receive a notification, alongside a QR code which can be used to collect the order.
+                            </p>
+                        </div>
+                        <div class="column is-6 is-flex align-center justify-center p40-0">
+                            <img class="half-width" src="~/assets/images/app-screen.jpg">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="container">
+                <div class="box">
+                    <div class="columns">
                         <div class="column is-6 is-flex align-center justify-center">
                             <img src="~/assets/images/bob-app-icon.png">
                         </div>

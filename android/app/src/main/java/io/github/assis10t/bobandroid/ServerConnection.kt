@@ -25,6 +25,7 @@ class ServerConnection {
         val httpClient: OkHttpClient = OkHttpClient()
 
         val onConnectedListeners: MutableList<(serverAddress: String) -> Unit> = mutableListOf()
+        private val authListeners: MutableList<(loggedIn: Boolean) -> Unit> = mutableListOf()
 
         fun initialize() {
             doAsync {
@@ -150,7 +151,7 @@ class ServerConnection {
     val getWarehouses = getWarehousesFactory(httpClient, Gson())
 
     val getWarehouseFactory = { http: OkHttpClient, gson: Gson ->
-        { warehouseId: String, onGetWarehouse: (error: Exception?, warehouse: Warehouse?) -> Unit ->
+        { context: Context, warehouseId: String, onGetWarehouse: (error: Exception?, warehouse: Warehouse?) -> Unit ->
             connect { server ->
                 getRequestFactory(http, gson)("$server/api/warehouse/$warehouseId") { error, str ->
                     if (error != null) {
@@ -159,8 +160,26 @@ class ServerConnection {
                         val response = gson.fromJson(str!!, GetWarehouseResponse::class.java)
                         val warehouse = response.warehouse
                         if (warehouse != null) {
-                            // Remove items that are out of stock.
-                            warehouse.items = warehouse.items.filter { it.quantity != null && it.quantity > 0 }
+                            // Reduce stock by what's already in the cart & remove items out of stock.
+                            val cartItems = getCart(context).items
+                            warehouse.items = warehouse.items
+                                .map { item ->
+                                    if (item.quantity == null)
+                                        return@map item
+                                    else
+                                        return@map Item(
+                                            item._id,
+                                            item.warehouseId,
+                                            item.name,
+                                            item.image,
+                                            item.position,
+                                            item.quantity - (cartItems[item._id]?.quantity ?: 0.0),
+                                            item.unit,
+                                            item.price,
+                                            item.size
+                                        )
+                                }
+                                .filter { item -> item.quantity != null && item.quantity > 0 }
                         }
                         onGetWarehouse(null, response.warehouse)
                     }
@@ -213,19 +232,22 @@ class ServerConnection {
         context.getSharedPreferences("bob", Context.MODE_PRIVATE).getString("username", null)
     }
 
+    @SuppressLint("ApplySharedPref")
     private val setCurrentUsername = { context: Context, username: String? ->
         if (username == null) {
             context
                 .getSharedPreferences("bob", Context.MODE_PRIVATE)
                 .edit()
                 .remove("username")
-                .apply()
+                .commit()
+            authListeners.forEach { it(false) }
         } else {
             context
                 .getSharedPreferences("bob", Context.MODE_PRIVATE)
                 .edit()
                 .putString("username", username)
-                .apply()
+                .commit()
+            authListeners.forEach { it(true) }
         }
     }
 
@@ -248,6 +270,7 @@ class ServerConnection {
 
     val logout = { context: Context, onLogoutComplete: ((error: Exception?) -> Unit)? ->
         setCurrentUsername(context, null)
+        Timber.d("Logged out.")
         onLogoutComplete?.invoke(null)
     }
 
@@ -267,4 +290,29 @@ class ServerConnection {
         }
     }
     val register = registerFactory(httpClient, Gson())
+
+    val deleteMyDataFactory = { http: OkHttpClient, gson: Gson ->
+        { context: Context, onDeleteMyData: (error: Exception?) -> Unit ->
+            connect { server ->
+                getRequestFactory(http, gson)("$server/api/reset") { error, str ->
+                    if (error != null) {
+                        onDeleteMyData(error)
+                    } else {
+                        logout(context) {_ ->
+                            onDeleteMyData(null)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    val deleteMyData = deleteMyDataFactory(httpClient, Gson())
+
+    fun addAuthListener(listener: (loggedIn: Boolean) -> Unit) {
+        authListeners.add(listener)
+    }
+
+    fun removeAuthListener(listener: (loggedIn: Boolean) -> Unit) {
+        authListeners.remove(listener)
+    }
 }
